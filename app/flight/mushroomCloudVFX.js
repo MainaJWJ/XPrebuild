@@ -168,6 +168,15 @@
           return vec2(nearT, farT);
         }
 
+        vec3 aces(vec3 x) {
+          const float a = 2.51;
+          const float b = 0.03;
+          const float c = 2.43;
+          const float d = 0.59;
+          const float e = 0.14;
+          return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+        }
+
         void main() {
           vec3 ro = uCameraPosition - uExplosionPos; // Localized Camera position
           vec3 rd = normalize(vWorldPosition - uCameraPosition); // Ray direction
@@ -189,7 +198,7 @@
             float density = sampleValue.x;
             float temperature = sampleValue.y;
             if (density > .012) {
-              float absorption = density * stepSize * .145;
+              float absorption = density * (stepSize / uScale) * .145;
               float alpha = 1.0 - exp(-absorption);
               vec3 cold = mix(vec3(.025, .022, .02), vec3(.14, .105, .085), density);
               vec3 hot = mix(vec3(.55, .055, .005), vec3(1.0, .52, .06), temperature);
@@ -198,7 +207,7 @@
               float edgeLight = clamp(density * .72 + temperature * .95, 0.0, 1.0);
               localColor *= mix(.7, 1.3, edgeLight);
               color += transmittance * alpha * localColor;
-              color += transmittance * temperature * temperature * stepSize
+              color += transmittance * temperature * temperature * (stepSize / uScale)
                 * vec3(.18, .035, .003) * uFireIntensity;
               transmittance *= 1.0 - alpha;
             }
@@ -207,7 +216,7 @@
 
           float alpha = 1.0 - transmittance;
           if (alpha < .01) discard;
-          gl_FragColor = vec4(color, alpha);
+          gl_FragColor = vec4(aces(color), alpha);
         }
     `;
 
@@ -260,6 +269,15 @@
                      mix(hash(i + vec2(0,1)), hash(i + vec2(1,1)), f.x), f.y);
         }
 
+        vec3 aces(vec3 x) {
+          const float a = 2.51;
+          const float b = 0.03;
+          const float c = 2.43;
+          const float d = 0.59;
+          const float e = 0.14;
+          return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+        }
+
         void main() {
           vec2 p = vUv - .5;
           float d = length(p);
@@ -273,7 +291,7 @@
           if (vType > .5) cold *= 1.8;
           vec3 ember = mix(vec3(.22,.025,.003), vec3(1.2,.68,.15), hot);
           vec3 color = mix(cold, ember, smoothstep(.20, .80, hot));
-          gl_FragColor = vec4(color, vAlpha * shape * uSmokeDensity);
+          gl_FragColor = vec4(aces(color), vAlpha * shape * uSmokeDensity);
         }
     `;
 
@@ -367,6 +385,15 @@
                      mix(hash(i + vec2(0,1)), hash(i + vec2(1,1)), f.x), f.y);
         }
 
+        vec3 aces(vec3 x) {
+          const float a = 2.51;
+          const float b = 0.03;
+          const float c = 2.43;
+          const float d = 0.59;
+          const float e = 0.14;
+          return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+        }
+
         void main() {
           vec2 uv = gl_PointCoord - .5;
           float c = cos(vRotation), s = sin(vRotation);
@@ -381,12 +408,79 @@
 
           float hot = clamp(vTemperature, 0.0, 1.0);
           vec3 cold = mix(vec3(.035,.032,.03), vec3(.22,.19,.17), clamp(vDensity,0.0,1.0));
-          vec3 ember = mix(vec3(.20,.025,.004), vec3(.82,.24,.025), hot);
+          vec3 ember = mix(vec3(.20,.025,.004), vec3(1.2,.68,.15), hot);
           vec3 fire = mix(ember, vec3(1.0,.62,.16), smoothstep(.82, 1.0, hot));
           vec3 color = mix(cold, fire, smoothstep(.34, .88, hot));
           if (vType > 1.5) color = mix(vec3(.07,.055,.045), vec3(.35,.13,.035), hot * .45);
           float alpha = vAlpha * shape * mix(.55, 1.0, n) * uSmokeDensity;
-          gl_FragColor = vec4(color, alpha);
+          gl_FragColor = vec4(aces(color), alpha);
+        }
+    `;
+
+    const fireballVert = `
+        uniform float uTime;
+        uniform float uNoiseStrength;
+        varying vec3 vNormal;
+        varying vec3 vWorldPosition;
+
+        float hash(vec3 p) {
+          p = fract(p * 0.3183099 + .1);
+          p *= 17.0;
+          return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+        }
+
+        float noise(vec3 p) {
+          vec3 i = floor(p);
+          vec3 f = fract(p);
+          f = f * f * (3.0 - 2.0 * f);
+          return mix(mix(mix(hash(i), hash(i + vec3(1,0,0)), f.x),
+                         mix(hash(i + vec3(0,1,0)), hash(i + vec3(1,1,0)), f.x), f.y),
+                     mix(mix(hash(i + vec3(0,0,1)), hash(i + vec3(1,0,1)), f.x),
+                         mix(hash(i + vec3(0,1,1)), hash(i + vec3(1,1,1)), f.x), f.y), f.z);
+        }
+
+        void main() {
+          vec3 p = position;
+          float n = noise(normal * 3.2 + uTime * .9) + .5 * noise(normal * 7.0 - uTime * 1.4);
+          p += normal * (n - .72) * uNoiseStrength;
+          vec4 world = modelMatrix * vec4(p, 1.0);
+          vWorldPosition = world.xyz;
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * viewMatrix * world;
+        }
+    `;
+
+    const fireballFrag = `
+        uniform float uTime;
+        uniform float uOpacity;
+        uniform float uIntensity;
+        uniform vec3 uCoreColor;
+        uniform vec3 uEdgeColor;
+        uniform vec3 uExplosionPos;
+        varying vec3 vNormal;
+        varying vec3 vWorldPosition;
+
+        float hash(vec3 p) {
+          return fract(sin(dot(p, vec3(127.1,311.7,74.7))) * 43758.5453);
+        }
+
+        vec3 aces(vec3 x) {
+          const float a = 2.51;
+          const float b = 0.03;
+          const float c = 2.43;
+          const float d = 0.59;
+          const float e = 0.14;
+          return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+        }
+
+        void main() {
+          vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+          float facing = max(dot(vNormal, viewDir), 0.0);
+          float rim = pow(1.0 - facing, 1.8);
+          float flicker = .86 + .14 * sin(uTime * 12.0 + hash(floor((vWorldPosition - uExplosionPos) * 2.0)) * 6.283);
+          vec3 color = mix(uCoreColor, uEdgeColor, smoothstep(.15, .92, rim));
+          color *= uIntensity * flicker * (1.35 - rim * .45);
+          gl_FragColor = vec4(aces(color), uOpacity * smoothstep(0.0, .12, facing));
         }
     `;
 
@@ -488,7 +582,7 @@
                     uDensity: { value: 1 },
                     uTurbulence: { value: 1 },
                     uFireIntensity: { value: 1 },
-                    uStepCount: { value: 44 },
+                    uStepCount: { value: 96 },
                     uBoxMin: { value: this.activeBoxMin.clone() },
                     uBoxMax: { value: this.activeBoxMax.clone() },
                     uCameraPosition: { value: new THREE.Vector3() },
@@ -508,9 +602,14 @@
 
         update(_delta, timeline, params) {
             this.mesh.visible = timeline.time > .02;
+            const scale = params.explosionScale;
+            this.mesh.scale.setScalar(scale);
+            const center = new THREE.Vector3(0, 27.5, 0);
+            this.mesh.position.copy(center).multiplyScalar(scale);
+
             const uniforms = this.mesh.material.uniforms;
             uniforms.uTime.value = timeline.time;
-            uniforms.uScale.value = params.explosionScale;
+            uniforms.uScale.value = scale;
             uniforms.uFireball.value = timeline.fireball;
             uniforms.uStemRise.value = timeline.stemRise;
             uniforms.uCapSpread.value = timeline.capSpread;
@@ -522,9 +621,8 @@
             uniforms.uDensity.value = params.smokeDensity * .92;
             uniforms.uTurbulence.value = params.turbulenceStrength;
             uniforms.uFireIntensity.value = params.fireballIntensity;
-            uniforms.uStepCount.value = Math.min(128, params.volumeSteps + (1 - timeline.headGrowth) * 12);
+            uniforms.uStepCount.value = Math.min(256, params.volumeSteps + (1 - timeline.headGrowth) * 18);
             
-            const scale = params.explosionScale;
             const capY = (4 + 43 * timeline.headRise) * scale;
             const capRadius = (7.5 + 14 * timeline.headGrowth) * scale;
             const capThickness = (5.8 + 9.2 * timeline.headGrowth) * scale;
@@ -545,11 +643,82 @@
         }
     }
 
+    // --- 4.5 Additive Fireball Core ---
+    class Fireball {
+        constructor(scene, explosionPos) {
+            this.explosionPos = explosionPos;
+            this.group = new THREE.Group();
+            this.group.position.y = 2.2;
+            scene.add(this.group);
+            this.layers = [];
+
+            const configs = [
+                { scale: 1, core: 0xffffdf, edge: 0xff5b08, opacity: 1, noise: 1.05 },
+                { scale: 1.18, core: 0xffd64a, edge: 0x7b1002, opacity: .42, noise: 1.7 },
+                { scale: .72, core: 0xffffff, edge: 0xffb018, opacity: .7, noise: .65 }
+            ];
+            for (const cfg of configs) {
+                const material = new THREE.ShaderMaterial({
+                    vertexShader: fireballVert,
+                    fragmentShader: fireballFrag,
+                    transparent: true,
+                    depthWrite: false,
+                    blending: THREE.AdditiveBlending,
+                    uniforms: {
+                        uTime: { value: 0 },
+                        uNoiseStrength: { value: cfg.noise },
+                        uOpacity: { value: 0 },
+                        uIntensity: { value: 1 },
+                        uCoreColor: { value: new THREE.Color(cfg.core) },
+                        uEdgeColor: { value: new THREE.Color(cfg.edge) },
+                        uExplosionPos: { value: explosionPos.clone() }
+                    }
+                });
+                const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 64), material);
+                mesh.userData.cfg = cfg;
+                this.group.add(mesh);
+                this.layers.push(mesh);
+            }
+        }
+
+        reset() {
+            this.group.visible = false;
+        }
+
+        update(_delta, timeline, params) {
+            const time = timeline.time;
+            const active = time >= 0.05 && time < 9.0;
+            this.group.visible = active;
+            if (!active) return;
+            const t = clamp01((time - .05) / 8.5);
+            const expansion = Math.pow(t, .34);
+            const fade = 1 - clamp01((time - 3.5) / 5.0);
+            const base = params.explosionScale * (0.28 + expansion * 4.5);
+            this.group.position.y = (1.5 + expansion * 2.9) * params.explosionScale;
+            this.layers.forEach((mesh, i) => {
+                const pulse = 1 + Math.sin(time * (5.1 + i) + i * 2.3) * .045;
+                mesh.scale.setScalar(base * mesh.userData.cfg.scale * pulse);
+                mesh.rotation.set(time * .18 * (i + 1), time * .12 * (i + 1), time * .09);
+                mesh.material.uniforms.uTime.value = time + i * 4.1;
+                mesh.material.uniforms.uOpacity.value = fade * mesh.userData.cfg.opacity;
+                mesh.material.uniforms.uIntensity.value = params.fireballIntensity * (1.25 - t * .35);
+                mesh.material.uniforms.uExplosionPos.value.copy(this.explosionPos);
+            });
+        }
+
+        dispose() {
+            for (const mesh of this.layers) {
+                mesh.geometry.dispose();
+                mesh.material.dispose();
+            }
+        }
+    }
+
     // --- 5. Ground Shockwave Ring ---
     class Shockwave {
         constructor(scene, explosionPos) {
             this.explosionPos = explosionPos;
-            const geometry = new THREE.RingGeometry(.82, 1, 128, 6); // Reduced segments for game performance (384/18 -> 128/6)
+            const geometry = new THREE.RingGeometry(.82, 1, 128, 6);
             const material = new THREE.ShaderMaterial({
                 vertexShader: shockwaveVert,
                 fragmentShader: shockwaveFrag,
@@ -567,7 +736,7 @@
             });
             this.mesh = new THREE.Mesh(geometry, material);
             this.mesh.rotation.x = -Math.PI / 2;
-            this.mesh.position.y = .035;
+            this.mesh.position.y = 100.035;
             scene.add(this.mesh);
         }
 
@@ -596,7 +765,7 @@
 
     // --- 6. Ground Dust Storm (Points) ---
     class GroundDust {
-        constructor(scene, turbulence, maxCount = 20000) { // Reduced max particles for game (60000 -> 20000)
+        constructor(scene, turbulence, maxCount = 40000) {
             this.turbulence = turbulence;
             this.maxCount = maxCount;
             this.activeCount = 0;
@@ -656,12 +825,12 @@
                 const radius = (.4 + r2 * 2.6) * scale;
                 const p = i * 3;
                 this.position[p] = Math.cos(angle) * radius;
-                this.position[p + 1] = .2 + r3 * 1.05;
+                this.position[p + 1] = (.2 + r3 * 1.05) * scale;
                 this.position[p + 2] = Math.sin(angle) * radius;
                 
                 const speed = (4.6 + r2 * 8.0) * scale * (.78 + Math.sin(angle * 5.0) * .16);
                 this.velocity[p] = Math.cos(angle) * speed;
-                this.velocity[p + 1] = 1.8 + r3 * 4.8;
+                this.velocity[p + 1] = (1.8 + r3 * 4.8) * scale;
                 this.velocity[p + 2] = Math.sin(angle) * speed;
                 this.age[i] = 0;
                 this.lifetime[i] = 16.0 + r2 * 12.0;
@@ -695,9 +864,10 @@
         update(delta, timeline, params) {
             const time = timeline.time;
             if (time > .45 && time < 3.6) {
-                this.spawn(Math.ceil(delta * 1200 * params.dustAmount), params.explosionScale); // Scaled down spawn rate (3300 -> 1200)
+                this.spawn(Math.ceil(delta * 2400 * params.dustAmount), params.explosionScale);
             }
             const dt = Math.min(delta, .033);
+            const scale = params.explosionScale;
             for (let i = 0; i < this.activeCount; i++) {
                 const p = i * 3;
                 this.age[i] += dt;
@@ -707,13 +877,13 @@
                     continue;
                 }
                 this.force.set(this.position[p], this.position[p + 1], this.position[p + 2]);
-                this.turbulence.getForce(this.force, time, this.force).multiplyScalar(params.turbulenceStrength * 1.2);
+                this.turbulence.getForce(this.force, time, this.force).multiplyScalar(params.turbulenceStrength * 1.2 * scale);
                 this.velocity[p] += this.force.x * dt;
-                this.velocity[p + 1] += (this.force.y - .75) * dt;
+                this.velocity[p + 1] += (this.force.y - .75 * scale) * dt;
                 this.velocity[p + 2] += this.force.z * dt;
                 
                 const radius = Math.sqrt(this.position[p] * this.position[p] + this.position[p + 2] * this.position[p + 2]) + .001;
-                const entrainment = timeline.stemRise * (1 - timeline.cooling) * Math.max(0, 1 - radius / (18 * params.explosionScale));
+                const entrainment = timeline.stemRise * (1 - timeline.cooling) * Math.max(0, 1 - radius / (18 * scale));
                 this.velocity[p] -= (this.position[p] / radius) * entrainment * 6.5 * dt;
                 this.velocity[p + 1] += entrainment * 5.2 * dt;
                 this.velocity[p + 2] -= (this.position[p + 2] / radius) * entrainment * 6.5 * dt;
@@ -722,13 +892,13 @@
                 this.velocity[p] *= drag;
                 this.velocity[p + 2] *= drag;
                 this.position[p] += this.velocity[p] * dt;
-                this.position[p + 1] = Math.max(.12, this.position[p + 1] + this.velocity[p + 1] * dt);
+                this.position[p + 1] = Math.max(.12 * scale, this.position[p + 1] + this.velocity[p + 1] * dt);
                 this.position[p + 2] += this.velocity[p + 2] * dt;
                 
-                if (this.position[p + 1] <= .13) this.velocity[p + 1] = Math.abs(this.velocity[p + 1]) * .2;
+                if (this.position[p + 1] <= .13 * scale) this.velocity[p + 1] = Math.abs(this.velocity[p + 1]) * .2;
                 this.temperature[i] *= Math.pow(.965, dt * 60);
                 this.rotation[i] += this.angularVelocity[i] * dt;
-                this.size[i] = Math.min(7.5 * params.explosionScale, this.size[i] + dt * .16 * params.explosionScale);
+                this.size[i] = Math.min(7.5 * scale, this.size[i] + dt * .16 * scale);
                 this.alpha[i] = Math.sin(Math.min(1, life * 4) * Math.PI * .5) * Math.pow(1 - life, 1.2) * .72;
             }
             this.points.material.uniforms.uTime.value = time;
@@ -744,7 +914,7 @@
 
     // --- 7. Volumetric Mushroom Cloud Rolling Dust (Instanced) ---
     class MushroomCloud {
-        constructor(scene, turbulence, maxCount = 50000) { // Reduced max particles for game (200000 -> 50000)
+        constructor(scene, turbulence, maxCount = 120000) {
             this.turbulence = turbulence;
             this.maxCount = maxCount;
             this.activeCount = 0;
@@ -822,11 +992,11 @@
                 const headY = (4 + 43 * timeline.headRise) * scale;
                 
                 this.position[p] = Math.cos(angle) * (capParticle ? capRadius : radius);
-                this.position[p + 1] = capParticle ? headY + (r3 - .5) * 12 * scale : .9 + r3 * 1.8;
+                this.position[p + 1] = capParticle ? headY + (r3 - .5) * 12 * scale : (.9 + r3 * 1.8) * scale;
                 this.position[p + 2] = Math.sin(angle) * (capParticle ? capRadius : radius);
-                this.velocity[p] = Math.cos(angle) * (capParticle ? 1.2 : -1.8 - r2 * 1.5);
-                this.velocity[p + 1] = capParticle ? (r3 - .5) * 1.2 : (7.8 + r3 * 7.0) * scale;
-                this.velocity[p + 2] = Math.sin(angle) * (capParticle ? 1.2 : -1.8 - r2 * 1.5);
+                this.velocity[p] = Math.cos(angle) * (capParticle ? 1.2 : -1.8 - r2 * 1.5) * scale;
+                this.velocity[p + 1] = (capParticle ? (r3 - .5) * 1.2 : (7.8 + r3 * 7.0)) * scale;
+                this.velocity[p + 2] = Math.sin(angle) * (capParticle ? 1.2 : -1.8 - r2 * 1.5) * scale;
                 this.age[i] = 0;
                 this.lifetime[i] = 18 + r4 * 17;
                 this.temperature[i] = capParticle ? .78 + r3 * .22 : .52 + r3 * .28;
@@ -861,7 +1031,7 @@
             const dt = Math.min(delta, .033);
             if (time > 3.5 && time < 22) {
                 const ramp = timeline.stemRise * (1 - timeline.cooling);
-                this.emissionCarry += dt * 180 * ramp * params.particleCount; // Scaled down spawn rate (420 -> 180)
+                this.emissionCarry += dt * 360 * ramp * params.particleCount;
                 const count = Math.floor(this.emissionCarry);
                 if (count > 0) {
                     this.spawn(count, time, params.explosionScale, timeline);
@@ -891,17 +1061,17 @@
 
                 this.positionVector.set(x, y, z);
                 this.turbulence.getForce(this.positionVector, time + i * .00017, this.force);
-                const turb = params.turbulenceStrength * (0.65 + mature * .8) * (0.45 + this.density[i] * .55);
+                const turb = params.turbulenceStrength * (0.65 + mature * .8) * (0.45 + this.density[i] * .55) * scale;
                 vx += this.force.x * turb * dt;
                 vy += this.force.y * turb * .55 * dt;
                 vz += this.force.z * turb * dt;
 
                 const columnZone = y < capHeight - 2.4 * scale;
                 if (columnZone) {
-                    vy += (2.9 * temp + .32) * dt;
+                    vy += (2.9 * temp + .32) * dt * scale;
                     const normalizedHeight = Math.max(0, Math.min(1, y / Math.max(1, capHeight)));
                     const columnRadius = (3.4 + normalizedHeight * 2.8) * scale;
-                    const inwardFlow = (1.15 + normalizedHeight * 1.8) * params.vortexStrength;
+                    const inwardFlow = (1.15 + normalizedHeight * 1.8) * params.vortexStrength * scale;
                     vx -= nx * inwardFlow * dt;
                     vz -= nz * inwardFlow * dt;
                     if (radius > columnRadius) {
@@ -910,10 +1080,10 @@
                     }
                 } else {
                     const heightDelta = y - capHeight;
-                    const radialPush = (2.8 + mature * 3.8) * temp * params.vortexStrength;
+                    const radialPush = (2.8 + mature * 3.8) * temp * params.vortexStrength * scale;
                     vx += nx * radialPush * dt;
                     vz += nz * radialPush * dt;
-                    vy += (-heightDelta * .24 + .35 * temp) * dt;
+                    vy += (-heightDelta * .24 + .35 * temp * scale) * dt;
 
                     const ringRadius = (5.5 + mature * 10.5) * scale;
                     const ringDelta = radius - ringRadius;
@@ -964,10 +1134,11 @@
             this.scene = scene;
             this.camera = camera;
             this.position = position.clone();
+            this.position.y -= 100.0;
             this.scale = scale;
 
             this.group = new THREE.Group();
-            this.group.position.copy(position);
+            this.group.position.copy(this.position);
             scene.add(this.group);
 
             // Light configuration inspired by original point light
@@ -980,11 +1151,12 @@
 
             // Set up systems passing the local Group
             this.explosionVolume = new ExplosionVolume(this.group, camera, this.position);
+            this.fireball = new Fireball(this.group, this.position);
             this.shockwave = new Shockwave(this.group, this.position);
-            this.groundDust = new GroundDust(this.group, this.turbulence);
+            // this.groundDust = new GroundDust(this.group, this.turbulence); // Disabled ground dust
             this.mushroomCloud = new MushroomCloud(this.group, this.turbulence);
 
-            this.systems = [this.explosionVolume, this.shockwave, this.groundDust, this.mushroomCloud];
+            this.systems = [this.explosionVolume, this.fireball, this.shockwave, this.mushroomCloud];
 
             this.time = 0;
             this.duration = 32.0; // 32 seconds lifespan matching timeline
@@ -1000,11 +1172,11 @@
                 smokeDensity: 6.0,
                 turbulenceStrength: 1.5,
                 vortexStrength: 1.4,
-                fireballIntensity: 5.0,
-                shockwaveStrength: 1.3,
+                fireballIntensity: 100.0,
+                shockwaveStrength: 3,
                 dustAmount: 1.6,
                 particleCount: 1.6,
-                volumeSteps: 44 // Reduced steps for game performance (normally 96/128)
+                volumeSteps: 96 // Restored default high-quality steps
             };
         }
 

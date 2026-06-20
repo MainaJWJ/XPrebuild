@@ -747,6 +747,16 @@
             "date": "2026-06-16",
             "action": "Fixed Absolute Path 404 in Mushroom Cloud Index",
             "description": "Changed script src from absolute /src/main.js to relative ./src/main.js inside mushroom cloud/index.html to ensure it loads properly when served from subdirectories."
+        },
+        {
+            "date": "2026-06-20",
+            "action": "Bundled Standalone Mushroom Cloud into Single JS File",
+            "description": "Consolidated all modular JS files (shaders, timelines, post-processing, camera/explosion controllers, and simulation classes) from the mushroom cloud/src folder into a single file named standalone_bundled.js. Created standalone_test.html to import this single-file bundle using the r184 importmap, allowing standalone verification of the high-fidelity effect."
+        },
+        {
+            "date": "2026-06-21",
+            "action": "Fixed Scale-Invariance for Volumetric Raymarching Box and Particle Physics",
+            "description": "Scaled the bounding box geometry mesh and position offset dynamically by explosionScale in ExplosionVolume.update. Also scaled initial particle velocities, vertical offsets, and physical accelerations (including buoyancy, gravity, inward flows, and turbulence force) by scale in MushroomCloud and GroundDust. This resolves a visual mismatch where the raymarched volumetric fire remained a tiny unscaled block at the ground level while the smoke particles expanded and rose into a massive cloud."
         }
     ]
 }
