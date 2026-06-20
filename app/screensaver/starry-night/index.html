@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="description" content="Starry Night, inspired by the original screen saver known from Norton Commander">
+<meta name="copyright" content="Copyright (c) 2021 Gabor Bata">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@gabor_bata">
+<meta name="twitter:creator" content="@gabor_bata">
+<meta property="og:title" content="Starry Night">
+<meta property="og:description" content="Starry Night, inspired by the original screen saver known from Norton Commander">
+<meta property="og:type" content="product">
+<meta property="og:url" content="https://gaborbata.github.io/starry-night/">
+<meta property="og:image" content="https://gaborbata.github.io/starry-night/starry-night.png">
+<title>✨ Starry Night</title>
+<style type="text/css">
+    body {
+        background-color: #000;
+        color: #ccc;
+        margin: 0;
+        padding: 0;
+    }
+
+    #wrapper {
+        display: table;
+        height: 100%;
+        position: absolute;
+        width: 100%;
+    }
+
+    #container {
+        display: table-cell;
+    }
+
+
+
+    .star {
+       background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAKCAMAAADfAc3wAAAACVBMVEUAAACHiYb////0rNC2AAAAP0lEQVR42mMgDzAxka6FVM1MIABnQmkIwqcJSTOmMQitjIwYzsHUwgQBEBaYwKsZv834/UrQzzQLbQLuohQAAAB7AM2+S2csAAAAAElFTkSuQmCC');
+       background-size: 120px 20px;
+       height: 20px;
+       image-rendering: pixelated;
+       position: absolute;
+       width: 20px;
+    }
+
+    .star-1 {
+        background-position: 0 0;
+    }
+
+    .star-2 {
+        background-position: -20px 0;
+    }
+
+    .star-3 {
+        background-position: -40px 0;
+    }
+
+    .star-4 {
+        background-position: -60px 0;
+    }
+
+    .star-5 {
+        background-position: -80px 0;
+    }
+
+    .star-6 {
+        background-position: -100px 0;
+    }
+</style>
+
+<div id="wrapper">
+    <div id="container"></div>
+</div>
+<script>
+{
+    const STAR_DISAPPEAR = 2, STAR_BLOW_UP = 6, STARS = new Map(), TICK = 150;
+    let width, height, intervalId = null;
+
+    function init() {
+        intervalId != null && clearInterval(intervalId);
+        const container = document.querySelector('#container');
+        STARS.forEach(star => container.removeChild(star.el));
+        STARS.clear();
+        width = Math.floor(container.clientWidth / 20);
+        height = Math.floor(container.clientHeight / 30);
+        const numOfStars = Math.max(Math.floor(width * height / 60.0), width * height > 12 ? 12 : 0);
+        while (STARS.size < numOfStars) {
+            const el = document.createElement('div');
+            el.classList.add('star');
+            reset(el);
+            container.appendChild(el);
+        }
+        intervalId = setInterval(animate, TICK);
+    }
+
+    function animate() {
+        const deadStars = [];
+        STARS.forEach((star, id) => {
+            if (star.lifeTime > 0) {
+                star.lifeTime -= TICK;
+            } else {
+                if (star.animIdx < star.animLen) {
+                    star.el.classList.replace(`star-${star.animIdx}`, `star-${++star.animIdx}`);
+                } else {
+                    deadStars.push(id);
+                }
+            }
+        });
+        deadStars.forEach(id => {
+            const el = STARS.get(id).el;
+            STARS.delete(id);
+            reset(el);
+        });
+    }
+
+    function reset(el) {
+        let x, y, id;
+        do {
+            x = Math.floor(Math.random() * width);
+            y = Math.floor(Math.random() * height);
+            id = `${x}-${y}`;
+        } while (STARS.has(id));
+        el.style.left = `${x * 20}px`;
+        el.style.top = `${y * 30 + 5}px`;
+        el.classList.remove(`star-${STAR_DISAPPEAR}`, `star-${STAR_BLOW_UP}`);
+        el.classList.add('star-1');
+        STARS.set(id, {
+            el: el,
+            lifeTime: Math.floor(Math.random() * 8000) + 2000,
+            animLen: Math.random() > 0.2 ? STAR_DISAPPEAR : STAR_BLOW_UP,
+            animIdx: 1
+        });
+    }
+
+    init();
+    window.addEventListener('resize', init);
+
+}
+</script>
+<script>
+  // ===== Screensaver Exit Logic =====
+  function exitAndClose() {
+      if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ type: 'exitFullscreenApp' }, '*');
+      }
+  }
+
+  var screensaverFirstEvent = false;
+  var screensaverReady = false;
+  function handleScreensaverExit() {
+      if (!screensaverReady) return;
+      if (!screensaverFirstEvent) {
+          screensaverFirstEvent = true;
+          exitAndClose();
+      }
+  }
+
+  window.addEventListener('mousemove', handleScreensaverExit);
+  window.addEventListener('mousedown', handleScreensaverExit);
+  window.addEventListener('keydown', handleScreensaverExit);
+  window.addEventListener('touchstart', handleScreensaverExit);
+
+  window.addEventListener('DOMContentLoaded', function () {
+      setTimeout(() => { screensaverReady = true; }, 700);
+  });
+</script>
+</html>

@@ -1,0 +1,51 @@
+/* desktop.css */
+/* Windows XP 데스크톱의 기본 레이아웃 및 뼈대 스타일 */
+
+/* 기본 body 스타일 설정 */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    /* 배경 스타일은 #desktop-wrapper로 이동 */
+}
+
+#desktop-wrapper {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Windows XP 바탕화면 배경 설정 (경로 오류 수정: ../image -> ./image) */
+    background: #5A7EDC url('./image/wallpaper.bmp') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* 데스크톱 영역 스타일 */
+#desktop-area {
+    /* 작업표시줄 높이(30px)를 제외한 전체 높이 */
+    width: calc(100% - 40px);
+    /* 오른쪽에 40픽셀 여유 공간 확보 */
+    height: calc(100vh - 30px);
+    position: relative;
+    padding: 20px;
+    margin-right: 40px;
+    /* 오른쪽 여백 추가 */
+}
+
+/* 작업표시줄 컨테이너 스타일 */
+#taskbar-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    z-index: 1000;
+}
+
+/* 작업표시줄 iframe 스타일 */
+#taskbar-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+}

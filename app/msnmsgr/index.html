@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Messenger</title>
+    <link rel="stylesheet" href="../../fonts/fonts.css">
+    <link rel="stylesheet" href="./xpdesign.css">
+    <script src="../../focusController.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 11px;
+            background-color: var(--window-bg);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--window-fg);
+            overflow: hidden;
+        }
+
+        /* MSN Container Styles */
+        .msn-container {
+            height: 100%;
+            background: white linear-gradient(to bottom, white, #EEF2F6, #DFE7EF, #CADAEB, #DFE7EF, #EEF2F6, white);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .msn-login-view {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+
+        .login-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 30px;
+            z-index: 2;
+        }
+
+        .login-box {
+            padding: 15px 25px 20px 25px;
+            width: 100%;
+            text-align: center;
+        }
+
+        #msn-avatar-preview {
+            width: 96px;
+            height: 96px;
+            border: 2px solid #4C6D9E;
+            border-radius: 15px;
+            background: white;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .login-input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .label-input {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 200px;
+            margin-bottom: 10px;
+        }
+
+        .label-input label {
+            text-align: left;
+            margin-bottom: 2px;
+            color: #12368D;
+        }
+
+        .label-input input {
+            width: 100%;
+            box-sizing: border-box;
+            height: 21px;
+            border: 1px solid #7F9DB9;
+            padding: 2px;
+        }
+
+        .msn-select {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .msn-select select {
+            border: 1px solid #7F9DB9;
+            background: white;
+            color: #12368D;
+            font-size: 11px;
+            font-family: 'Tahoma', sans-serif;
+            height: 21px;
+            padding: 2px;
+            width: 150px;
+        }
+
+        .msn-checkbox {
+            text-align: left;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            color: #12368D;
+        }
+
+        /* Standard XP Checkbox (Simplified for this app) */
+        .msn-checkbox input[type="checkbox"] {
+            margin-right: 6px;
+        }
+
+        .msn-btn {
+            padding: 4px 15px;
+            border: 1px solid #064381;
+            color: #064381;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 11px;
+            font-family: Tahoma;
+            background: white linear-gradient(to bottom, white, #D9E1FA);
+            cursor: pointer;
+        }
+
+        .msn-btn.default {
+            box-shadow: inset -1px -2px 0 0 #ff9900, inset 1px 1px 0 0 #ff9900;
+        }
+
+        .msn-btn:hover {
+            background: #E6EEF7;
+            border-color: #000080;
+        }
+
+        .passport-footer {
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 2;
+            border-top: 1px solid #9DB2CE;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .passport-footer img {
+            width: 16px;
+            margin-right: 8px;
+        }
+
+        #loading-img {
+            display: none;
+            margin: 10px auto;
+        }
+
+        /* Contacts View Styles */
+        .msn-contacts-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #D7E4F5;
+        }
+
+        .msn-user-header {
+            background: linear-gradient(to bottom, #EFF5FB, #E1EAF7);
+            border-bottom: 1px solid #9DB2CE;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+        }
+
+        .user-info-main {
+            display: flex;
+            align-items: center;
+        }
+
+        #msn-contacts-avatar {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #70809C;
+            margin-right: 10px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .contacts-body {
+            display: flex;
+            flex-grow: 1;
+            min-height: 0;
+        }
+
+        .contacts-sidebar {
+            width: 32px;
+            background: linear-gradient(to right, #eeeef7, #ebf0f3, #eceff3, #ebf0f1, #ebeff6, #eaeffb, #e0e7f8);
+            border-right: 1px solid #8e92ad;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 10px;
+            flex-shrink: 0;
+        }
+
+        .contacts-sidebar img {
+            width: 24px;
+        }
+
+        .msn-contacts-list-container {
+            flex-grow: 1;
+            background-color: #fff;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .contact-group-header {
+            padding: 4px 6px;
+            font-weight: bold;
+            color: #2861A8;
+            border-bottom: 1px solid #DEDEDC;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+        }
+
+        .msn-contacts-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .contact-item:hover {
+            background-color: #E9EFF7;
+        }
+
+        .contact-item img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .contacts-footer {
+            background-color: white;
+            border-top: 1px solid #9DB2CE;
+            padding: 5px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .ad-banner img {
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="msn-container">
+        <!-- Login View -->
+        <div id="login-view" class="msn-login-view">
+            <div class="login-content">
+                <div class="login-box">
+                    <img id="msn-avatar-preview" src="chess.bmp" alt="Avatar">
+                    <div class="login-input-container">
+                        <div class="label-input">
+                            <label for="username">E-mail Address:</label>
+                            <input type="text" id="username" value="administrator@xp.local">
+                        </div>
+                        <div class="label-input">
+                            <label for="password">Password:</label>
+                            <input type="password" id="password" value="********">
+                        </div>
+                    </div>
+
+                    <div class="msn-select">
+                        <select id="status">
+                            <option value="Online">Online</option>
+                            <option value="Busy">Busy</option>
+                            <option value="Away">Away</option>
+                            <option value="Appear Offline">Appear Offline</option>
+                        </select>
+                    </div>
+
+                    <div style="width: 200px; margin: 0 auto;">
+                        <div class="msn-checkbox">
+                            <input type="checkbox" id="remember" checked>
+                            <label for="remember">Remember me</label>
+                        </div>
+                        <div class="msn-checkbox">
+                            <input type="checkbox" id="auto-login">
+                            <label for="auto-login">Sign me in automatically</label>
+                        </div>
+                    </div>
+
+                    <button id="login-btn" class="msn-btn default" style="margin-top: 20px;" onclick="doLogin()">Sign In</button>
+                    <img id="loading-img" src="signin.gif" alt="Signing in...">
+                </div>
+            </div>
+            <div class="passport-footer">
+                <img src="passport.png" alt="Passport">
+                <span>.NET Passport Service</span>
+            </div>
+        </div>
+
+        <!-- Contacts View -->
+        <div id="contacts-view" class="msn-contacts-view">
+            <div class="msn-user-header">
+                <div class="user-info-main">
+                    <img id="msn-contacts-avatar" src="chess.bmp" alt="My Avatar">
+                    <div>
+                        <span id="display-name" style="font-weight: bold;">Administrator</span><br>
+                        <span id="display-status" style="color: #70809C;">(Online)</span>
+                    </div>
+                </div>
+                <button class="msn-btn" onclick="doSignOut()">Sign Out</button>
+            </div>
+            <div class="contacts-body">
+                <div class="contacts-sidebar">
+                    <img src="contacts.jpg" alt="Contacts">
+                </div>
+                <div class="msn-contacts-list-container">
+                    <div class="contact-group-header">
+                        <div class="status-dot"></div>
+                        <span>Online (3)</span>
+                    </div>
+                    <ul class="msn-contacts-list">
+                        <li class="contact-item">
+                            <img src="chess.bmp" alt="Avatar">
+                            <span>Bill Gates (Online)</span>
+                        </li>
+                        <li class="contact-item">
+                            <img src="chess.bmp" alt="Avatar">
+                            <span>Steve Ballmer (Online)</span>
+                        </li>
+                        <li class="contact-item">
+                            <img src="chess.bmp" alt="Avatar">
+                            <span>Clippy (Busy)</span>
+                        </li>
+                    </ul>
+                    <br>
+                    <div class="contact-group-header" style="color: #888;">
+                        <div class="status-dot" style="background-color: #888;"></div>
+                        <span>Offline (12)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="contacts-footer">
+                <div class="ad-banner">
+                    <img src="ad1.gif" alt="Advertisement">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function doLogin() {
+            const loginBtn = document.getElementById('login-btn');
+            const loadingImg = document.getElementById('loading-img');
+            const loginBox = document.querySelector('.login-box');
+            
+            // Hide login elements except avatar and loading
+            document.querySelectorAll('.login-input-container, .msn-select, .msn-checkbox, #login-btn').forEach(el => el.style.display = 'none');
+            loadingImg.style.display = 'block';
+
+            // Simulate network delay
+            setTimeout(() => {
+                document.getElementById('login-view').style.display = 'none';
+                document.getElementById('contacts-view').style.display = 'flex';
+                
+                // Reset login view for next time
+                loadingImg.style.display = 'none';
+                document.querySelectorAll('.login-input-container, .msn-select, .msn-checkbox, #login-btn').forEach(el => el.style.display = '');
+            }, 2000);
+        }
+
+        function doSignOut() {
+            document.getElementById('contacts-view').style.display = 'none';
+            document.getElementById('login-view').style.display = 'flex';
+        }
+    </script>
+</body>
+
+</html>

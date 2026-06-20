@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../scroll.css">
+    <title>Notepad</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Tahoma, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+            background-color: #ede8cd;
+        }
+
+        /* Standardized Menu Bar Styles (from folder.html) */
+        .com__toolbar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            line-height: 100%;
+            height: 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to right, #edede5 0%, #ede8cd 100%);
+            flex-shrink: 0;
+        }
+
+        .com__options {
+            height: 24px;
+            border-bottom: 0px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0px 0 0px 2px;
+            border-left: 0;
+            flex: 1;
+            display: flex;
+        }
+
+        .com__options .menu-item {
+            position: relative;
+            padding: 6px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .com__options .menu-item:hover,
+        .com__options .menu-item.active {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        .com__options .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #888;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            list-style: none;
+            padding: 2px;
+            margin: 0;
+            z-index: 100;
+            color: black;
+            min-width: 150px;
+        }
+
+        .com__options .menu-item.active .dropdown-menu {
+            display: block;
+        }
+
+        .com__options .dropdown-menu li {
+            padding: 2px 20px 2px 25px;
+            /* Left padding increased for checkmark space */
+            white-space: nowrap;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .com__options .dropdown-menu li:hover {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        /* Disabled item style */
+        .com__options .dropdown-menu li.disabled {
+            color: #888;
+            pointer-events: none;
+        }
+
+        .com__options .dropdown-menu li.disabled:hover {
+            background-color: transparent;
+            color: #888;
+            cursor: default;
+        }
+
+        .com__options .dropdown-menu li.separator {
+            height: 1px;
+            background-color: #ccc;
+            padding: 0;
+            margin: 4px 0;
+            cursor: default;
+        }
+
+        .com__options .dropdown-menu li.separator:hover {
+            background-color: #ccc;
+            color: inherit;
+        }
+
+        /* Checkmark style for toggles (e.g. Word Wrap) */
+        .com__options .dropdown-menu li.checked::before {
+            content: '✓';
+            position: absolute;
+            left: 7px;
+            font-weight: bold;
+        }
+
+        /* Notepad Specific Styles */
+        .notepad-textarea {
+            width: 100%;
+            height: calc(100vh - 24px);
+            /* Adjusted for toolbar height */
+            outline: none;
+            font-family: 'Lucida Console', monospace;
+            font-size: 13px;
+            line-height: 14px;
+            resize: none;
+            padding: 2px;
+            overflow: auto;
+            border: 1px solid #96abff;
+            background-color: #ffffff;
+            white-space: nowrap;
+        }
+
+        .notepad-textarea.word-wrap {
+            white-space: normal;
+        }
+    </style>
+    <script src="../focusController.js"></script>
+</head>
+
+<body>
+    <section class="com__toolbar">
+        <div class="com__options">
+            <div class="menu-item"><span>File</span>
+                <ul class="dropdown-menu">
+                    <li class="disabled">New</li>
+                    <li class="disabled">Open...</li>
+                    <li class="disabled">Save</li>
+                    <li class="disabled">Save As...</li>
+                    <li class="separator"></li>
+                    <li class="disabled">Page Setup...</li>
+                    <li class="disabled">Print...</li>
+                    <li class="separator"></li>
+                    <li data-action="Exit">Exit</li>
+                </ul>
+            </div>
+            <div class="menu-item"><span>Edit</span>
+                <ul class="dropdown-menu">
+                    <li class="disabled">Undo</li>
+                    <li class="separator"></li>
+                    <li class="disabled">Cut</li>
+                    <li class="disabled">Copy</li>
+                    <li class="disabled">Paste</li>
+                    <li class="disabled">Delete</li>
+                    <li class="separator"></li>
+                    <li class="disabled">Find...</li>
+                    <li class="disabled">Find Next</li>
+                    <li class="disabled">Replace...</li>
+                    <li class="disabled">Go To...</li>
+                    <li class="separator"></li>
+                    <li class="disabled">Select All</li>
+                    <li data-action="Time/Date">Time/Date</li>
+                </ul>
+            </div>
+            <div class="menu-item"><span>Format</span>
+                <ul class="dropdown-menu">
+                    <li data-action="Word Wrap" id="word-wrap-item">Word Wrap</li>
+                    <li class="disabled">Font...</li>
+                </ul>
+            </div>
+            <div class="menu-item"><span>View</span>
+                <ul class="dropdown-menu">
+                    <li class="disabled">Status Bar</li>
+                </ul>
+            </div>
+            <div class="menu-item"><span>Help</span>
+                <ul class="dropdown-menu">
+                    <li class="disabled">Help Topics</li>
+                    <li class="separator"></li>
+                    <li class="disabled">About Notepad</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <textarea id="notepad-textarea" class="notepad-textarea" placeholder="Type your text here..."
+        spellcheck="false"></textarea>
+
+    <script>
+        let docText = '';
+        let wordWrap = false;
+
+        const textarea = document.getElementById('notepad-textarea');
+
+        // Textarea Input Handling
+        textarea.addEventListener('input', function () {
+            docText = this.value;
+        });
+
+        textarea.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                var start = this.selectionStart;
+                var end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + '\t' + this.value.substring(end);
+                this.selectionStart = start + 1;
+                this.selectionEnd = start + 1;
+            }
+        });
+
+        // ---------------------------------------------------------
+        // Standardized Menu Bar Logic (Inline)
+        // ---------------------------------------------------------
+        const menuItems = document.querySelectorAll('.com__options .menu-item');
+        let isMenuActive = false;
+
+        menuItems.forEach(menuItem => {
+            menuItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+
+                // If clicking an already active menu, close it
+                if (menuItem.classList.contains('active')) {
+                    menuItem.classList.remove('active');
+                    isMenuActive = false;
+                    return;
+                }
+
+                // Close all other menus and open this one
+                menuItems.forEach(item => item.classList.remove('active'));
+                menuItem.classList.add('active');
+                isMenuActive = true;
+            });
+
+            menuItem.addEventListener('mouseenter', () => {
+                if (isMenuActive) {
+                    menuItems.forEach(item => item.classList.remove('active'));
+                    menuItem.classList.add('active');
+                }
+            });
+        });
+
+        document.addEventListener('click', () => {
+            menuItems.forEach(item => item.classList.remove('active'));
+            isMenuActive = false;
+        });
+
+        // Menu Action Handler
+        const actionItems = document.querySelectorAll('.com__options .dropdown-menu li[data-action]');
+        actionItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent menu toggle logic from interfering
+                const action = item.dataset.action;
+                handleMenuAction(action);
+
+                // Close menu after action
+                menuItems.forEach(m => m.classList.remove('active'));
+                isMenuActive = false;
+            });
+        });
+
+        function handleMenuAction(action) {
+            switch (action) {
+                case 'Exit':
+                    if (confirm('Do you want to close Notepad?')) {
+                        window.parent.postMessage({ type: 'closeWindow' }, '*');
+                    }
+                    break;
+                case 'Time/Date':
+                    const now = new Date();
+                    const dateStr = now.toLocaleTimeString() + ' ' + now.toLocaleDateString();
+                    const startPos = textarea.selectionStart;
+                    const endPos = textarea.selectionEnd;
+                    const textBefore = textarea.value.substring(0, startPos);
+                    const textAfter = textarea.value.substring(endPos);
+                    textarea.value = textBefore + dateStr + textAfter;
+
+                    textarea.selectionStart = startPos + dateStr.length;
+                    textarea.selectionEnd = startPos + dateStr.length;
+                    textarea.focus();
+                    break;
+                case 'Word Wrap':
+                    toggleWordWrap();
+                    break;
+                default:
+                    console.log('Action not implemented:', action);
+            }
+        }
+
+        function toggleWordWrap() {
+            wordWrap = !wordWrap;
+            const wordWrapItem = document.getElementById('word-wrap-item');
+
+            if (wordWrap) {
+                textarea.classList.add('word-wrap');
+                wordWrapItem.classList.add('checked');
+            } else {
+                textarea.classList.remove('word-wrap');
+                wordWrapItem.classList.remove('checked');
+            }
+        }
+
+        function init() {
+            document.title = 'Notepad';
+            textarea.focus();
+        }
+
+        // ---------------------------------------------------------
+        // File Loading Logic (from previous version)
+        // ---------------------------------------------------------
+        window.addEventListener('message', function (event) {
+            console.log('Received message in notepad:', event.data);
+            if (event.data.type === 'openTextFile') {
+                loadTextFile(event.data.filePath, event.data.fileName);
+            }
+        });
+
+        function loadTextFile(filePath, fileName) {
+            const actualFilePath = convertVfsPathToActual(filePath);
+
+            if (actualFilePath) {
+                fetch(actualFilePath)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(textContent => {
+                        console.log('Successfully loaded text file:', fileName);
+                        document.getElementById('notepad-textarea').value = textContent;
+                        document.title = fileName + ' - Notepad';
+                    })
+                    .catch(error => {
+                        console.error('Error loading text file:', error);
+                        document.getElementById('notepad-textarea').value = 'Error loading file: ' + error.message;
+                    });
+            } else {
+                console.log('Path conversion failed for:', filePath);
+            }
+        }
+
+        function convertVfsPathToActual(vfsPath) {
+            const fileName = extractFileName(vfsPath);
+            console.log('Converting VFS path:', vfsPath, 'File name:', fileName);
+            return `./text/${fileName}`;
+        }
+
+        function extractFileName(path) {
+            const lastSlashIndex = path.lastIndexOf('/');
+            if (lastSlashIndex !== -1) {
+                return path.substring(lastSlashIndex + 1);
+            }
+            return path;
+        }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+Sample Notes
+============
+
+This is a sample notes file created for the Windows XP desktop simulation.
+
+- Feature 1: File system simulation
+- Feature 2: Application launching
+- Feature 3: Window management
+- Feature 4: Inter-application communication
+
+Date: October 14, 2025

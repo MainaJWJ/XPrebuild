@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Properties</title>
+    <link rel="stylesheet" href="../../fonts/fonts.css">
+    <link rel="stylesheet" href="../properties/xpdesign/xpdesign.css">
+    <script src="../../focusController.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 11px;
+            background-color: var(--window-bg);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--window-fg);
+        }
+
+        .container {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Content Area (Using frame style from xpdesign.css) */
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #919B9C;
+            background: linear-gradient(180deg, #FCFCFE 0%, #F4F3EE 100%);
+            box-shadow: inset -1px -1px 0 #FCFCFE, 1px 1px 0 #D0CEBF;
+            border-radius: 0;
+        }
+
+        /* System Info Layout */
+        .sys-info-row {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .sys-info-left {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-right: 15px;
+        }
+
+        .sys-info-right {
+            width: 55%;
+        }
+
+        .sys-icon {
+            width: 110px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .rebuild-logo {
+            width: 120px;
+            height: auto;
+            margin-top: 10px;
+        }
+
+        .info-group {
+            margin-bottom: 12px;
+        }
+
+        .info-title {
+            margin: 0 0 2px 0;
+            font-weight: normal;
+        }
+
+        .info-text {
+            margin: 0 0 2px 15px;
+        }
+
+        .support-text {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #000;
+        }
+
+        /* Override/Enhance xpdesign.css buttons for this specific layout */
+        .button-row {
+            display: flex;
+            justify-content: flex-end;
+            padding: 12px;
+            gap: 6px;
+            background-color: var(--window-bg);
+        }
+
+        button.support-info {
+            margin-top: auto;
+            align-self: flex-end;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="content-area">
+            <div class="sys-info-row">
+                <!-- Left Pane -->
+                <div class="sys-info-left">
+                    <img src="sys.png" alt="System" class="sys-icon">
+                    <div style="flex-grow: 1;"></div>
+                    <span class="support-text">Manufactured and supported by:</span>
+                    <img src="rebuild.png" alt="Rebuild" class="rebuild-logo">
+                </div>
+
+                <!-- Right Pane -->
+                <div class="sys-info-right">
+                    <div class="info-group">
+                        <p class="info-title">System:</p>
+                        <p class="info-text">Microsoft Windows XP</p>
+                        <p class="info-text">Professional</p>
+                        <p class="info-text">Version 2002</p>
+                        <p class="info-text">Service Pack 1</p>
+                    </div>
+
+                    <div class="info-group">
+                        <p class="info-title">Registered to:</p>
+                        <p class="info-text">Administrator</p>
+                    </div>
+
+                    <div style="flex-grow: 1; height: 20px;"></div>
+
+                    <div class="info-group">
+                        <p class="info-title">Computer:</p>
+                        <p class="info-text">Project Rebuild</p>
+                        <p class="info-text">Intel(R) Pentium(R) 4 CPU 2.40GHz</p>
+                        <p class="info-text">2.40 GHz, 2.00 GB of RAM</p>
+                        <p class="info-text">Physical Address Extension</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: auto;">
+                <button class="support-info">Support Information</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="button-row">
+        <button onclick="window.parent.postMessage({type: 'closeWindow'}, '*')">OK</button>
+        <button onclick="window.parent.postMessage({type: 'closeWindow'}, '*')">Cancel</button>
+        <button class="disabled">Apply</button>
+    </div>
+
+    <script>
+        // Tab switching logic removed as requested.
+    </script>
+</body>
+
+</html>

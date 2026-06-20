@@ -1,0 +1,25 @@
+{
+  "faction": "NEUTRAL",
+  "hostileFactions": [],
+  "destruction": {
+    "explosionScale": 1.0,
+    "explosionCount": 0,
+    "health": 99999,
+    "damage": 0
+  },
+  "collisionRadius": 1000.0,
+  "model": {
+    "file": "model/runway/runway.glb",
+    "scale": 100,
+    "initialRotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "initialPosition": {
+      "x": 1300,
+      "y": 1000,
+      "z": -20340
+    }
+  }
+}

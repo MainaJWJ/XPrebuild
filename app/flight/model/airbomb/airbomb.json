@@ -1,0 +1,46 @@
+{
+  "category": "bomb",
+  "model": {
+    "file": "model/airbomb/airbomb.glb",
+    "scale": 1
+  },
+  "performance": {
+    "speed": 0,
+    "acceleration": 0,
+    "maxSpeed": 0,
+    "agility": 0,
+    "accelerationRate": 1.0,
+    "minSpeed": 0,
+    "gravityEffect": 0.0,
+    "gravity": 400.0,
+    "turnDrag": 0.0,
+    "turnSensitivity": 0,
+    "lifespan": 20.0,
+    "ignitionDelay": 999.0,
+    "pitchLimits": {
+      "up": 0,
+      "down": 0
+    },
+    "maxRollAngle": 0
+  },
+  "camera": {
+    "lerpSpeed": 0,
+    "minDistance": 0,
+    "maxDistance": 0,
+    "lookAtDistance": 0,
+    "follow": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "visuals": {
+    "engineHardpoints": []
+  },
+  "destruction": {
+    "explosionScale": 12.0,
+    "health": 10,
+    "damage": 15000
+  },
+  "hardpoints": {}
+}

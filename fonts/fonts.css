@@ -1,0 +1,73 @@
+/* ============================================================
+   fonts.css — Windows XP 폰트 선언 파일
+   이 파일은 @font-face 선언만 포함합니다.
+   실제 적용(font-family 지정)은 별도로 진행합니다.
+
+   【위치】 fonts/fonts.css  (fonts/ 폴더 안에 위치)
+   【TTF 경로】 url() 경로는 이 파일 기준 → TTF와 같은 폴더이므로 './파일명.ttf'
+
+   【HTML에서 링크하는 방법】
+     - 루트 파일 (index.html, taskbar.html 등): href="fonts/fonts.css"
+     - app/ 1단계 (bin.html 등):               href="../fonts/fonts.css"
+     - app/ 2단계 (excel/index.html 등):        href="../../fonts/fonts.css"
+     - app/ 3단계 이상:                         href="../../../fonts/fonts.css"
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   Tahoma (Regular)
+   용도: Windows XP 기본 UI 폰트
+   사용 위치: 메뉴, 다이얼로그, 버튼, 아이콘 라벨, 작업표시줄 등
+   XP 기준 크기: 8pt = 11px (@96dpi)
+   ------------------------------------------------------------ */
+@font-face {
+    font-family: 'Tahoma';
+    src: url('./tahoma.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block; /* UI 폰트이므로 swap 대신 block 사용 (레이아웃 깜빡임 방지) */
+}
+
+
+/* ------------------------------------------------------------
+   Trebuchet MS (Regular)
+   용도: Windows XP 창 제목 표시줄 전용 폰트
+   사용 위치: .title-bar-text
+   XP 기준 크기: 10pt = 13px (@96dpi), Bold
+   ------------------------------------------------------------ */
+@font-face {
+    font-family: 'Trebuchet MS';
+    src: url('./trebuchet-ms.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+
+/* ------------------------------------------------------------
+   MS Sans Serif
+   용도: Windows 95/98/ME 레거시 UI 폰트
+   사용 위치: 클래식 테마 다이얼로그, 레트로 UI 요소 등
+   참고: XP Luna 테마의 기본 폰트는 아니지만,
+         일부 레거시 앱(minesweeper 등)의 고증을 위해 포함
+   ------------------------------------------------------------ */
+@font-face {
+    font-family: 'MS Sans Serif';
+    src: url('./MS Sans Serif.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+
+/* ------------------------------------------------------------
+   Raster Font
+   용도: CMD(명령 프롬프트) 및 터미널 스타일 폰트
+   ------------------------------------------------------------ */
+@font-face {
+    font-family: 'Raster';
+    src: url('./raster.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}

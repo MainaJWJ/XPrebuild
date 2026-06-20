@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../fonts/fonts.css">
+    <link rel="stylesheet" href="../scroll.css">
+    <script src="../focusController.js"></script>
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background: none;
+            overflow: hidden;
+            font-family: Tahoma, 'Noto Sans', sans-serif;
+            font-size: 11px;
+        }
+
+        /* winXP-master의 MyComputer 스타일 */
+        .my-computer-window {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            display: flex;
+            overflow: hidden;
+            flex-direction: column;
+            background: linear-gradient(to right, #edede5 0%, #ede8cd 100%);
+        }
+
+        .com__toolbar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            line-height: 100%;
+            height: 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .com__options {
+            height: 24px;
+            border-bottom: 0px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0px 0 0px 2px;
+            border-left: 0;
+            flex: 1;
+            display: flex;
+        }
+
+        .com__options .menu-item {
+            position: relative;
+            padding: 6px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .com__options .menu-item:hover,
+        .com__options .menu-item.active {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        .com__options .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #888;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            list-style: none;
+            padding: 2px;
+            margin: 0;
+            z-index: 100;
+            color: black;
+        }
+
+        .com__options .menu-item.active .dropdown-menu {
+            display: block;
+        }
+
+        .com__options .dropdown-menu li {
+            padding: 2px 20px 2px 25px;
+            /* Left padding increased for checkmark space */
+            white-space: nowrap;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .com__options .dropdown-menu li:hover {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        /* Disabled item style */
+        .com__options .dropdown-menu li.disabled {
+            color: #888;
+            pointer-events: none;
+        }
+
+        .com__options .dropdown-menu li.disabled:hover {
+            background-color: transparent;
+            color: #888;
+            cursor: default;
+        }
+
+        /* Checkmark style for toggles */
+        .com__options .dropdown-menu li.checked::before {
+            content: '✓';
+            position: absolute;
+            left: 7px;
+            font-weight: bold;
+        }
+
+        .com__options .dropdown-menu li.separator {
+            height: 1px;
+            background-color: #ccc;
+            /* 구분선으로서의 시각적 표현 */
+            padding: 0;
+            margin: 4px 0;
+            cursor: default;
+        }
+
+        .com__options .dropdown-menu li.separator:hover {
+            background-color: #ccc;
+            /* 원래 색상 유지 */
+            color: inherit;
+            /* 원래 글자색 유지 */
+        }
+
+        .com__windows-logo {
+            height: 36px;
+            border-left: 1px solid white;
+            border-bottom: 0px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .com__function_bar {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            padding: 1px 3px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .com__function_bar__button {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0);
+            border-radius: 3px;
+            padding: 0 4px;
+            cursor: pointer;
+        }
+
+        .com__function_bar__button:hover {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .com__function_bar__button:hover:active {
+            border: 1px solid rgb(185, 185, 185);
+            background-color: #dedede;
+            box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.7);
+        }
+
+        .com__function_bar__button:hover:active>* {
+            transform: translate(1px, 1px);
+        }
+
+        .com__function_bar__button--disabled {
+            filter: grayscale(1);
+            opacity: 0.7;
+            display: flex;
+            height: 100%;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0);
+            padding: 0 4px;
+            cursor: default;
+        }
+
+        .com__function_bar__icon {
+            height: 22px;
+            width: 22px;
+        }
+
+        .com__function_bar__text {
+            margin-left: 4px;
+        }
+
+        .com__function_bar__separate {
+            height: 90%;
+            width: 1px;
+            background-color: rgba(0, 0, 0, 0.2);
+            margin: 0 2px;
+        }
+
+        .com__address_bar {
+            flex-shrink: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            height: 22px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            padding: 0 2px;
+            box-shadow: inset 0 -2px 1px -1px #b0b0b0;
+        }
+
+        .com__address_bar__title {
+            color: rgba(0, 0, 0, 0.5);
+            padding: 7px;
+            height: 15px;
+        }
+
+        .com__address_bar__content {
+            border: rgba(122, 122, 255, 0.6) 1px solid;
+            height: calc(100% - 1px);
+            display: flex;
+            flex: 1;
+            align-items: center;
+            background-color: white;
+            position: relative;
+            padding: 0 4px;
+        }
+
+        .com__address_bar__content__img {
+            width: 16px;
+            height: 16px;
+            padding-right: 5px;
+        }
+
+        .com__address_bar__right_space {
+            display: flex;
+            align-items: center;
+            padding: 0 16px 0 4px;
+            flex: 0 0 30px;
+        }
+
+        .com__address_bar__right__img {
+            width: 20px;
+            height: 20px;
+            padding-right: 7px;
+        }
+
+        .com__address_bar__right__text {
+            font-size: 11px;
+        }
+
+        .com__content {
+            flex: 1;
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            border-top-width: 0;
+            background-color: #f1f1f1;
+            overflow: auto;
+            font-size: 11px;
+            position: relative;
+        }
+
+        .com__content__inner {
+            display: flex;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .com__content__left {
+            width: 180px;
+            height: calc(100%-10px);
+            background: linear-gradient(to bottom, #748aff 0%, #4057d3 100%);
+            padding: 10px;
+        }
+
+        .com__content__left__card {
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .com__content__left__card__header {
+            display: flex;
+            align-items: center;
+            height: 23px;
+            padding-left: 11px;
+            padding-right: 2px;
+            cursor: pointer;
+            background: linear-gradient(to right, rgb(240, 240, 255) 0, rgb(240, 240, 255) 30%, rgb(168, 188, 255) 100%);
+        }
+
+        .com__content__left__card__header__text {
+            font-weight: 700;
+            color: #0c327d;
+            flex: 1;
+        }
+
+        .com__content__left__card__header__img {
+            width: 18px;
+            height: 18px;
+        }
+
+        .com__content__left__card__content {
+            padding: 5px 10px;
+            background: linear-gradient(to right, rgb(180, 200, 251) 0%, rgb(164, 185, 251) 50%, rgb(180, 200, 251) 100%);
+        }
+
+        .com__content__left__card__row {
+            display: flex;
+            margin-bottom: 2px;
+            align-items: center;
+        }
+
+        .com__content__left__card__img {
+            width: 14px;
+            height: 14px;
+            margin-right: 5px;
+        }
+
+        .com__content__left__card__text {
+            font-size: 10px;
+            line-height: 14px;
+            color: #0c327d;
+        }
+
+        .com__content__left__card__text.link:hover {
+            cursor: pointer;
+            color: #2b72ff;
+            text-decoration: underline;
+        }
+
+        .com__content__right {
+            height: calc(100%-10px);
+            overflow: auto;
+            background-color: #fff;
+            flex: 1;
+            padding: 10px;
+            position: relative;
+        }
+
+        .com__content__right__card {
+            margin-bottom: 10px;
+        }
+
+        .com__content__right__card__header {
+            font-weight: 700;
+            padding: 2px 0 3px 12px;
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .com__content__right__card__header:after {
+            content: '';
+            display: block;
+            background: linear-gradient(to right, #70bfff 0, #fff 100%);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 1px;
+            width: 100%;
+        }
+
+        .com__content__right__card__content {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 5px 15px 0;
+        }
+
+        .com__content__right__card__item {
+            width: 80px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .com__content__right__card__img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 8px;
+            transition: filter 0.01s ease;
+            /* 부드러운 필터 전환 효과 */
+        }
+
+        .com__content__right__card__text {
+            font-family: 'Tahoma', sans-serif;
+            font-size: 11px;
+            color: black;
+            text-align: center;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 2px 4px;
+        }
+
+        /* 폴더 아이콘 선택 시 이미지에 파란색 필터 적용 */
+        .com__content__right__card__item.selected .com__content__right__card__img {
+            filter: sepia(95%) hue-rotate(185deg) saturate(4) brightness(0.6) opacity(0.9);
+        }
+
+        /* 폴더 아이콘 선택 시 텍스트 스타일 */
+        .com__content__right__card__item.selected .com__content__right__card__text {
+            background-color: #000080;
+            /* Windows 98 스타일의 진한 파란색 */
+            color: white;
+            border: 1px dotted white;
+            /* 흰색 점선 테두리 */
+            padding: 1px 3px;
+            border-radius: 0;
+            /* 사각형 테두리 */
+        }
+
+        /* 드래그 선택 상자 스타일 제거 */
+
+        /* 상태 표시줄 스타일 */
+        .status-bar {
+            margin: 0 1px;
+            /* 좌우 여백 */
+            display: flex;
+            /* 내부 요소들을 가로로 나란히 배치 */
+            gap: 1px;
+            /* 내부 요소 사이의 간격 */
+            height: 22px;
+            /* 상태 표시줄 높이 */
+        }
+
+        .status-bar-field {
+            /* 입체적인 테두리 효과 */
+            box-shadow: inset -1px -1px #dfdfdf, inset 1px 1px grey;
+            flex-grow: 1;
+            /* 남은 공간을 모두 차지 */
+            padding: 4px 3px;
+            /* 내부 여백 */
+            margin: 0;
+            /* 외부 여백 없음 */
+        }
+    </style>
+    <script src="../focusController.js"></script>
+</head>
+
+<body>
+    <div class="my-computer-window">
+        <section class="com__toolbar">
+            <div class="com__options">
+                <div class="menu-item"><span><u>F</u>ile</span>
+                    <ul class="dropdown-menu">
+                        <li class="disabled">Create Shortcut</li>
+                        <li class="disabled">Delete</li>
+                        <li class="disabled">Rename</li>
+                        <li class="disabled">Properties</li>
+                        <li class="separator"></li>
+                        <li data-action="Close">Close</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>E</u>dit</span>
+                    <ul class="dropdown-menu">
+                        <li class="disabled">Undo</li>
+                        <li class="separator"></li>
+                        <li class="disabled">Cut</li>
+                        <li class="disabled">Copy</li>
+                        <li class="disabled">Paste</li>
+                        <li class="separator"></li>
+                        <li>Select All</li>
+                        <li>Invert Selection</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>V</u>iew</span>
+                    <ul class="dropdown-menu">
+                        <li>Toolbars</li>
+                        <li>Status Bar</li>
+                        <li>Explorer Bar</li>
+                        <li class="separator"></li>
+                        <li>Thumbnails</li>
+                        <li>Tiles</li>
+                        <li>Icons</li>
+                        <li>List</li>
+                        <li>Details</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>F</u>avorites</span>
+                    <ul class="dropdown-menu">
+                        <li>Add to Favorites...</li>
+                        <li>Organize Favorites...</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>T</u>ools</span>
+                    <ul class="dropdown-menu">
+                        <li>Map Network Drive...</li>
+                        <li>Disconnect Network Drive...</li>
+                        <li class="separator"></li>
+                        <li>Folder Options...</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>H</u>elp</span>
+                    <ul class="dropdown-menu">
+                        <li>Help and Support Center</li>
+                        <li class="separator"></li>
+                        <li>About Windows</li>
+                    </ul>
+                </div>
+
+                <div class="com__windows-logo"
+                    style="margin-left: auto; display: flex; align-items: center; justify-content: center; padding: 0 0px; height: 100%; border-left: 1px solid rgba(0, 0, 0, 0.1);">
+                    <img src="../image/windows.png" alt="Windows Logo"
+                        style="height: 100%; object-fit: contain; padding: 0;">
+                </div>
+            </div>
+        </section>
+        <section class="com__function_bar">
+            <div id="back-btn" class="com__function_bar__button--disabled"><img class="com__function_bar__icon"
+                    src="../image/back.png" alt=""> <span class="com__function_bar__text">Back</span></div>
+            <div id="forward-btn" class="com__function_bar__button--disabled"><img class="com__function_bar__icon"
+                    src="../image/front.png" alt=""></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/foldersearch.png"
+                    alt=""></div>
+            <div class="com__function_bar__separate"></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/search.png"
+                    alt=""> <span class="com__function_bar__text">Search</span></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/folder.png"
+                    alt=""> <span class="com__function_bar__text">Folders</span></div>
+            <div class="com__function_bar__separate"></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon"
+                    src="../image/start menu programs.png" alt=""></div>
+
+        </section>
+        <section class="com__address_bar" style="margin-bottom: 1px;">
+            <div class="com__address_bar__title">Address</div>
+            <div class="com__address_bar__content">
+                <img src="../image/mycomputer.png" alt="icon" class="com__address_bar__content__img">
+                <div class="com__address_bar__content__text">My Computer</div>
+            </div>
+            <div class="com__address_bar__right_space">
+                <img src="../image/continue.png" alt="icon" class="com__address_bar__right__img">
+                <span class="com__address_bar__right__text">Go</span>
+            </div>
+        </section>
+        <div class="com__content">
+            <div class="com__content__inner">
+                <div class="com__content__left">
+                    <div class="com__content__left__card">
+                        <div class="com__content__left__card__header">
+                            <div class="com__content__left__card__header__text">System Tasks</div><img
+                                src="../image/uparrow.png" alt="" class="com__content__left__card__header__img">
+                        </div>
+                        <div class="com__content__left__card__content">
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/shell32.png" alt="view">
+                                <div class="com__content__left__card__text link">View system information</div>
+                            </div>
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/execute.png" alt="remove">
+                                <div class="com__content__left__card__text link">Add or remove programs</div>
+                            </div>
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/panel.png" alt="control">
+                                <div class="com__content__left__card__text link">Change a setting</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="com__content__left__card">
+                        <div class="com__content__left__card__header">
+                            <div class="com__content__left__card__header__text">Other Places</div><img
+                                src="../image/uparrow.png" alt="" class="com__content__left__card__header__img">
+                        </div>
+                        <div class="com__content__left__card__content">
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/network.png" alt="network">
+                                <div class="com__content__left__card__text link">My Network Places</div>
+                            </div>
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/docfolder.png" alt="document">
+                                <div class="com__content__left__card__text link">My Documents</div>
+                            </div>
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/folder.png" alt="folder">
+                                <div class="com__content__left__card__text link">Shared Documents</div>
+                            </div>
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/panel.png" alt="control">
+                                <div class="com__content__left__card__text link">Control Panel</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="com__content__right">
+                    <!-- Content will be rendered here by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-bar-field">C:\documents and settings\administrator\My Computer</div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import FolderEnhancer from '../folderEnhancer.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // ==================================================================================
+            // 1. 가상 파일 시스템(VFS) 및 상태 관리 변수
+            // ==================================================================================
+
+            // vfs: 탐색기의 모든 폴더와 파일 구조를 정의하는 거대한 자바스크립트 객체입니다.
+            const vfs = {
+                'My Computer': {
+                    type: 'root',
+                    icon: '../image/mycomputer.png',
+                    children: {
+                        'Local Disk (C:)': {
+                            type: 'drive',
+                            icon: '../image/drive.png',
+                            children: {
+                                'Program Files': {
+                                    type: 'folder',
+                                    icon: '../image/folder.png',
+                                    children: {
+                                        'My New App': {
+                                            type: 'folder',
+                                            icon: '../image/folder.png',
+                                            children: {
+                                                'readme.txt': {
+                                                    type: 'file',
+                                                    icon: '../image/file.png'
+                                                },
+                                                'screenshot.jpg': {
+                                                    type: 'file',
+                                                    icon: '../image/file.png'
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                'Users': {
+                                    type: 'folder',
+                                    icon: '../image/folder.png',
+                                    children: {
+                                        'My Pictures': {
+                                            type: 'folder',
+                                            icon: '../image/folder.png',
+                                            children: {
+                                                '가을.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '겨울.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '공간 이동.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '달과 붉은 사막.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '달과 산.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '물고기.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '바람.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '보라 꽃.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '빨강 꽃.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '석상.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '석양.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '수련.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '열대.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '유연.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '집.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '친구.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '크리스탈.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '튜울립.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '평화.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '표면.jpg': { type: 'file', icon: '../image/file.png' },
+                                                '푸른 언덕.jpg': { type: 'file', icon: '../image/file.png' }
+                                            }
+                                        }
+                                    }
+                                },
+                                'Documents': {
+                                    type: 'folder',
+                                    icon: '../image/folder.png',
+                                    children: {
+                                        'samplepdf.pdf': { type: 'file', icon: '../image/pdf.png' },
+                                        'language_understanding_paper.pdf': { type: 'file', icon: '../image/pdf.png' },
+                                    }
+                                },
+                                'Windows': { type: 'folder', icon: '../image/folder.png', children: {} },
+                                'readme.txt': { type: 'file', icon: '../image/file.png' }
+                            }
+                        },
+                        'CD Drive (D:)': {
+                            type: 'cd',
+                            icon: '../image/drive.png',
+                            children: {}
+                        }
+                    }
+                }
+            };
+
+            // --- 상태 관리 변수 ---
+            // currentPath: 현재 탐색기가 보여주고 있는 경로 (예: 'My Computer/Local Disk (C:)')
+            let currentPath = 'My Computer';
+            // navigationHistory: 사용자의 폴더 이동 기록을 저장하는 배열
+            let navigationHistory = ['My Computer'];
+            // historyIndex: 뒤로/앞으로 가기를 위해 현재 기록에서의 위치를 나타내는 인덱스
+            let historyIndex = 0;
+
+            // ==================================================================================
+            // 2. 자주 사용하는 HTML 요소 (DOM) 참조
+            // ==================================================================================
+            const contentRight = document.querySelector('.com__content__right');
+            const addressBarText = document.querySelector('.com__address_bar__content__text');
+            const addressBarIcon = document.querySelector('.com__address_bar__content__img');
+            const backBtn = document.getElementById('back-btn');
+            const forwardBtn = document.getElementById('forward-btn');
+            const menuItems = document.querySelectorAll('.com__options .menu-item');
+
+            // FolderEnhancer 초기화 (드래그 선택 + 우클릭 메뉴)
+            new FolderEnhancer({
+                container: contentRight,
+                selectableItems: '.com__content__right__card__item',
+                selectionClass: 'selected'
+            }).initialize();
+
+            // ==================================================================================
+            // 3. 핵심 기능 함수
+            // ==================================================================================
+
+            /**
+             * 주어진 경로의 내용물을 화면에 그려주는 핵심 함수입니다.
+             * @param {string} path - 렌더링할 경로
+             */
+            function render(path) {
+                // 내부 경로(예: 'My Computer/Local Disk (C:)')를 분석합니다.
+                const pathParts = path.split('/');
+                let currentLevel = vfs;
+                let currentItem = null;
+
+                for (const part of pathParts) {
+                    if (currentLevel[part]) {
+                        currentItem = currentLevel[part];
+                        currentLevel = currentLevel[part].children;
+                    } else if (vfs[part]) {
+                        currentItem = vfs[part];
+                        currentLevel = vfs[part].children;
+                    }
+                    else {
+                        console.error('Path not found:', path);
+                        return;
+                    }
+                }
+
+                // 아이콘을 그리기 전, 오른쪽 컨텐츠 영역을 깨끗하게 비웁니다.
+                contentRight.innerHTML = '';
+
+                if (!currentLevel) {
+                    return; // 하위 항목이 없으면 여기서 종료
+                }
+
+                // --- 경로에 따른 조건부 렌더링 ---
+                // 현재 경로가 'My Computer'일 때만 특별한 그룹 UI(제목, 파란 선)를 보여줍니다.
+                if (path === 'My Computer') {
+                    // "Hard Disk Drives" 같은 그룹을 만들기 위한 로직
+                    const groups = {
+                        'Hard Disk Drives': [],
+                        'Devices with Removable Storage': [],
+                    };
+
+                    for (const [name, item] of Object.entries(currentLevel)) {
+                        const itemData = { name, ...item };
+                        if (item.type === 'drive') groups['Hard Disk Drives'].push(itemData);
+                        else if (item.type === 'cd') groups['Devices with Removable Storage'].push(itemData);
+                    }
+
+                    // 각 그룹(드라이브, CD 등)별로 카드 UI를 생성합니다.
+                    for (const [groupName, items] of Object.entries(groups)) {
+                        if (items.length > 0) {
+                            const card = document.createElement('div');
+                            card.className = 'com__content__right__card';
+                            const header = document.createElement('div');
+                            header.className = 'com__content__right__card__header';
+                            header.textContent = groupName;
+                            const content = document.createElement('div');
+                            content.className = 'com__content__right__card__content';
+
+                            items.forEach(item => {
+                                const itemEl = document.createElement('div');
+                                itemEl.className = 'com__content__right__card__item';
+                                itemEl.dataset.name = item.name;
+                                itemEl.dataset.type = item.type;
+                                const img = document.createElement('img');
+                                img.src = item.icon;
+                                img.alt = item.type;
+                                img.className = 'com__content__right__card__img';
+                                const text = document.createElement('div');
+                                text.className = 'com__content__right__card__text';
+                                text.textContent = item.name;
+                                itemEl.appendChild(img);
+                                itemEl.appendChild(text);
+                                content.appendChild(itemEl);
+                            });
+
+                            card.appendChild(header);
+                            card.appendChild(content);
+                            contentRight.appendChild(card);
+                        }
+                    }
+                } else {
+                    // --- 'My Computer'가 아닌 모든 하위 폴더를 위한 단순 렌더링 로직 ---
+                    const content = document.createElement('div');
+                    content.className = 'com__content__right__card__content';
+
+                    // 폴더를 파일보다 먼저 보여주기 위해 아이템들을 정렬합니다.
+                    const items = Object.entries(currentLevel).sort(([, a], [, b]) => {
+                        if ((a.type === 'folder' || a.type === 'drive') && b.type === 'file') return -1;
+                        if (a.type === 'file' && (b.type === 'folder' || b.type === 'drive')) return 1;
+                        return 0;
+                    });
+
+                    // 정렬된 아이콘들을 화면에 추가합니다. (그룹 UI 없음)
+                    for (const [name, item] of items) {
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'com__content__right__card__item';
+                        itemEl.dataset.name = name;
+                        itemEl.dataset.type = item.type;
+                        const img = document.createElement('img');
+                        img.src = item.icon;
+                        img.alt = item.type;
+                        img.className = 'com__content__right__card__img';
+                        const text = document.createElement('div');
+                        text.className = 'com__content__right__card__text';
+                        text.textContent = name;
+                        itemEl.appendChild(img);
+                        itemEl.appendChild(text);
+                        content.appendChild(itemEl);
+                    }
+                    contentRight.appendChild(content);
+                }
+
+                // --- 렌더링 후 UI 업데이트 및 이벤트 리스너 재설정 ---
+                // 화면이 다시 그려진 후, 주소창, 탐색 버튼 상태를 업데이트하고,
+                // 새로 생긴 아이콘들에 대한 상호작용(클릭, 키보드)이 가능하도록 리스너를 다시 설정합니다.
+                updateAddressBar(path, currentItem.icon);
+                updateNavButtons();
+                setupItemInteraction();
+            }
+
+            /**
+             * 주소창의 아이콘과 텍스트를 현재 경로에 맞게 업데이트합니다.
+             * 내부 경로(예: 'My Computer/...')를 사용자 친화적인 경로(예: 'C:\...')로 변환합니다.
+             */
+            function updateAddressBar(path, iconSrc) {
+                let displayPath = path;
+                if (path.startsWith('My Computer/Local Disk (C:)')) {
+                    displayPath = 'C:' + path.substring('My Computer/Local Disk (C:)'.length).replace(/\//g, '\\');
+                } else if (path.startsWith('My Computer/CD Drive (D:)')) {
+                    displayPath = 'D:' + path.substring('My Computer/CD Drive (D:)'.length).replace(/\//g, '\\');
+                }
+
+                addressBarText.textContent = displayPath;
+                addressBarIcon.src = iconSrc;
+            }
+
+            /**
+             * 뒤로/앞으로 가기 버튼의 활성화/비활성화 상태를 업데이트합니다.
+             */
+            function updateNavButtons() {
+                backBtn.className = historyIndex > 0 ? 'com__function_bar__button' : 'com__function_bar__button--disabled';
+                forwardBtn.className = historyIndex < navigationHistory.length - 1 ? 'com__function_bar__button' : 'com__function_bar__button--disabled';
+            }
+
+            /**
+             * 새 경로로 이동하고, 히스토리를 관리하며, 화면을 다시 렌더링합니다.
+             * @param {string} newPath - 이동할 새로운 경로
+             */
+            function navigateTo(newPath) {
+                currentPath = newPath;
+                if (historyIndex < navigationHistory.length - 1) {
+                    navigationHistory = navigationHistory.slice(0, historyIndex + 1);
+                }
+                navigationHistory.push(newPath);
+                historyIndex++;
+                render(currentPath);
+            }
+
+            /**
+             * 파일 타입의 아이템을 실행(더블클릭/Enter)했을 때 호출되는 함수입니다.
+             * @param {string} itemName - 실행할 아이템의 이름
+             */
+            /**
+             * 파일 타입의 아이템을 실행(더블클릭/Enter)했을 때 호출되는 함수입니다.
+             * @param {string} itemName - 실행할 아이템의 이름
+             */
+            function executeFile(itemName) {
+                // Check if the file is an image based on extension
+                const imageExtensions = ['.jpg', '.jpeg', '.png', '.bmp'];
+                const fileExtension = '.' + itemName.split('.').pop().toLowerCase();
+
+                if (fileExtension === '.pdf') {
+                    // This is a PDF file - launch PDF viewer app and send file path
+                    const fullPath = `${currentPath}/${itemName}`;
+                    console.log('Attempting to open PDF in viewer:', fullPath); // Debug log
+                    if (window.parent) {
+                        // Send launchApp message with payload for pdfviewer
+                        console.log('Sending launchApp message for pdfviewer with payload'); // Debug log
+                        window.parent.postMessage({
+                            type: 'launchApp',
+                            appId: 'pdfviewer',
+                            payload: {
+                                type: 'openPdfFile',
+                                filePath: fullPath
+                            }
+                        }, '*');
+                    }
+                } else if (imageExtensions.includes(fileExtension)) {
+                    // This is an image file - launch image viewer app and send file path
+                    const fullPath = `${currentPath}/${itemName}`;
+                    console.log('Attempting to open image in viewer:', fullPath); // Debug log
+                    if (window.parent) {
+                        // Send launchApp message with payload for imageviewer
+                        console.log('Sending launchApp message for imageviewer with payload'); // Debug log
+                        window.parent.postMessage({
+                            type: 'launchApp',
+                            appId: 'imageviewer',
+                            payload: {
+                                type: 'openImageViewer',
+                                filePath: fullPath
+                            }
+                        }, '*');
+                    }
+                } else if (fileExtension === '.txt') {
+                    // This is a text file - launch msnotepad app and send file path
+                    const fullPath = `${currentPath}/${itemName}`;
+                    console.log('Attempting to open text in notepad:', fullPath); // Debug log
+                    if (window.parent) {
+                        // Send launchApp message with payload for msnotepad
+                        console.log('Sending launchApp message for msnotepad with payload'); // Debug log
+                        window.parent.postMessage({
+                            type: 'launchApp',
+                            appId: 'msnotepad',
+                            payload: {
+                                type: 'openTextFile',
+                                filePath: fullPath,
+                                fileName: itemName
+                            }
+                        }, '*');
+                    }
+                } else {
+                    // This is not an image, PDF, or text file - show alert as before
+                    alert(`Executing file: ${itemName}\n(This is a custom function call)`);
+                }
+            }
+
+            // ==================================================================================
+            // 4. 이벤트 리스너 설정 및 초기화
+            // ==================================================================================
+
+            /**
+             * 화면에 그려진 모든 아이콘에 클릭/더블클릭 이벤트를 설정합니다.
+             * render() 함수가 호출될 때마다 새로 실행되어야 합니다.
+             */
+            function setupItemInteraction() {
+                const items = document.querySelectorAll('.com__content__right__card__item');
+                items.forEach(item => {
+                    // 아이콘 단일 클릭 이벤트는 FolderEnhancer가 처리하므로 제거됨
+
+                    // 아이콘 더블 클릭 이벤트 (폴더 진입 또는 파일 실행)
+                    item.addEventListener('dblclick', (e) => {
+                        e.stopPropagation();
+                        const itemName = item.dataset.name;
+                        const itemType = item.dataset.type;
+                        if (itemType === 'folder' || itemType === 'drive') {
+                            navigateTo(`${currentPath}/${itemName}`);
+                        } else {
+                            executeFile(itemName);
+                        }
+                    });
+                });
+            }
+
+            // --- 키보드 탐색 로직 (복원 및 통합됨) ---
+            // 아이콘 선택 해제, 위치 계산, 키보드 입력(방향키, Enter, Esc)을 처리합니다.
+            const clearAllSelections = () => {
+                document.querySelectorAll('.com__content__right__card__item.selected').forEach(item => {
+                    item.classList.remove('selected');
+                });
+            };
+
+
+
+            // 뒤로 가기 버튼 클릭 이벤트
+            backBtn.addEventListener('click', () => {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    currentPath = navigationHistory[historyIndex];
+                    render(currentPath);
+                }
+            });
+
+            // 앞으로 가기 버튼 클릭 이벤트
+            forwardBtn.addEventListener('click', () => {
+                if (historyIndex < navigationHistory.length - 1) {
+                    historyIndex++;
+                    currentPath = navigationHistory[historyIndex];
+                    render(currentPath);
+                }
+            });
+
+            // 아이콘이 없는 빈 공간 클릭 시 선택 해제
+            contentRight.addEventListener('click', (e) => {
+                if (e.target === contentRight) {
+                    clearAllSelections();
+                }
+            });
+
+            // 상단 드롭다운 메뉴 이벤트 처리
+            let isMenuActive = false;
+            menuItems.forEach(menuItem => {
+                menuItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const wasActive = menuItem.classList.contains('active');
+                    menuItems.forEach(item => item.classList.remove('active'));
+                    isMenuActive = false;
+                    if (!wasActive) {
+                        menuItem.classList.add('active');
+                        isMenuActive = true;
+                    }
+                });
+                menuItem.addEventListener('mouseenter', () => {
+                    if (isMenuActive) {
+                        menuItems.forEach(item => item.classList.remove('active'));
+                        menuItem.classList.add('active');
+                    }
+                });
+            });
+            document.addEventListener('click', () => {
+                menuItems.forEach(item => item.classList.remove('active'));
+                isMenuActive = false;
+            });
+
+            // 메뉴 액션 처리 (Close 등)
+            const closeItem = document.querySelector('[data-action="Close"]');
+            if (closeItem) {
+                closeItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // 메뉴 닫기
+                    menuItems.forEach(item => item.classList.remove('active'));
+                    isMenuActive = false;
+
+                    // 경고창 및 닫기
+                    if (confirm('Do you want to close this window?')) {
+                        window.parent.postMessage({ type: 'closeWindow' }, '*');
+                    }
+                });
+            }
+
+            // --- 초기 화면 렌더링 ---
+            // 스크립트가 로드되면, 초기 경로('My Computer')를 기준으로 첫 화면을 그립니다.
+            render(currentPath);
+        });
+    </script>
+
+</body>
+
+</html>

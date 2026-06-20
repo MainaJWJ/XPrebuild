@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webamp</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            background-color: #ece9d8;
+            font-family: Tahoma, sans-serif;
+            color: #000;
+            height: 100%;
+            overflow: hidden;
+        }
+        .webamp-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+        .webamp-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .webamp-info {
+            margin-bottom: 20px;
+        }
+        .webamp-controls {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 5px 10px;
+            background: #ece9d8;
+            border: 2px solid;
+            border-top-color: #fff;
+            border-left-color: #fff;
+            border-bottom-color: #808080;
+            border-right-color: #808080;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ccc;
+        }
+    </style>
+    <script src="../../focusController.js"></script>
+</head>
+<body>
+    <div class="webamp-placeholder">
+        <div class="webamp-title">WEBAMP PLAYER</div>
+        <div class="webamp-info">Webamp is running in a separate manager</div>
+        <div class="webamp-controls">
+            <button onclick="window.parent.postMessage({type: 'exitFullscreenApp'}, '*')">Close</button>
+        </div>
+    </div>
+</body>
+</html>

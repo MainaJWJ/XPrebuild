@@ -1,0 +1,100 @@
+==========================================================
+Windows Media Player 가상 창 크기 조절 (리사이즈) 구현 코드
+==========================================================
+이전 버전을 복원하신 뒤, 창 크기 조절과 시스템 포커스 연동을 다시 복구하시려면 아래의 4가지 파일에 다음 코드들을 추가/수정해주시면 됩니다.
+
+1. [focusController.js] - 시스템 포커스 연동
+수정 전:
+const parentWindow = iframe.closest('.xp-window');
+
+수정 후:
+const parentWindow = iframe.closest('.xp-window, #wmplayer-container');
+
+
+2. [app/wmplayer/wmp8.css] - 마우스 커서 및 반응형 컨테이너
+파일의 빈 곳에 아래 내용을 편하게 추가합니다.
+app.wmp {
+    width: 100%;
+    height: 100%;
+}
+app.wmp appcontents {
+    width: 100%;
+    height: 100%;
+    min-width: 200px;
+    min-height: 200px;
+}
+app.wmp wmpmainframe #cornermetal #wmpresizer {
+    cursor: se-resize !important;
+}
+
+
+3. [app/wmplayer/index.html] - 크기 조절 마우스 이벤트 발송
+<script> 내부의 드래그 이벤트 코드 아래쪽(또는 맨 끝부분)에 추가합니다.
+// 8. 창 크기 조절 (Resizing) - 우측 하단
+const resizer = document.getElementById('wmpresizer');
+if (resizer) {
+    let isResizing = false;
+    resizer.addEventListener('mousedown', (e) => {
+        e.stopPropagation(); // 일반 바탕 드래그 이벤트 방지
+        isResizing = true;
+        window.parent.postMessage({ type: 'wmplayerResizeStart', x: e.screenX, y: e.screenY }, '*');
+    });
+    window.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        window.parent.postMessage({ type: 'wmplayerResize', x: e.screenX, y: e.screenY }, '*');
+    });
+    window.addEventListener('mouseup', () => {
+        if (isResizing) {
+            isResizing = false;
+            window.parent.postMessage({ type: 'wmplayerResizeEnd' }, '*');
+        }
+    });
+}
+
+
+4. [app/wmplayer/wmplayerManager.js] - 부모 창에서 실시간 크기 갱신
+* constructor() 안에 추가:
+this.isResizing = false;
+this.startWidth = 0;
+this.startHeight = 0;
+
+* handleMessage(e) 안의 최상단에 포커스 로직 추가:
+if (e.data.type === 'focusWindow' && e.data.windowId === 'wmplayer-window') {
+    this.bringToFront();
+}
+
+* handleMessage(e) 안의 // 드래그 제어 로직들 틈에 덧붙여 추가:
+} else if (e.data.type === 'wmplayerResizeStart') {
+    if (!document.getElementById('wm-drag-glass')) {
+        const glass = document.createElement('div');
+        glass.id = 'wm-drag-glass';
+        glass.style.cssText = 'position: absolute; top:0; left:0; width:100%; height:100%; z-index:999999; cursor: se-resize;';
+        document.body.appendChild(glass);
+    }
+    this.isResizing = true;
+    this.startX = e.data.x;
+    this.startY = e.data.y;
+    this.startWidth = parseInt(this.container.style.width, 10) || 640;
+    this.startHeight = parseInt(this.container.style.height, 10) || 560;
+    this.bringToFront();
+
+} else if (e.data.type === 'wmplayerResize') {
+    if (this.isResizing && this.container) {
+        const dx = e.data.x - this.startX;
+        const dy = e.data.y - this.startY;
+        let newWidth = this.startWidth + dx;
+        let newHeight = this.startHeight + dy;
+                
+        // 최소 200x200 제한
+        if (newWidth < 200) newWidth = 200;
+        if (newHeight < 200) newHeight = 200;
+                
+        this.container.style.width = newWidth + 'px';
+        this.container.style.height = newHeight + 'px';
+    }
+
+} else if (e.data.type === 'wmplayerResizeEnd') {
+    this.isResizing = false;
+    const glass = document.getElementById('wm-drag-glass');
+    if (glass) glass.remove();
+}

@@ -1,0 +1,20 @@
+{
+  "project_name": "Classic-WindowsXP-Spider-Solitaire",
+  "last_modification_date": "2026-04-19T22:49:30+09:00",
+  "changes": [
+    {
+      "date": "2026-04-19T22:27:35+09:00",
+      "description": "Moved Google Tag Manager (gtag.js) initialization and configuration from index.html to local aaa.js. Updated index.html to reference aaa.js locally. Tracking ID: G-0P25S2ED06."
+    },
+    {
+      "date": "2026-04-19T22:44:10+09:00",
+      "description": "Removed the initial 'Microsoft Windows XP' splash screen by setting game_state to 2 (In-Game) at startup and removing the splash render logic in drawmanager.js."
+    },
+    {
+      "date": "2026-04-19T22:49:30+09:00",
+      "description": "Removed top menu buttons (New Game, Restart, Difficulty, Mute, Hint, Undo) and the menu bar background graphics while preserving underlying logic for future custom UI implementation."
+    }
+  ],
+  "current_gtag_location": "aaa.js",
+  "gtag_id": "G-0P25S2ED06"
+}

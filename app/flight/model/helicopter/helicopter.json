@@ -1,0 +1,132 @@
+{
+  "faction": "BLUE",
+  "hostileFactions": [
+    "RED"
+  ],
+  "destruction": {
+    "explosionScale": 7.0,
+    "explosionCount": 1,
+    "health": 100000,
+    "damage": 100
+  },
+  "collisionRadius": 40.0,
+  "model": {
+    "file": "model/helicopter/helicopter.glb",
+    "scale": 0.3,
+    "initialRotation": {
+      "x": 0,
+      "y": 88,
+      "z": 0
+    },
+    "initialPosition": {
+      "x": 7600,
+      "y": 574,
+      "z": -9400
+    },
+    "spawnHeading": 0,
+    "initialGrounded": true
+  },
+  "performance": {
+    "rollResponse": 0.7,
+    "pitchResponse": 0.7,
+    "speed": 420,
+    "climbSpeed": 150,
+    "acceleration": 2.5,
+    "accelerationRate": 0.15,
+    "minSpeed": 0,
+    "stallSpeed": 0,
+    "gravityEffect": 0.0,
+    "turnDrag": 0.1,
+    "turnSensitivity": 0.015,
+    "pitchRate": 1.2,
+    "rollRate": 1.5,
+    "yawRate": 1.0,
+    "flareAmmo": 30,
+    "flare": {
+      "lifespan": 6.0,
+      "gravity": 120.0,
+      "drag": 1.2,
+      "interval": 0.18,
+      "burstCount": 4,
+      "cooldown": 3.0
+    },
+    "gun": {
+      "fireCooldown": 0.05,
+      "bulletSpeed": 3500,
+      "bulletLife": 2.5,
+      "bulletSpread": 0.025,
+      "damage": 15
+    },
+    "pitchLimits": {
+      "up": 20,
+      "down": -20
+    },
+    "maxRollAngle": 20
+  },
+  "camera": {
+    "lerpSpeed": 0.15,
+    "minDistance": 60,
+    "maxDistance": 300,
+    "lookAtDistance": 800,
+    "s1": {
+      "x": -1000,
+      "y": 700,
+      "z": 0
+    },
+    "s2": {
+      "x": -200,
+      "y": 400,
+      "z": 0,
+      "lookAtMode": "bombing_sight"
+    },
+    "s3": {
+      "x": 15,
+      "y": 40,
+      "z": 1,
+      "lookAtMode": "cockpit"
+    }
+  },
+  "rearviewMirror": {
+    "offset": {
+      "x": -15,
+      "y": 15,
+      "z": 0
+    },
+    "lookTarget": {
+      "x": -100,
+      "y": 10,
+      "z": 0
+    }
+  },
+  "visuals": {
+    "engineHardpoints": [],
+
+    "gunHardpoints": [
+      {
+        "x": 35,
+        "y": -5,
+        "z": 0
+      }
+    ]
+  },
+  "hardpoints": {
+    "hardpoint_1": {
+      "type": "airbomb",
+      "position": { "x": 0, "y": -6, "z": 0 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "scale": 0.4
+    },
+    "hardpoint_2": {
+      "type": "aim120d",
+      "position": { "x": 5, "y": -2, "z": -15 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "scale": 0.4
+    },
+    "hardpoint_4": {
+      "type": "aim120d",
+      "position": { "x": 5, "y": -2, "z": 15 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "scale": 0.4
+    }
+  }
+}

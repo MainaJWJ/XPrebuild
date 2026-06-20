@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft PowerPoint</title>
+    <link rel="icon" href="../../image/ppt.png" type="image/png">
+    <!-- Reuse Excel's Icon Font -->
+    <link rel='stylesheet' href='../excel/iconfont.min.css' />
+    <link rel="stylesheet" href="../../scroll.css">
+
+    <style>
+        :root {
+            --ppt-orange: #d24726;
+            --ppt-orange-dark: #b43c1f;
+            --ribbon-bg: #f3f2f1;
+            --border-color: #e1dfdd;
+            --hover-bg: #cda8a2;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f3f3f3;
+        }
+
+        /* Layout Container */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background-color: var(--ppt-orange);
+            color: white;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 13px;
+        }
+
+        .app-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+            background: url('../../image/ppt.png') no-repeat center/contain;
+        }
+
+        .window-controls {
+            margin-left: auto;
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            cursor: pointer;
+        }
+
+        /* Ribbon */
+        .ribbon {
+            background-color: var(--ribbon-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ribbon-tabs {
+            display: flex;
+            padding-left: 10px;
+            background-color: var(--ppt-orange);
+        }
+
+        .ribbon-tab {
+            padding: 6px 15px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        .ribbon-tab.active {
+            background-color: var(--ribbon-bg);
+            color: var(--ppt-orange);
+            font-weight: bold;
+        }
+
+        .ribbon-toolbar {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            gap: 10px;
+        }
+
+        .tool-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 8px;
+            border: 1px solid transparent;
+            border-radius: 2px;
+            cursor: pointer;
+            color: #333;
+            font-size: 12px;
+        }
+
+        .tool-btn:hover {
+            background-color: #e1dfdd;
+        }
+
+        .tool-btn i {
+            font-size: 18px;
+            margin-bottom: 2px;
+            color: #555;
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background-color: #ccc;
+            margin: 0 5px;
+        }
+
+        /* Workspace */
+        .workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #e1dfdd;
+            border-right: 1px solid #ccc;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slide-thumb {
+            width: 100%;
+            height: 100px;
+            /* Aspect 16:9 approx */
+            background-color: white;
+            border: 1px solid #999;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .slide-thumb.active {
+            border: 2px solid var(--ppt-orange);
+        }
+
+        .main-stage {
+            flex: 1;
+            background-color: #d0d0d0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            position: relative;
+        }
+
+        /* Slide Content mimicking the original Code */
+        .slide-page {
+            width: 960px;
+            /* 10in @ 96dpi */
+            height: 540px;
+            /* 16:9 */
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            outline: none;
+        }
+
+        .editable-area {
+            position: absolute;
+            left: 50px;
+            top: 50px;
+            right: 50px;
+            bottom: 50px;
+            border: 1px dashed #ddd;
+            padding: 20px;
+            font-size: 24px;
+        }
+
+        @media screen and (max-width: 800px) {
+            .slide-page {
+                transform: scale(0.6);
+            }
+        }
+    </style>
+    <script src="../../focusController.js"></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Title Bar -->
+        <!-- Title Bar Removed -->
+
+        <!-- Ribbon -->
+        <div class="ribbon">
+            <div class="ribbon-tabs">
+                <div class="ribbon-tab">File</div>
+                <div class="ribbon-tab active">Home</div>
+                <div class="ribbon-tab">Insert</div>
+                <div class="ribbon-tab">Design</div>
+                <div class="ribbon-tab">Transitions</div>
+                <div class="ribbon-tab">Animations</div>
+                <div class="ribbon-tab">Slide Show</div>
+            </div>
+            <div class="ribbon-toolbar">
+                <div class="tool-btn" onclick="execCmd('paste')" title="Paste">
+                    <i class="iconfont luckysheet-iconfont-niantie"></i>
+                </div>
+                <!-- Separator -->
+                <div class="separator"></div>
+
+                <div class="tool-btn" onclick="execCmd('bold')" title="Bold">
+                    <i class="iconfont luckysheet-iconfont-jiacu"></i>
+                </div>
+                <div class="tool-btn" onclick="execCmd('italic')" title="Italic">
+                    <i class="iconfont luckysheet-iconfont-wenbenqingxie1"></i>
+                </div>
+                <div class="tool-btn" onclick="execCmd('underline')" title="Underline">
+                    <i class="iconfont luckysheet-iconfont-wenbenxiahuaxian"></i>
+                </div>
+                <div class="tool-btn" onclick="execCmd('strikeThrough')" title="Strikethrough">
+                    <i class="iconfont luckysheet-iconfont-wenbenshanchuxian"></i>
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="tool-btn" onclick="execCmd('justifyLeft')" title="Align Left">
+                    <i class="iconfont luckysheet-iconfont-wenbenzuoduiqi"></i>
+                </div>
+                <div class="tool-btn" onclick="execCmd('justifyCenter')" title="Align Center">
+                    <i class="iconfont luckysheet-iconfont-wenbenjuzhongduiqi"></i>
+                </div>
+                <div class="tool-btn" onclick="execCmd('justifyRight')" title="Align Right">
+                    <i class="iconfont luckysheet-iconfont-wenbenyouduiqi"></i>
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="tool-btn" onclick="addTextBox()" title="Insert Text Box">
+                    <i class="iconfont luckysheet-iconfont-wenbenhengxiang"></i>
+                    <span style="font-size: 10px;">Text Box</span>
+                </div>
+
+                <div class="tool-btn" onclick="addSlide()" title="New Slide">
+                    <i class="iconfont luckysheet-iconfont-jia"></i>
+                    <span style="font-size: 10px;">New Slide</span>
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="tool-btn" onclick="startSlideShow()" title="Slide Show">
+                    <i class="iconfont luckysheet-iconfont-yunhang"></i>
+                    <span style="font-size: 10px;">Play</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workspace -->
+        <div class="workspace">
+            <div class="sidebar" id="slide-sidebar">
+                <!-- Thumbnails will go here -->
+            </div>
+            <div class="main-stage">
+                <div class="slide-page" id="main-slide">
+                    <div class="editable-area" contenteditable="true">
+                        <h1>Click to add title</h1>
+                        <p>Click to add subtitle</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        let slides = [{
+            id: 1,
+            elements: [{
+                type: 'text',
+                content: '<h1>Click to add title</h1>',
+                top: 150,
+                left: 100,
+                width: 760,
+                height: 100
+            }, {
+                type: 'text',
+                content: '<p>Click to add subtitle</p>',
+                top: 280,
+                left: 100,
+                width: 760,
+                height: 80
+            }]
+        }];
+        let currentSlideId = 1;
+
+        // --- DOM Elements ---
+        const sidebar = document.getElementById('slide-sidebar');
+        const mainStage = document.getElementById('main-slide');
+
+        // --- Rendering ---
+        function render() {
+            renderSidebar();
+            renderStage();
+        }
+
+        function renderSidebar() {
+            sidebar.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = `slide-thumb ${slide.id === currentSlideId ? 'active' : ''}`;
+                thumb.onclick = () => {
+                    currentSlideId = slide.id;
+                    render();
+                };
+
+                // Mini Preview (Simplified)
+                let previewHTML = '';
+                slide.elements.forEach(el => {
+                    // Scaled down positioning for preview (approx 10%)
+                    previewHTML += `<div style="position:absolute; top:${el.top / 10}px; left:${el.left / 10}px; width:${el.width / 10}px; height:${el.height / 10}px; background:#ddd; overflow:hidden; font-size:2px;"></div>`;
+                });
+
+                thumb.innerHTML = `
+                    ${previewHTML}
+                    <span style="position:absolute; bottom:5px; right:5px; font-size:10px; color:#666;">${index + 1}</span>
+                `;
+                sidebar.appendChild(thumb);
+            });
+        }
+
+        function renderStage() {
+            mainStage.innerHTML = '';
+            const slide = slides.find(s => s.id === currentSlideId);
+            if (!slide) return;
+
+            slide.elements.forEach((el, index) => {
+                const div = document.createElement('div');
+                div.className = 'editable-area';
+                div.style.top = el.top + 'px';
+                div.style.left = el.left + 'px';
+                div.style.width = el.width + 'px';
+                div.style.height = el.height + 'px';
+                div.innerHTML = el.content;
+                div.contentEditable = true;
+
+                // Event Listeners for Interaction
+                div.onmousedown = (e) => startDrag(e, index, div);
+                div.oninput = (e) => {
+                    el.content = div.innerHTML;
+                }; // Auto-save content
+
+                mainStage.appendChild(div);
+            });
+        }
+
+        // --- Actions ---
+        function addSlide() {
+            const newId = Date.now();
+            slides.push({
+                id: newId,
+                elements: [{
+                    type: 'text',
+                    content: '<h2>Title</h2>',
+                    top: 50,
+                    left: 50,
+                    width: 860,
+                    height: 60
+                }, {
+                    type: 'text',
+                    content: '<p>Content...</p>',
+                    top: 130,
+                    left: 50,
+                    width: 860,
+                    height: 300
+                }]
+            });
+            currentSlideId = newId;
+            render();
+        }
+
+        function addTextBox() {
+            const slide = slides.find(s => s.id === currentSlideId);
+            if (slide) {
+                slide.elements.push({
+                    type: 'text',
+                    content: '<p>New Text Box</p>',
+                    top: 200,
+                    left: 200,
+                    width: 300,
+                    height: 50
+                });
+                render();
+            }
+        }
+
+        function execCmd(command, value = null) {
+            // Ensure we are focusing the document (specifically the editable area)
+            // Note: Since we use mousedown(preventDefault) on buttons, focus should persist.
+            document.execCommand(command, false, value);
+
+            // Force focus back to the editable area if lost (though preventDefault usually handles it)
+            if (selectedElement) {
+                // Ideally we'd track the exact selection range, but for simple B/I/U, 
+                // just keeping focus or letting the browser handle selection is usually enough 
+                // IF we didn't lose it.
+            }
+        }
+
+        // Prevent toolbar buttons from stealing focus
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.onmousedown = (e) => {
+                e.preventDefault(); // Critical: Keeps focus on the contenteditable element
+            };
+        });
+
+        // --- Drag & Drop Logic ---
+        let isDragging = false;
+        let dragTargetIdx = -1;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let initialLeft = 0;
+        let initialTop = 0;
+
+        function startDrag(e, index, divElement) {
+            if (e.target !== divElement) return; // Allow text selection inside
+
+            isDragging = true;
+            dragTargetIdx = index;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            initialLeft = parseInt(divElement.style.left || 0);
+            initialTop = parseInt(divElement.style.top || 0);
+
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function onDrag(e) {
+            if (!isDragging) return;
+            const dx = e.clientX - dragStartX;
+            const dy = e.clientY - dragStartY;
+
+            const slide = slides.find(s => s.id === currentSlideId);
+            if (slide && slide.elements[dragTargetIdx]) {
+                slide.elements[dragTargetIdx].left = initialLeft + dx;
+                slide.elements[dragTargetIdx].top = initialTop + dy;
+                renderStage(); // Re-render to update pos (optimization: direct style update)
+            }
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('mouseup', stopDrag);
+            renderSidebar(); // Update thumbnail position
+        }
+
+        // --- Init ---
+        render();
+
+        // --- Slide Show Logic ---
+        function startSlideShow() {
+            // Create a fullscreen overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'fullscreen-overlay';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100vw';
+            overlay.style.height = '100vh';
+            overlay.style.backgroundColor = 'black';
+            overlay.style.zIndex = '9999';
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+
+            // Container for slide content to scale it
+            const stage = document.createElement('div');
+            stage.style.width = '960px'; // Base width
+            stage.style.height = '540px'; // Base height
+            stage.style.backgroundColor = 'white';
+            stage.style.position = 'relative';
+            stage.style.overflow = 'hidden';
+            stage.style.transformOrigin = 'center center';
+
+            overlay.appendChild(stage);
+            document.body.appendChild(overlay);
+
+            // Request Fullscreen
+            if (overlay.requestFullscreen) {
+                overlay.requestFullscreen();
+            } else if (overlay.webkitRequestFullscreen) { /* Safari */
+                overlay.webkitRequestFullscreen();
+            } else if (overlay.msRequestFullscreen) { /* IE11 */
+                overlay.msRequestFullscreen();
+            }
+
+            // Render current slide into the overlay
+            renderFullscreenSlide(stage);
+
+            // Scale to fit
+            const scaleX = window.innerWidth / 960;
+            const scaleY = window.innerHeight / 540;
+            const scale = Math.min(scaleX, scaleY);
+            stage.style.transform = `scale(${scale})`;
+
+            // Event Listeners
+            document.addEventListener('keydown', handleFullscreenKey);
+            overlay.addEventListener('click', nextFullscreenSlide);
+            window.addEventListener('resize', () => {
+                const sx = window.innerWidth / 960;
+                const sy = window.innerHeight / 540;
+                const s = Math.min(sx, sy);
+                stage.style.transform = `scale(${s})`;
+            });
+
+            // Handle Fullscreen Exit
+            document.addEventListener('fullscreenchange', onFullscreenChange);
+        }
+
+        function renderFullscreenSlide(container) {
+            container.innerHTML = '';
+            const slide = slides.find(s => s.id === currentSlideId);
+            if (!slide) return;
+
+            slide.elements.forEach(el => {
+                const div = document.createElement('div');
+                div.style.position = 'absolute';
+                div.style.top = el.top + 'px';
+                div.style.left = el.left + 'px';
+                div.style.width = el.width + 'px';
+                div.style.height = el.height + 'px';
+                div.innerHTML = el.content;
+                // No contentEditable, no dragging
+                container.appendChild(div);
+            });
+        }
+
+        function nextFullscreenSlide(e) {
+            // Simple next slide logic
+            const idx = slides.findIndex(s => s.id === currentSlideId);
+            if (idx < slides.length - 1) {
+                currentSlideId = slides[idx + 1].id;
+                const stage = document.querySelector('#fullscreen-overlay > div');
+                if (stage) renderFullscreenSlide(stage);
+            } else {
+                exitSlideShow(); // End on last click
+            }
+        }
+
+        function prevFullscreenSlide() {
+            const idx = slides.findIndex(s => s.id === currentSlideId);
+            if (idx > 0) {
+                currentSlideId = slides[idx - 1].id;
+                const stage = document.querySelector('#fullscreen-overlay > div');
+                if (stage) renderFullscreenSlide(stage);
+            }
+        }
+
+        function handleFullscreenKey(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                nextFullscreenSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevFullscreenSlide();
+            } else if (e.key === 'Escape') {
+                exitSlideShow();
+            }
+        }
+
+        function onFullscreenChange() {
+            if (!document.fullscreenElement) {
+                exitSlideShow();
+            }
+        }
+
+        function exitSlideShow() {
+            const overlay = document.getElementById('fullscreen-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+            document.removeEventListener('keydown', handleFullscreenKey);
+            document.removeEventListener('fullscreenchange', onFullscreenChange);
+
+            // Restore normal view (in case index changed)
+            render();
+
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+        }
+
+    </script>
+</body>
+
+</html>

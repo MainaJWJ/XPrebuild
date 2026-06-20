@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sound Recorder</title>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: #ece9d8;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+
+        .sndrec32 {
+            padding: 0;
+            background: #ece9d8;
+        }
+
+        .sndrec32 .display-panel { 
+            height: 48px; 
+            flex-grow: 1;
+            background-color: black; 
+            border-right: 1px solid #ffffff;
+            border-bottom: 1px solid #ffffff;
+            border-left: 1px solid #808080;
+            border-top: 1px solid #808080;
+            box-shadow: inset 1px 1px 0px black;
+            position: relative; 
+            margin: 0 6px;
+        }
+        
+        .sndrec32 .waveform-canvas { width: 100%; height: 100%; display: block; }
+        
+        .sndrec32 .controls-panel { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 6px 10px 10px 10px; 
+        }
+        
+        .sndrec32 .progress-bar { 
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%; 
+            margin: 10px 0; 
+            display: block;
+            background: transparent;
+        }
+
+        .sndrec32 .progress-bar:focus {
+            outline: none;
+        }
+
+        .sndrec32 .progress-bar::-moz-range-track {
+            height: 2px;
+            background: #F0EDE0;
+            border: 1px solid #FFFFFF;
+            border-top: 1px solid #9D9C99;
+            border-left: 1px solid #9D9C99;
+            border-radius: 2px;
+            box-shadow: inset 0 1px #F2F1E9;
+        }
+
+        .sndrec32 .progress-bar::-moz-range-thumb {
+            border-radius: 0;
+            background: #F3F3EF;
+            border: 1px solid #778892;
+            border-top: 1px solid #B5C4CD;
+            border-left: 1px solid #B5C4CD;
+            width: 9px;
+            height: 20px;
+            box-shadow: inset 0 2px #48CB46, inset 0 -2px #48CB46;
+            border-radius: 2px;
+        }
+
+        .sndrec32 .progress-bar::-moz-range-thumb:hover {
+            box-shadow: inset 0 2px #F9B435, inset 0 -2px #F9B435;
+        }
+
+        .sndrec32 .progress-bar::-moz-range-thumb:active {
+            box-shadow: inset 0 2px #229512, inset 0 -2px #229512;
+        }
+
+        .sndrec32 .progress-bar::-webkit-slider-runnable-track {
+            height: 2px;
+            background: #F0EDE0;
+            border: 1px solid #FFFFFF;
+            border-top: 1px solid #9D9C99;
+            border-left: 1px solid #9D9C99;
+            border-radius: 2px;
+            box-shadow: inset 0 1px #F2F1E9;
+        }
+
+        .sndrec32 .progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            margin-top: -10px;
+            border-radius: 0;
+            background: #F3F3EF;
+            border: 1px solid #778892;
+            border-top: 1px solid #B5C4CD;
+            border-left: 1px solid #B5C4CD;
+            width: 11px;
+            height: 22px;
+            box-shadow: inset 0 2px #48CB46, inset 0 -2px #48CB46;
+            border-radius: 3px;
+        }
+
+        .sndrec32 .progress-bar::-webkit-slider-thumb:hover {
+            box-shadow: inset 0 2px #F9B435, inset 0 -2px #F9B435;
+        }
+
+        .sndrec32 .progress-bar::-webkit-slider-thumb:active {
+            box-shadow: inset 0 2px #229512, inset 0 -2px #229512;
+        }
+        
+        .sndrec32 .time-info { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            width: 100%; 
+            font-size: 11px; 
+            margin-bottom: 4px;
+        }
+
+        .sndrec32 .info-label {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 70px;
+            text-align: center;
+        }
+
+        .sndrec32 .buttons { 
+            display: flex; 
+            justify-content: center; 
+            gap: 5px; 
+            width: 100%;
+        }
+        
+        .sndrec32 winbutton {
+            min-width: 54px !important;
+            height: 28px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            background: linear-gradient(180deg, #ffffff 0%, #ece9d8 100%);
+            border: 1px solid #7a96df;
+            border-radius: 3px;
+            cursor: pointer;
+            box-sizing: border-box;
+            box-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+        }
+        
+        .sndrec32 winbutton:active:not(.disabled) {
+            background: #e2e1d9;
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5);
+            padding-top: 2px;
+            padding-left: 2px;
+        }
+        
+        .sndrec32 winbutton svg { 
+            width: 18px; 
+            height: 18px; 
+            fill: #000; 
+        }
+        
+        .sndrec32 winbutton[data-action="record"] svg {
+            fill: #d50000;
+        }
+        
+        .sndrec32 winbutton.disabled svg {
+            fill: #a0a0a0; 
+        }
+
+        .sndrec32 winbutton.disabled {
+            cursor: default;
+            box-shadow: none;
+        }
+
+        .xp-menubar {
+            height: 24px;
+            border-bottom: 0px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0px 0 0px 0px;
+            border-left: 0;
+            display: flex;
+            background: linear-gradient(to right, #edede5 0%, #ede8cd 100%);
+            font-family: Tahoma, 'Noto Sans', sans-serif;
+            font-size: 11px;
+        }
+
+        .xp-menubar .menu-item {
+            position: relative;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            user-select: none;
+            color: #000;
+        }
+
+        .xp-menubar .menu-item:hover,
+        .xp-menubar .menu-item.active {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        .xp-menubar .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #888;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            list-style: none;
+            padding: 2px;
+            margin: 0;
+            z-index: 100;
+            color: black;
+            min-width: 150px;
+        }
+
+        .xp-menubar .menu-item.active .dropdown-menu {
+            display: block;
+        }
+
+        .xp-menubar .dropdown-menu li {
+            padding: 2px 20px 2px 25px;
+            white-space: nowrap;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .xp-menubar .dropdown-menu li:hover {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        .xp-menubar .dropdown-menu li.disabled {
+            color: #888;
+            pointer-events: none;
+        }
+
+        .xp-menubar .dropdown-menu li.disabled:hover {
+            background-color: transparent;
+            color: #888;
+            cursor: default;
+        }
+
+        .xp-menubar .dropdown-menu li.checked::before {
+            content: '✓';
+            position: absolute;
+            left: 7px;
+            font-weight: bold;
+        }
+
+        .xp-menubar .dropdown-menu li.separator {
+            height: 1px;
+            background-color: #ccc;
+            padding: 0;
+            margin: 4px 0;
+            cursor: default;
+        }
+
+        .xp-menubar .dropdown-menu li.separator:hover {
+            background-color: #ccc;
+            color: inherit;
+        }
+
+    </style>
+</head>
+<body>
+
+        <div class="sndrec32">
+            <div id="menu2" class="xp-menubar">
+                <div class="menu-item"><span><u>F</u>ile</span>
+                    <ul class="dropdown-menu">
+                        <li data-cmd="new"><u>N</u>ew</li>
+                        <li data-cmd="open"><u>O</u>pen...</li>
+                        <li data-cmd="save" class="disabled"><u>S</u>ave</li>
+                        <li data-cmd="saveas" class="disabled">Save <u>A</u>s...</li>
+                        <li class="disabled"><u>R</u>evert...</li>
+                        <li class="separator"></li>
+                        <li class="disabled"><u>P</u>roperties</li>
+                        <li class="separator"></li>
+                        <li>E<u>x</u>it</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>E</u>dit</span>
+                    <ul class="dropdown-menu">
+                        <li class="disabled"><u>C</u>opy</li>
+                        <li class="disabled"><u>P</u>aste Insert</li>
+                        <li class="disabled">Paste <u>M</u>ix</li>
+                        <li class="separator"></li>
+                        <li class="disabled"><u>I</u>nsert File...</li>
+                        <li class="disabled">Mix with <u>F</u>ile...</li>
+                        <li class="separator"></li>
+                        <li data-cmd="deleteBefore" class="disabled">Delete <u>B</u>efore Current Position</li>
+                        <li data-cmd="deleteAfter" class="disabled">Delete <u>A</u>fter Current Position</li>
+                        <li class="separator"></li>
+                        <li class="disabled">A<u>u</u>dio Properties</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span>E<u>f</u>fects</span>
+                     <ul class="dropdown-menu">
+                        <li data-cmd="volUp" class="disabled"><u>I</u>ncrease Volume (by 25%)</li>
+                        <li data-cmd="volDown" class="disabled"><u>D</u>ecrease Volume</li>
+                        <li class="separator"></li>
+                        <li data-cmd="speedUp" class="disabled">I<u>n</u>crease Speed (by 100%)</li>
+                        <li data-cmd="speedDown" class="disabled">D<u>e</u>crease Speed</li>
+                        <li class="separator"></li>
+                        <li data-cmd="echo" class="disabled">Add <u>E</u>cho</li>
+                        <li data-cmd="reverse" class="disabled"><u>R</u>everse</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>H</u>elp</span>
+                    <ul class="dropdown-menu">
+                        <li class="disabled">Help <u>T</u>opics</li>
+                        <li class="separator"></li>
+                        <li class="disabled"><u>A</u>bout Sound Recorder</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="controls-panel">
+                <div class="time-info">
+                    <div class="info-label">  
+                        <span id="position-label">Position:</span>
+                        <span id="position-value">0.00 s</span>
+                    </div>
+                  
+                    <div class="display-panel">
+                        <canvas class="waveform-canvas"></canvas>
+                    </div>
+
+                    <div class="info-label"> 
+                        <span id="length-label">Length:</span>
+                        <span id="length-value">0.00 s</span>
+                    </div>
+                </div>
+                
+                <input type="range" class="progress-bar" value="0" min="0" max="1000" disabled="">
+                
+                <div class="buttons">
+                    <winbutton data-action="seek-start" title="Seek to Start" class="disabled">
+                       <svg viewBox="0 0 24 24"><path d="M19 5l-10 7 10 7V5zM11 5l-10 7 10 7V5z"></path></svg>
+                    </winbutton>
+                    
+                    <winbutton data-action="seek-end" title="Seek to End" class="disabled">
+                        <svg viewBox="0 0 24 24"><path d="M5 5v14l10-7zM13 5v14l10-7z"></path></svg>
+                    </winbutton>
+                    
+                    <winbutton data-action="play" title="Play" class="disabled">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                    </winbutton>
+                    
+                    <winbutton data-action="stop" title="Stop" class="disabled">
+                        <svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"></path></svg>
+                    </winbutton>
+                    
+                    <winbutton data-action="record" title="Record">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle></svg>
+                    </winbutton>
+                </div>
+            </div>
+            <audio id="sndrec-player" style="display:none;"></audio>
+            <input type="file" id="file-open-input" accept="audio/*" style="display:none;">
+        </div>
+
+    <script>
+// === WAV Encoder ===
+function audioBufferToWav(buffer) {
+  const numCh = buffer.numberOfChannels, sr = buffer.sampleRate, len = buffer.length;
+  const bytesPerSample = 2, blockAlign = numCh * bytesPerSample;
+  const dataSize = len * blockAlign, bufSize = 44 + dataSize;
+  const ab = new ArrayBuffer(bufSize), dv = new DataView(ab);
+  let o = 0;
+  function ws(s){for(let i=0;i<s.length;i++){dv.setUint8(o,s.charCodeAt(i));o++}}
+  function wu32(v){dv.setUint32(o,v,true);o+=4}
+  function wu16(v){dv.setUint16(o,v,true);o+=2}
+  ws('RIFF'); wu32(bufSize-8); ws('WAVE'); ws('fmt ');
+  wu32(16); wu16(1); wu16(numCh); wu32(sr); wu32(sr*blockAlign); wu16(blockAlign); wu16(16);
+  ws('data'); wu32(dataSize);
+  const channels = [];
+  for(let c=0;c<numCh;c++) channels.push(buffer.getChannelData(c));
+  for(let i=0;i<len;i++){
+    for(let c=0;c<numCh;c++){
+      let s = Math.max(-1, Math.min(1, channels[c][i]));
+      dv.setInt16(o, s<0 ? s*0x8000 : s*0x7FFF, true); o+=2;
+    }
+  }
+  return new Blob([ab], {type:'audio/wav'});
+}
+
+// === Globals ===
+let isRecording=false, isPlaying=false, mediaRecorder, audioChunks=[];
+let audioBlob, audioUrl, audioBuffer=null;
+let audioContext, analyser, micSource, audioPlayerSource;
+let animationId, recordStartTime, recordDuration=0;
+
+const canvas = document.querySelector('.waveform-canvas');
+const canvasCtx = canvas.getContext('2d');
+const btnRecord = document.querySelector('[data-action="record"]');
+const btnStop = document.querySelector('[data-action="stop"]');
+const btnPlay = document.querySelector('[data-action="play"]');
+const btnSeekStart = document.querySelector('[data-action="seek-start"]');
+const btnSeekEnd = document.querySelector('[data-action="seek-end"]');
+const labelPosition = document.getElementById('position-value');
+const labelLength = document.getElementById('length-value');
+const progressBar = document.querySelector('.progress-bar');
+const audioPlayer = document.getElementById('sndrec-player');
+const fileInput = document.getElementById('file-open-input');
+
+function initAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    audioPlayerSource = audioContext.createMediaElementSource(audioPlayer);
+    audioPlayerSource.connect(analyser);
+    analyser.connect(audioContext.destination);
+  }
+}
+
+function drawVisualizer() {
+  animationId = requestAnimationFrame(drawVisualizer);
+  if(canvas.width!==canvas.clientWidth) canvas.width=canvas.clientWidth;
+  if(canvas.height!==canvas.clientHeight) canvas.height=canvas.clientHeight;
+  const bl=analyser.frequencyBinCount, da=new Uint8Array(bl);
+  analyser.getByteTimeDomainData(da);
+  canvasCtx.fillStyle='rgb(0,0,0)'; canvasCtx.fillRect(0,0,canvas.width,canvas.height);
+  canvasCtx.lineWidth=1.5; canvasCtx.strokeStyle='#00ff00'; canvasCtx.beginPath();
+  const sw=canvas.width/bl; let x=0;
+  for(let i=0;i<bl;i++){const v=da[i]/128,y=v*canvas.height/2;i===0?canvasCtx.moveTo(x,y):canvasCtx.lineTo(x,y);x+=sw;}
+  canvasCtx.lineTo(canvas.width,canvas.height/2); canvasCtx.stroke();
+}
+
+function drawFlatLine() {
+  if(canvas.width!==canvas.clientWidth) canvas.width=canvas.clientWidth;
+  if(canvas.height!==canvas.clientHeight) canvas.height=canvas.clientHeight;
+  canvasCtx.fillStyle='rgb(0,0,0)'; canvasCtx.fillRect(0,0,canvas.width,canvas.height);
+  canvasCtx.lineWidth=1.5; canvasCtx.strokeStyle='#00ff00'; canvasCtx.beginPath();
+  canvasCtx.moveTo(0,canvas.height/2); canvasCtx.lineTo(canvas.width,canvas.height/2); canvasCtx.stroke();
+}
+
+function updateMenuStates() {
+  const hasAudio = !!audioBlob;
+  document.querySelectorAll('[data-cmd="save"],[data-cmd="saveas"]').forEach(el => {
+    el.classList.toggle('disabled', !hasAudio);
+  });
+  document.querySelectorAll('[data-cmd="deleteBefore"],[data-cmd="deleteAfter"]').forEach(el => {
+    el.classList.toggle('disabled', !hasAudio);
+  });
+  document.querySelectorAll('[data-cmd="volUp"],[data-cmd="volDown"],[data-cmd="speedUp"],[data-cmd="speedDown"],[data-cmd="echo"],[data-cmd="reverse"]').forEach(el => {
+    el.classList.toggle('disabled', !hasAudio);
+  });
+}
+
+function updateButtons() {
+  btnRecord.classList.toggle('disabled', isRecording||isPlaying);
+  btnStop.classList.toggle('disabled', !isRecording&&!isPlaying);
+  btnPlay.classList.toggle('disabled', isRecording||!audioBlob||isPlaying);
+  btnSeekStart.classList.toggle('disabled', isRecording||!audioBlob);
+  btnSeekEnd.classList.toggle('disabled', isRecording||!audioBlob);
+  progressBar.disabled = !audioBlob||isRecording;
+  updateMenuStates();
+}
+
+function updateTimeDisplay(pos, length) {
+  labelPosition.textContent = pos.toFixed(2)+" s";
+  labelLength.textContent = length.toFixed(2)+" s";
+  if(length>0&&!isRecording) progressBar.value=(pos/length)*1000;
+  else progressBar.value=0;
+}
+
+function setAudioFromBuffer(buf) {
+  audioBuffer = buf;
+  audioBlob = audioBufferToWav(buf);
+  audioUrl = URL.createObjectURL(audioBlob);
+  audioPlayer.src = audioUrl;
+  recordDuration = buf.duration;
+  updateTimeDisplay(0, recordDuration);
+  updateButtons();
+  drawFlatLine();
+}
+
+async function getAudioBuffer() {
+  initAudioContext();
+  if(audioBuffer) return audioBuffer;
+  const arrBuf = await audioBlob.arrayBuffer();
+  audioBuffer = await audioContext.decodeAudioData(arrBuf);
+  return audioBuffer;
+}
+
+async function processAudio(effectFn) {
+  if(!audioBlob) return;
+  initAudioContext();
+  const buf = await getAudioBuffer();
+  const result = effectFn(buf, audioContext);
+  setAudioFromBuffer(result);
+}
+
+function cloneBuffer(buf, ctx) {
+  const nb = ctx.createBuffer(buf.numberOfChannels, buf.length, buf.sampleRate);
+  for(let c=0;c<buf.numberOfChannels;c++) nb.getChannelData(c).set(buf.getChannelData(c));
+  return nb;
+}
+function effectVolUp(buf, ctx) {
+  const nb = cloneBuffer(buf, ctx);
+  for(let c=0;c<nb.numberOfChannels;c++){const d=nb.getChannelData(c);for(let i=0;i<d.length;i++) d[i]=Math.max(-1,Math.min(1,d[i]*1.25));}
+  return nb;
+}
+function effectVolDown(buf, ctx) {
+  const nb = cloneBuffer(buf, ctx);
+  for(let c=0;c<nb.numberOfChannels;c++){const d=nb.getChannelData(c);for(let i=0;i<d.length;i++) d[i]*=0.75;}
+  return nb;
+}
+function effectReverse(buf, ctx) {
+  const nb = cloneBuffer(buf, ctx);
+  for(let c=0;c<nb.numberOfChannels;c++) nb.getChannelData(c).reverse();
+  return nb;
+}
+function effectEcho(buf, ctx) {
+  const delay=0.15, decay=0.4, delaySamples=Math.floor(delay*buf.sampleRate);
+  const nb = cloneBuffer(buf, ctx);
+  for(let c=0;c<nb.numberOfChannels;c++){
+    const d=nb.getChannelData(c);
+    for(let i=delaySamples;i<d.length;i++) d[i]=Math.max(-1,Math.min(1,d[i]+d[i-delaySamples]*decay));
+  }
+  return nb;
+}
+function effectSpeedUp(buf, ctx) {
+  const newLen = Math.floor(buf.length/2);
+  const nb = ctx.createBuffer(buf.numberOfChannels, newLen, buf.sampleRate);
+  for(let c=0;c<buf.numberOfChannels;c++){const src=buf.getChannelData(c),dst=nb.getChannelData(c);for(let i=0;i<newLen;i++) dst[i]=src[i*2];}
+  return nb;
+}
+function effectSpeedDown(buf, ctx) {
+  const newLen = buf.length*2;
+  const nb = ctx.createBuffer(buf.numberOfChannels, newLen, buf.sampleRate);
+  for(let c=0;c<buf.numberOfChannels;c++){
+    const src=buf.getChannelData(c),dst=nb.getChannelData(c);
+    for(let i=0;i<newLen;i++){const si=i/2,li=Math.floor(si),hi=Math.min(li+1,src.length-1),f=si-li;dst[i]=src[li]*(1-f)+src[hi]*f;}
+  }
+  return nb;
+}
+
+async function deleteBefore() {
+  if(!audioBlob) return;
+  const buf = await getAudioBuffer();
+  const pos = audioPlayer.currentTime||0;
+  const startSample = Math.floor(pos*buf.sampleRate);
+  if(startSample<=0) return;
+  const newLen = buf.length - startSample;
+  if(newLen<=0) return;
+  const nb = audioContext.createBuffer(buf.numberOfChannels, newLen, buf.sampleRate);
+  for(let c=0;c<buf.numberOfChannels;c++) nb.getChannelData(c).set(buf.getChannelData(c).subarray(startSample));
+  setAudioFromBuffer(nb);
+}
+
+async function deleteAfter() {
+  if(!audioBlob) return;
+  const buf = await getAudioBuffer();
+  const pos = audioPlayer.currentTime||0;
+  const endSample = Math.floor(pos*buf.sampleRate);
+  if(endSample>=buf.length) return;
+  if(endSample<=0) return;
+  const nb = audioContext.createBuffer(buf.numberOfChannels, endSample, buf.sampleRate);
+  for(let c=0;c<buf.numberOfChannels;c++) nb.getChannelData(c).set(buf.getChannelData(c).subarray(0, endSample));
+  setAudioFromBuffer(nb);
+}
+
+function cmdNew() {
+  if(isRecording||isPlaying) return;
+  audioBlob=null; audioUrl=null; audioBuffer=null;
+  audioPlayer.src=''; recordDuration=0;
+  updateTimeDisplay(0,0); updateButtons(); drawFlatLine();
+}
+function cmdOpen() { fileInput.click(); }
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0]; if(!file) return;
+  initAudioContext();
+  try { const arrBuf = await file.arrayBuffer(); const decoded = await audioContext.decodeAudioData(arrBuf); setAudioFromBuffer(decoded); }
+  catch(err) { alert('Cannot open this audio file: '+err.message); }
+  fileInput.value='';
+});
+function cmdSave() {
+  if(!audioBlob) return;
+  const a=document.createElement('a'); a.href=URL.createObjectURL(audioBlob);
+  a.download='recording.wav'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+document.querySelectorAll('[data-cmd]').forEach(el => {
+  el.addEventListener('click', async () => {
+    if(el.classList.contains('disabled')) return;
+    const cmd = el.dataset.cmd;
+    switch(cmd) {
+      case 'new': cmdNew(); break;
+      case 'open': cmdOpen(); break;
+      case 'save': case 'saveas': cmdSave(); break;
+      case 'deleteBefore': await deleteBefore(); break;
+      case 'deleteAfter': await deleteAfter(); break;
+      case 'volUp': await processAudio(effectVolUp); break;
+      case 'volDown': await processAudio(effectVolDown); break;
+      case 'speedUp': await processAudio(effectSpeedUp); break;
+      case 'speedDown': await processAudio(effectSpeedDown); break;
+      case 'echo': await processAudio(effectEcho); break;
+      case 'reverse': await processAudio(effectReverse); break;
+    }
+  });
+});
+
+const menuItems = document.querySelectorAll('.xp-menubar .menu-item');
+document.addEventListener('mousedown', (e) => {
+  if(!e.target.closest('.xp-menubar')) menuItems.forEach(i=>i.classList.remove('active'));
+});
+menuItems.forEach(item => {
+  item.addEventListener('mousedown', () => {
+    const was = item.classList.contains('active');
+    menuItems.forEach(i=>i.classList.remove('active'));
+    if(!was) item.classList.add('active');
+  });
+  item.addEventListener('mouseenter', () => {
+    if(Array.from(menuItems).some(i=>i.classList.contains('active'))){
+      menuItems.forEach(i=>i.classList.remove('active'));
+      item.classList.add('active');
+    }
+  });
+  const dd = item.querySelector('.dropdown-menu');
+  if(dd) dd.addEventListener('click', e => {
+    const li=e.target.closest('li');
+    if(li&&!li.classList.contains('disabled')&&!li.classList.contains('separator')) item.classList.remove('active');
+  });
+});
+
+btnRecord.onclick = async () => {
+  if(btnRecord.classList.contains('disabled')) return;
+  initAudioContext();
+  if(audioContext.state==='suspended') await audioContext.resume();
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    if(micSource) try{micSource.disconnect();}catch(e){}
+    micSource = audioContext.createMediaStreamSource(stream);
+    micSource.connect(analyser);
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = e => { if(e.data.size>0) audioChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      const webmBlob = new Blob(audioChunks, {type:'audio/webm'});
+      stream.getTracks().forEach(t=>t.stop());
+      isRecording = false;
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try { const decoded = await audioContext.decodeAudioData(reader.result); setAudioFromBuffer(decoded); }
+        catch(e) { audioBlob=webmBlob; audioBuffer=null; audioUrl=URL.createObjectURL(audioBlob); audioPlayer.src=audioUrl; recordDuration=(Date.now()-recordStartTime)/1000; updateTimeDisplay(0,recordDuration); updateButtons(); }
+        drawFlatLine();
+      };
+      reader.readAsArrayBuffer(webmBlob);
+    };
+    recordStartTime = Date.now();
+    mediaRecorder.start(100);
+    isRecording = true; updateButtons();
+    cancelAnimationFrame(animationId); drawVisualizer();
+    const ti = setInterval(()=>{if(!isRecording){clearInterval(ti);return;}const d=(Date.now()-recordStartTime)/1000;updateTimeDisplay(d,d);},50);
+  } catch(err) { alert("Microphone access denied: "+err); }
+};
+
+btnStop.onclick = () => {
+  if(btnStop.classList.contains('disabled')) return;
+  if(isRecording) { mediaRecorder.stop(); cancelAnimationFrame(animationId); setTimeout(drawFlatLine,100); }
+  else if(isPlaying) { audioPlayer.pause(); isPlaying=false; updateButtons(); cancelAnimationFrame(animationId); setTimeout(drawFlatLine,100); }
+};
+
+btnPlay.onclick = () => {
+  if(btnPlay.classList.contains('disabled')||!audioBlob) return;
+  initAudioContext();
+  if(audioContext.state==='suspended') audioContext.resume();
+  if(micSource) try{micSource.disconnect();}catch(e){}
+  audioPlayer.play(); isPlaying=true; updateButtons();
+  cancelAnimationFrame(animationId); drawVisualizer();
+  const ti=setInterval(()=>{if(!isPlaying){clearInterval(ti);return;}updateTimeDisplay(audioPlayer.currentTime,recordDuration);},50);
+};
+
+audioPlayer.onended = () => { isPlaying=false; updateButtons(); updateTimeDisplay(recordDuration,recordDuration); cancelAnimationFrame(animationId); setTimeout(drawFlatLine,100); };
+btnSeekStart.onclick = () => { if(btnSeekStart.classList.contains('disabled')) return; if(audioPlayer.src){audioPlayer.currentTime=0;updateTimeDisplay(0,recordDuration);} };
+btnSeekEnd.onclick = () => { if(btnSeekEnd.classList.contains('disabled')) return; if(audioPlayer.src&&recordDuration){audioPlayer.currentTime=recordDuration;updateTimeDisplay(recordDuration,recordDuration);} };
+
+progressBar.addEventListener('input', (e) => {
+  if(!audioBlob||isRecording) return;
+  const p=(e.target.value/1000)*recordDuration;
+  audioPlayer.currentTime=p; updateTimeDisplay(p,recordDuration);
+});
+
+requestAnimationFrame(()=>{ drawFlatLine(); updateButtons(); });
+    </script>
+</body>
+</html>

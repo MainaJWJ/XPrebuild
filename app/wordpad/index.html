@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WordPad (Standalone)</title>
+    <!-- Link to the extracted wordpad CSS -->
+    <link rel="stylesheet" href="wordpad.css">
+    <script src="../../focusController.js"></script>
+
+    <style>
+        /* Standalone App Wrapper Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: #ECE9D8; /* Standard XP Background */
+            font-family: Tahoma, sans-serif;
+        }
+
+        .wordpad-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            flex: 1;
+        }
+
+        /* Essential Adjustments for standalone */
+        .wordpad-editor {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            outline: none;
+            background: #fff;
+        }
+
+        .wordpad-color-palette {
+            position: absolute;
+            background: #ECE9D8;
+            border: 1px solid #000;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            z-index: 1000;
+            padding: 5px;
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 4px;
+            font-size: 11px;
+            align-items: center;
+        }
+
+        .color-swatch {
+            width: 14px;
+            height: 14px;
+            border: 1px solid #808080;
+            cursor: pointer;
+        }
+
+        .color-label {
+            cursor: pointer;
+            padding-left: 4px;
+        }
+
+        /* Group flex fix */
+        .wordpad-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 2px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+            border-right: 1px solid #ccc;
+            padding-right: 10px;
+        }
+        
+        .toolbar-group button {
+            margin-right: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wordpad-container">
+        <!-- Toolbar 1: Main Actions -->
+        <div class="wordpad-toolbar" id="wordpad-main-toolbar">
+            <div class="toolbar-group">
+                <button id="wordpad-new" title="New"><div class="toolbar-icon-1 icon-new"></div></button>
+                <button id="wordpad-open" title="Open"><div class="toolbar-icon-1 icon-open"></div></button>
+                <button id="wordpad-save" title="Save"><div class="toolbar-icon-1 icon-save"></div></button>
+            </div>
+            <div class="toolbar-group">
+                <button id="wordpad-print" title="Print"><div class="toolbar-icon-1 icon-print"></div></button>
+                <button id="wordpad-print-preview" disabled title="Print Preview"><div class="toolbar-icon-1 icon-print-preview"></div></button>
+            </div>
+            <div class="toolbar-group">
+                <button id="wordpad-find" title="Find"><div class="toolbar-icon-1 icon-find"></div></button>
+            </div>
+            <div class="toolbar-group">
+                <button id="wordpad-cut" title="Cut"><div class="toolbar-icon-1 icon-cut"></div></button>
+                <button id="wordpad-copy" title="Copy"><div class="toolbar-icon-1 icon-copy"></div></button>
+                <button id="wordpad-paste" title="Paste"><div class="toolbar-icon-1 icon-paste"></div></button>
+                <button id="wordpad-undo" title="Undo"><div class="toolbar-icon-1 icon-undo"></div></button>
+            </div>
+            <div class="toolbar-group">
+                <button id="wordpad-insert-date" disabled title="Insert Date"><div class="toolbar-icon-1 icon-insert-date"></div></button>
+            </div>
+        </div>
+        
+        <!-- Toolbar 2: Formatting -->
+        <div class="wordpad-toolbar" id="wordpad-format-toolbar">
+            <div class="toolbar-group">
+                <div class="select-overlay-container" style="width: 140px;">
+                    <select id="wordpad-font-family">
+                        <option selected>Times New Roman</option>
+                        <option>Arial</option>
+                        <option>Calibri</option>
+                        <option>Tahoma</option>
+                        <option>Courier New</option>
+                        <option>Verdana</option>
+                    </select>
+                    <div class="xp-dropdown-btn" aria-hidden="true"></div>
+                </div>
+                <div class="select-overlay-container" style="width: 50px;">
+                    <select id="wordpad-font-size">
+                        <option>8</option>
+                        <option>9</option>
+                        <option selected>10</option>
+                        <option>11</option>
+                        <option>12</option>
+                        <option>14</option>
+                        <option>16</option>
+                        <option>18</option>
+                        <option>20</option>
+                        <option>24</option>
+                        <option>36</option>
+                        <option>48</option>
+                        <option>72</option>
+                    </select>
+                    <div class="xp-dropdown-btn" aria-hidden="true"></div>
+                </div>
+            </div>
+            <div class="toolbar-group">
+                <button id="wordpad-bold" class="toggle" title="Bold"><div class="toolbar-icon-2 icon-bold"></div></button>
+                <button id="wordpad-italic" class="toggle" title="Italic"><div class="toolbar-icon-2 icon-italic"></div></button>
+                <button id="wordpad-underline" class="toggle" title="Underline"><div class="toolbar-icon-2 icon-underline"></div></button>
+            </div>
+            <div class="toolbar-group">
+                <div class="wordpad-color-picker-wrapper">
+                    <button id="wordpad-color" title="Color"><div class="toolbar-icon-2 icon-color"></div></button>
+                </div>
+            </div>
+            <div class="toolbar-group">
+                <button id="wordpad-align-left" class="toggle selected" title="Align Left"><div class="toolbar-icon-2 icon-align-left"></div></button>
+                <button id="wordpad-align-center" class="toggle" title="Align Center"><div class="toolbar-icon-2 icon-align-center"></div></button>
+                <button id="wordpad-align-right" class="toggle" title="Align Right"><div class="toolbar-icon-2 icon-align-right"></div></button>
+            </div>
+            <div class="toolbar-group" style="border-right: none;">
+                <button id="wordpad-bullets" class="toggle" title="Bullets"><div class="toolbar-icon-2 icon-bullets"></div></button>
+            </div>
+        </div>
+
+        <!-- Ruler and Editor Body -->
+        <div class="wordpad-ruler inset-deep"></div>
+        <div class="wordpad-editor inset-deep" contenteditable="true" id="editor-body"></div>
+        
+        <!-- Status Bar -->
+        <div class="wordpad-statusbar status-bar" style="padding: 4px; font-size: 12px;">
+            <div class="wordpad-statusbar-panel status-bar-field">For Help, press F1 (Standalone Version)</div>
+        </div>
+    </div>
+
+    <!-- Application Logic (Extracted Pure Content) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const editor = document.getElementById('editor-body');
+            let savedSelectionRange = null;
+
+            // Define Toolbar Elements
+            const newButton = document.getElementById("wordpad-new");
+            const openButton = document.getElementById("wordpad-open");
+            const saveButton = document.getElementById("wordpad-save");
+            const printButton = document.getElementById("wordpad-print");
+            const cutButton = document.getElementById("wordpad-cut");
+            const copyButton = document.getElementById("wordpad-copy");
+            const pasteButton = document.getElementById("wordpad-paste");
+            const undoButton = document.getElementById("wordpad-undo");
+            
+            const fontFamily = document.getElementById("wordpad-font-family");
+            const fontSize = document.getElementById("wordpad-font-size");
+            const boldButton = document.getElementById("wordpad-bold");
+            const italicButton = document.getElementById("wordpad-italic");
+            const underlineButton = document.getElementById("wordpad-underline");
+            const colorButton = document.getElementById("wordpad-color");
+            const alignLeftButton = document.getElementById("wordpad-align-left");
+            const alignCenterButton = document.getElementById("wordpad-align-center");
+            const alignRightButton = document.getElementById("wordpad-align-right");
+            const bulletsButton = document.getElementById("wordpad-bullets");
+            const ruler = document.querySelector(".wordpad-ruler");
+
+            // --- Color Palette Setup ---
+            const colorPalette = document.createElement("div");
+            colorPalette.className = "wordpad-color-palette";
+            colorPalette.style.display = "none";
+            document.body.appendChild(colorPalette);
+
+            const colors = [
+                { name: "Black", value: "#000000" }, { name: "Maroon", value: "#800000" },
+                { name: "Green", value: "#008000" }, { name: "Olive", value: "#808000" },
+                { name: "Navy", value: "#000080" }, { name: "Purple", value: "#800080" },
+                { name: "Teal", value: "#008080" }, { name: "Gray", value: "#808080" },
+                { name: "Silver", value: "#C0C0C0" }, { name: "Red", value: "#FF0000" },
+                { name: "Lime", value: "#00FF00" }, { name: "Yellow", value: "#FFFF00" },
+                { name: "Blue", value: "#0000FF" }, { name: "Fuchsia", value: "#FF00FF" },
+                { name: "Aqua", value: "#00FFFF" }, { name: "White", value: "#FFFFFF" },
+            ];
+
+            let paletteHTML = "";
+            colors.forEach(color => {
+                paletteHTML += `
+                    <div class="color-swatch" data-color="${color.value}" style="background-color: ${color.value};"></div>
+                    <div class="color-label" data-color="${color.value}">${color.name}</div>
+                `;
+            });
+            colorPalette.innerHTML = paletteHTML;
+
+            // Apply color to text
+            const applyColor = (color) => {
+                editor.focus();
+                const selection = window.getSelection();
+                if (savedSelectionRange) {
+                    selection.removeAllRanges();
+                    selection.addRange(savedSelectionRange);
+                }
+                document.execCommand("foreColor", false, color);
+            };
+
+            colorPalette.addEventListener("click", (e) => {
+                const color = e.target.dataset.color;
+                if (color) {
+                    applyColor(color);
+                    colorPalette.style.display = "none";
+                }
+            });
+
+            // --- Action Listeners ---
+            newButton.addEventListener("click", () => {
+                if(confirm("Create new document? Unsaved changes will be lost.")) {
+                    editor.innerHTML = "";
+                }
+            });
+
+            openButton.addEventListener("click", () => {
+                alert("File system access is disabled in standalone mode.");
+            });
+
+            saveButton.addEventListener("click", () => {
+                alert("File system access is disabled in standalone mode. Document content length: " + editor.innerHTML.length);
+            });
+
+            printButton.addEventListener("click", () => {
+                window.print();
+            });
+
+            cutButton.addEventListener("click", () => { document.execCommand("cut"); editor.focus(); });
+            copyButton.addEventListener("click", () => { document.execCommand("copy"); editor.focus(); });
+            pasteButton.addEventListener("click", async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    document.execCommand("insertText", false, text);
+                } catch {
+                    document.execCommand("paste");
+                }
+                editor.focus();
+            });
+            undoButton.addEventListener("click", () => { document.execCommand("undo"); editor.focus(); });
+
+            fontFamily.addEventListener("change", () => {
+                document.execCommand("fontName", false, fontFamily.value);
+                editor.focus();
+            });
+
+            fontSize.addEventListener("change", () => {
+                const sizeMap = { 8: 1, 9: 2, 10: 2, 11: 3, 12: 3, 14: 4, 16: 5, 18: 5, 20: 6, 24: 6, 36: 7, 48: 7, 72: 7 };
+                const size = sizeMap[fontSize.value] || 2;
+                document.execCommand("fontSize", false, size);
+                editor.focus();
+            });
+
+            boldButton.addEventListener("click", () => { document.execCommand("bold"); editor.focus(); });
+            italicButton.addEventListener("click", () => { document.execCommand("italic"); editor.focus(); });
+            underlineButton.addEventListener("click", () => { document.execCommand("underline"); editor.focus(); });
+
+            colorButton.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (colorPalette.style.display === "none") {
+                    const selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        savedSelectionRange = selection.getRangeAt(0).cloneRange();
+                    }
+                    const buttonRect = colorButton.getBoundingClientRect();
+                    colorPalette.style.top = (buttonRect.bottom + 2) + "px";
+                    colorPalette.style.left = buttonRect.left + "px";
+                    colorPalette.style.display = "grid";
+                } else {
+                    colorPalette.style.display = "none";
+                }
+            });
+
+            document.addEventListener("click", (e) => {
+                if (!colorPalette.contains(e.target) && e.target !== colorButton) {
+                    colorPalette.style.display = "none";
+                }
+            });
+
+            alignLeftButton.addEventListener("click", () => { document.execCommand("justifyLeft"); editor.focus(); });
+            alignCenterButton.addEventListener("click", () => { document.execCommand("justifyCenter"); editor.focus(); });
+            alignRightButton.addEventListener("click", () => { document.execCommand("justifyRight"); editor.focus(); });
+            bulletsButton.addEventListener("click", () => { document.execCommand("insertUnorderedList"); editor.focus(); });
+
+            // --- Sync Toolbar State on User Interaction ---
+            const updateToolbar = () => {
+                boldButton.classList.toggle("selected", document.queryCommandState("bold"));
+                italicButton.classList.toggle("selected", document.queryCommandState("italic"));
+                underlineButton.classList.toggle("selected", document.queryCommandState("underline"));
+
+                alignLeftButton.classList.toggle("selected", document.queryCommandState("justifyLeft"));
+                alignCenterButton.classList.toggle("selected", document.queryCommandState("justifyCenter"));
+                alignRightButton.classList.toggle("selected", document.queryCommandState("justifyRight"));
+                bulletsButton.classList.toggle("selected", document.queryCommandState("insertUnorderedList"));
+
+                const currentFont = document.queryCommandValue("fontName").replace(/['"]/g, "");
+                if (currentFont) {
+                    // Try to set font in dropdown if matches
+                    for (let option of fontFamily.options) {
+                        if (option.value.toLowerCase() === currentFont.toLowerCase()) {
+                            fontFamily.value = option.value;
+                            break;
+                        }
+                    }
+                }
+            };
+
+            editor.addEventListener("keyup", updateToolbar);
+            editor.addEventListener("mouseup", updateToolbar);
+            editor.addEventListener("focus", updateToolbar);
+
+            // --- Simple Ruler Drawing ---
+            const drawRuler = () => {
+                ruler.innerHTML = "";
+                const widthInPixels = ruler.offsetWidth;
+                const ppi = 96;
+                const widthInInches = widthInPixels / ppi;
+
+                for (let i = 0; i < widthInInches; i++) {
+                    const inchMarkPos = i * ppi;
+                    
+                    const num = document.createElement("span");
+                    num.className = "ruler-number";
+                    num.textContent = i + 1;
+                    num.style.position = "absolute";
+                    num.style.left = (inchMarkPos + ppi) + "px";
+                    num.style.fontSize = "10px";
+                    num.style.top = "5px";
+                    ruler.appendChild(num);
+
+                    const ticks = [0.25, 0.5, 0.75];
+                    ticks.forEach(t => {
+                        if (i + t < widthInInches) {
+                            const tick = document.createElement("span");
+                            tick.style.position = "absolute";
+                            tick.style.left = (inchMarkPos + ppi * t) + "px";
+                            tick.style.height = t === 0.5 ? "10px" : "5px";
+                            tick.style.borderLeft = "1px solid #333";
+                            tick.style.bottom = "1px";
+                            ruler.appendChild(tick);
+                        }
+                    });
+                }
+            };
+            
+            drawRuler();
+            window.addEventListener('resize', drawRuler);
+
+            // Initialize formatting
+            document.execCommand("fontName", false, "Times New Roman");
+            document.execCommand("fontSize", false, "2"); // 10pt equivalent
+            editor.focus();
+        });
+    </script>
+</body>
+</html>

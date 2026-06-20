@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Picture Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../../scroll.css">
+    <script src="../../focusController.js"></script>
+
+</head>
+<body>
+    <div id="picture-viewer" class="picture-viewer">
+        <!-- Preview area -->
+        <div id="preview-container" class="preview-container">
+            <img id="preview-image" src="" alt="Preview" style="max-width: 100%; max-height: 100%;">
+        </div>
+
+        <!-- Toolbar -->
+        <div id="toolbar" class="toolbar">
+            <button id="prev-btn" class="toolbar-btn">
+                <img src="assets/previous.png" alt="Previous" title="Previous Image">
+            </button>
+            <button id="next-btn" class="toolbar-btn">
+                <img src="assets/next.png" alt="Next" title="Next Image">
+            </button>
+            <div class="separator"></div>
+            <button id="best-fit-btn" class="toolbar-btn">
+                <img src="assets/best-fit.png" alt="Best Fit" title="Best Fit">
+            </button>
+            <button id="actual-size-btn" class="toolbar-btn">
+                <img src="assets/actual-size.png" alt="Actual Size" title="Actual Size">
+            </button>
+            <button id="slideshow-btn" class="toolbar-btn disabled" disabled>
+                <img src="assets/slideshow.png" alt="Slideshow" title="Slideshow">
+            </button>
+            <div class="separator"></div>
+            <button id="zoom-in-btn" class="toolbar-btn">
+                <img src="assets/zoom-in.png" alt="Zoom In" title="Zoom In">
+            </button>
+            <button id="zoom-out-btn" class="toolbar-btn">
+                <img src="assets/zoom-out.png" alt="Zoom Out" title="Zoom Out">
+            </button>
+            <div class="separator"></div>
+            <button id="rotate-right-btn" class="toolbar-btn">
+                <img src="assets/rotate-right.png" alt="Rotate Right" title="Rotate Right">
+            </button>
+            <button id="rotate-left-btn" class="toolbar-btn">
+                <img src="assets/rotate-left.png" alt="Rotate Left" title="Rotate Left">
+            </button>
+            <div class="separator"></div>
+            <button class="toolbar-btn disabled" disabled>
+                <img src="assets/remove.png" alt="Remove" title="Remove">
+            </button>
+            <button class="toolbar-btn disabled" disabled>
+                <img src="assets/print.png" alt="Print" title="Print">
+            </button>
+            <button class="toolbar-btn disabled" disabled>
+                <img src="assets/save.png" alt="Save" title="Save">
+            </button>
+            <button class="toolbar-btn disabled" disabled>
+                <img src="assets/edit.png" alt="Edit" title="Edit">
+            </button>
+            <div class="separator"></div>
+            <button class="toolbar-btn disabled" disabled>
+                <img src="assets/help.png" alt="Help" title="Help">
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

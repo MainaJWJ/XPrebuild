@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run</title>
+    <!-- properties 폴더의 CSS 및 글로벌 scroll.css 스타일 적용 -->
+    <link rel="stylesheet" href="./properties/properties.css">
+    <link rel="stylesheet" href="../scroll.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--window-bg, rgba(236, 236, 228, 1));
+            font-family: "Tahoma", "Segoe UI", sans-serif;
+            font-size: 11px;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .run-dialog {
+            display: flex;
+            flex-direction: column;
+            padding: 11px;
+            height: 100%;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-top: 2px;
+        }
+
+        .header img {
+            width: 32px;
+            height: 32px;
+            margin-right: 15px;
+        }
+
+        .header p {
+            margin: 0;
+            line-height: 1.4;
+            padding-top: 2px;
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-left: 2px;
+        }
+
+        .input-area label {
+            margin-right: 12px;
+        }
+
+        .select-overlay-container {
+            display: flex;
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .select-overlay-container input {
+            width: 100%;
+            height: 21px;
+            padding-right: 18px; /* 드롭다운 화살표 영역 확보 */
+        }
+
+        /* 인풋창 호버/클릭 시 화살표 버튼에 properties와 동일한 효과 연동 */
+        .select-overlay-container input:hover + .vertical-scrollbar > button {
+            background: radial-gradient(circle at 0 0, #FDFFFF, #B9DAFB 75%);
+            box-shadow: 0 1px #A0B5D3, 1px 0 #7C9FD3, inset 1px 1px #ABBEE9, inset -1px -1px #8DA8E1;
+        }
+
+        .select-overlay-container input:active + .vertical-scrollbar > button {
+            background: radial-gradient(circle at 0 0, #6E8EF1, #D2DEEB 75%);
+            box-shadow: 0 1px #A0B5D3, 1px 0 #7C9FD3, inset 1px 1px #98A1DD, inset -1px -1px #B1C6F3;
+        }
+
+        /* 화살표 버튼 호버/클릭 활성화 */
+        .vertical-scrollbar > button {
+            pointer-events: auto !important; /* pointer-events: none 우회 */
+        }
+
+        /* 히스토리 드롭다운 스타일 */
+        .history-dropdown {
+            position: absolute;
+            top: 21px;
+            left: 0;
+            right: 0;
+            background: #FFF;
+            border: 1px solid #7F9DB9;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.15);
+            z-index: 50;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 3px 6px;
+            cursor: default;
+            color: #000;
+        }
+
+        .history-item:hover {
+            background: #316AC5;
+            color: #FFF;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: auto;
+        }
+
+        .buttons button {
+            width: 75px;
+            height: 23px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="run-dialog">
+        <!-- 상단: 아이콘 및 설명 -->
+        <div class="header">
+            <img src="../image/execute.png" alt="Run">
+            <p>Type the name of a program, folder, document, or Internet<br>resource, and Windows will open it for you.</p>
+        </div>
+
+        <!-- 중단: 입력 필드 -->
+        <div class="input-area">
+            <label for="run-input"><u>O</u>pen:</label>
+            <div class="select-overlay-container">
+                <input type="text" id="run-input" value="" autocomplete="off" autofocus>
+                <div class="vertical-scrollbar" aria-hidden="true" style="position: absolute; right: 1px; top: 1px; bottom: 1px; width: 16px; padding: 0; background: none; box-shadow: none; pointer-events: none;">
+                    <button style="display: none;"></button>
+                    <button id="btn-arrow" tabindex="-1" style="width: 100%; height: 100%; margin: 0; box-sizing: border-box;"></button>
+                </div>
+                <!-- 히스토리 드롭다운 -->
+                <div id="history-dropdown" class="history-dropdown" style="display: none;">
+                    <div class="history-item">notepad</div>
+                    <div class="history-item">calc</div>
+                    <div class="history-item">mspaint</div>
+                    <div class="history-item">winmine</div>
+                    <div class="history-item">messenger</div>
+                    <div class="history-item">cmd</div>
+                    <div class="history-item">wmplayer</div>
+                    <div class="history-item">backup</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단: 컨트롤 버튼 -->
+        <div class="buttons">
+            <button id="btn-ok">OK</button>
+            <button id="btn-cancel">Cancel</button>
+            <button id="btn-browse"><u>B</u>rowse...</button>
+        </div>
+    </div>
+
+
+    <script>
+        // 1. 명령어 매핑 정의 (단축 명령어 -> appRegistry ID)
+        const COMMAND_MAP = {
+            "notepad": "msnotepad",
+            "calc": "calculator",
+            "paint": "mspaint",
+            "mspaint": "mspaint",
+            "winmine": "minesweeper",
+            "minesweeper": "minesweeper",
+            "messenger": "msnmsgr",
+            "msn": "msnmsgr",
+            "backup": "ntbackup",
+            "ntbackup": "ntbackup",
+            "wmplayer": "wmplayer",
+            "wmp": "wmplayer",
+            "cmd": "cmd",
+            "explorer": "icon-my-computer",
+            "documents": "documents",
+            "sol": "spider",
+            "pinball": "pinball",
+            "vscode": "vscode",
+            "word": "msword",
+            "excel": "excel",
+            "powerpoint": "powerpoint",
+            "ppt": "powerpoint",
+            "photoshop": "photoshop"
+        };
+
+        const runInput = document.getElementById('run-input');
+        const arrowBtn = document.getElementById('btn-arrow');
+        const dropdown = document.getElementById('history-dropdown');
+        const btnOk = document.getElementById('btn-ok');
+        const btnCancel = document.getElementById('btn-cancel');
+        const btnBrowse = document.getElementById('btn-browse');
+
+
+        // 2. 드롭다운 목록 토글
+        arrowBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // 3. 외부 클릭 시 드롭다운 닫기
+        document.addEventListener('click', () => {
+            dropdown.style.display = 'none';
+        });
+
+        // 4. 드롭다운 아이템 선택
+        dropdown.addEventListener('click', (e) => {
+            if (e.target.classList.contains('history-item')) {
+                runInput.value = e.target.textContent;
+                dropdown.style.display = 'none';
+                runInput.focus();
+            }
+        });
+
+        // 5. 실행 함수
+        function executeCommand() {
+            const command = runInput.value.trim().toLowerCase();
+            if (!command) return;
+
+            // URL 패턴 감지 시 브라우저 열기
+            const isUrl = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(command);
+            
+            if (COMMAND_MAP[command]) {
+                const appId = COMMAND_MAP[command];
+                // 부모 창으로 실행 메시지 송신
+                window.parent.postMessage({ type: 'launchApp', appId: appId }, '*');
+                // 실행 창 닫기
+                closeRunDialog();
+            } else if (isUrl) {
+                // 웹사이트 실행인 경우 인터넷 익스플로러 팝업
+                let targetUrl = command;
+                if (!/^https?:\/\//i.test(targetUrl)) {
+                    targetUrl = 'http://' + targetUrl;
+                }
+                window.parent.postMessage({ 
+                    type: 'launchApp', 
+                    appId: 'internet-explorer', 
+                    payload: { url: targetUrl } 
+                }, '*');
+                closeRunDialog();
+            }
+        }
+
+
+        function closeRunDialog() {
+            window.parent.postMessage({ type: 'closeWindow' }, '*');
+        }
+
+        // 이벤트 트리거 연동
+        btnOk.addEventListener('click', executeCommand);
+        
+        runInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                executeCommand();
+            }
+        });
+
+        btnCancel.addEventListener('click', closeRunDialog);
+
+        // Browse... 버튼 누르면 내 문서(documents) 앱 실행
+        btnBrowse.addEventListener('click', () => {
+            window.parent.postMessage({ type: 'launchApp', appId: 'documents' }, '*');
+        });
+
+
+        // 초기 포커스 지정
+        runInput.focus();
+    </script>
+</body>
+</html>

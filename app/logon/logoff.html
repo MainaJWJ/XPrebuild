@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<!-- Metadata -->
+
+<head>
+    <title>Welcome</title>
+    <link rel="stylesheet" href="../../fonts/fonts.css">
+    <style>
+        /* Custom fonts removed, using system default. */
+
+        :root {
+            /* Primary Background */
+            --primary-bg: #5A7EDC;
+
+            /* Header Colors */
+            --header-bg: #00309C;
+            --header-stripe-0: #466DCD;
+            --header-stripe-1: #C7DDFF;
+            --header-stripe-2: #B0C9F7;
+            --header-stripe-3: #5A7EDC;
+
+            /* Center Section Colors */
+            --radial-gradient-inner: #91B1EF;
+            --radial-gradient-mid: #7698E6;
+            --radial-gradient-outer: #5A7EDC;
+            --center-divider-inner: #90ADED;
+            --center-divider-outer: #5A7EDC;
+
+            /* User Listing Colors */
+            --user-listing-0: #0E3997;
+            --user-listing-1: #5A7EDC;
+            --user-listing-border-selected: white;
+            --profile-picture-border-normal: white;
+            --profile-picture-border-inner: #FFEE00;
+            --profile-picture-border-outer: #FFB600;
+            --popup-background-color: #FFFFE1;
+
+            /* Footer Colors */
+            --footer-bg-left: #3833AC;
+            --footer-bg-right: #00309C;
+            --footer-stripe-0: #003399;
+            --footer-stripe-1: #F99736;
+            --footer-stripe-2: #C2814D;
+            --footer-stripe-3: #00309C;
+
+            /* Shadow (Password Box + "welcome" text) */
+            --shadow-color: rgba(15, 37, 104, 0.6);
+
+            /* Sizes - General */
+            --header-height: 8%;
+            --footer-height: 10%;
+            --stripe-height: 2px;
+            --center-divider-width: 1px;
+            --center-divider-height: 100%;
+            --logo-size: 136px;
+            --logo-text-gap: 16px;
+            --image-button-size: 24px;
+
+            /* Sizes - User Listing */
+            --user-listing-width: 368px;
+            --user-listing-horizontal-gap: 12px;
+            --user-listing-padding: 8px;
+            --profile-picture-size: 48px;
+            --profile-picture-border-radius: 6px;
+            --profile-picture-border-size: 2px;
+
+            /* Sizes - Password Entry Group */
+            --password-entry-length: 164px;
+            --password-entry-height: 24px;
+            --password-entry-offset: 6px;
+            --password-top-margin: calc(var(--profile-picture-size) * 0.5);
+            --password-left-margin: calc(2 * var(--profile-picture-border-size) + var(--user-listing-horizontal-gap) + var(--profile-picture-size) - var(--password-entry-offset));
+            --password-entry-button-margin: 8px;
+
+            /* Sizes - Popup */
+            --popup-border-radius: 8px;
+            --popup-padding: 10px;
+            --popup-border-size: 1px;
+            --popup-arrow-size: 20px;
+            --popop-arrow-position: 4px;
+            --popup-arrow-border-size: calc(var(--popup-arrow-size) + var(--popup-border-size) * 2);
+            --error-popup-gap: 6px;
+            --error-popup-top-margin: calc(var(--password-top-margin) + var(--popup-arrow-border-size) + var(--password-entry-height) + var(--error-popup-gap));
+            --error-popup-left-margin: calc(var(--password-left-margin) + var(--password-entry-length) / 2);
+
+            /* Sizes - Footer Content */
+            --footer-content-margin-side: 24px;
+            --footer-content-margin-top: 20px;
+
+            /* Primary Font */
+            --primary-font-family: 'Tahoma', sans-serif; /* XP 로그온 화면 폰트 */
+            --primary-font-size: 18px;
+            --primary-font-color: white;
+
+            /* Message Font (Corner) */
+            --message-font-size: 12px;
+        }
+
+        body,
+        html {
+            overflow: hidden;
+            overflow-x: hidden;
+        }
+
+        body {
+            /* Prevent Text Selection & Text Cursor */
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: default;
+            /* Reset Defaults */
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: var(--primary-bg);
+            font: var(--primary-font-size) var(--primary-font-family);
+            color: var(--primary-font-color);
+            /* Emulate "sort-of-bold-but-not" rendering with a text shadow rendered at the same spot. */
+            text-shadow: 0px 0px var(--primary-font-color);
+        }
+
+        #main-content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-bg);
+            font: var(--primary-font-size) var(--primary-font-family);
+            color: var(--primary-font-color);
+            /* Define Grid */
+            display: grid;
+            grid-template-rows: var(--header-height) var(--stripe-height) auto var(--stripe-height) var(--footer-height);
+        }
+
+        #header {
+            /* Positioning */
+            grid-row: 1;
+            width: 100%;
+            height: 100%;
+            /* Color */
+            background-color: var(--header-bg);
+        }
+
+        #headerStripe {
+            /* Positioning */
+            grid-row: 2;
+            width: 100%;
+            height: 100%;
+            /* Color */
+            background: linear-gradient(45deg, var(--header-stripe-0),
+                    var(--header-stripe-1), var(--header-stripe-2), var(--header-stripe-3));
+        }
+
+        #logo {
+            width: var(--logo-size);
+        }
+
+        .text-under-logo {
+            display: block;
+            margin: var(--logo-text-gap) calc(var(--logo-size) * 0.165) 0 0;
+        }
+
+        #center {
+            /* Positioning */
+            grid-row: 3;
+            width: 100%;
+            min-height: 0;
+            /* Color */
+            background: radial-gradient(circle at 5% 5%, var(--radial-gradient-inner) 0,
+                    var(--radial-gradient-mid) 6%, var(--radial-gradient-outer) 12%);
+            /* Child Positioning */
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        #center>* {
+            margin-right: 2%;
+        }
+
+        #center>*:last-child {
+            margin-right: 0;
+        }
+
+        #centerLeft {
+            /* Positioning */
+            flex: 8 1 0px;
+            /* Child Positioning */
+            text-align: end;
+        }
+
+        #centerDivider {
+            /* Size */
+            width: var(--center-divider-width);
+            height: var(--center-divider-height);
+            /* Color */
+            background: linear-gradient(180deg, var(--center-divider-outer),
+                    var(--center-divider-inner), var(--center-divider-outer));
+        }
+
+        #centerRight {
+            /* Positioning */
+            height: 100%;
+            flex: 4 1 0px;
+            /* Child Positioning */
+            display: flex;
+            flex-direction: column;
+            /* safe center Not Supported, Using flex-start + auto Margins Instead */
+            justify-content: flex-start;
+            overflow: hidden;
+        }
+
+        #userListings {
+            margin: auto 0;
+        }
+
+        /*
+ * Workaround since flex gap is not
+ * yet correctly supported by the webkit
+ * version included in the lighdm package.
+ */
+        #userListings>* {
+            margin-bottom: 15px;
+        }
+
+        #userListings>*:last-child {
+            margin-bottom: 0;
+        }
+
+        #footerStripe {
+            /* Positioning */
+            grid-row: 4;
+            width: 100%;
+            height: 100%;
+            /* Color */
+            background: linear-gradient(45deg, var(--footer-stripe-0),
+                    var(--footer-stripe-1), var(--footer-stripe-2), var(--footer-stripe-3));
+        }
+
+        #footer {
+            /* Positioning */
+            grid-row: 5;
+            width: 100%;
+            height: 100%;
+            /* Color */
+            background: linear-gradient(90deg, var(--footer-bg-left), var(--footer-bg-right));
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        #footer>* {
+            margin: var(--footer-content-margin-top) var(--footer-content-margin-side) 0 var(--footer-content-margin-side);
+        }
+
+        #shutdown-group:hover {
+            cursor: pointer;
+        }
+
+        #shutdown-group:hover>span {
+            text-decoration: underline;
+        }
+
+        #shutdown-group:hover>#shutdown-options {
+            filter: brightness(1.25);
+        }
+
+        #shutdown-options {
+            height: var(--image-button-size);
+            box-shadow: 2px 2px 0 var(--shadow-color);
+        }
+
+        #account-message {
+            font: var(--message-font-size) var(--primary-font-family);
+        }
+
+        /* User Profile */
+        .user-border-wrapper {
+            width: var(--user-listing-width);
+            background: linear-gradient(90deg, white, var(--primary-bg) 80%);
+            border-radius: var(--profile-picture-border-radius);
+            padding: 1px;
+        }
+
+        .profile-picture-wrapper {
+            background-color: var(--profile-picture-border-normal);
+            border-radius: var(--profile-picture-border-radius);
+            width: var(--profile-picture-size);
+            height: var(--profile-picture-size);
+            padding: var(--profile-picture-border-size);
+            box-shadow: 1px 1px 2px var(--shadow-color);
+        }
+
+        .user:hover .profile-picture-wrapper,
+        .user.active .profile-picture-wrapper {
+            background-color: var(--profile-picture-border-inner);
+            box-shadow: 1px 1px 2px var(--shadow-color), inset 0 0 1px 1px var(--profile-picture-border-outer);
+        }
+
+        .profile-picture {
+            width: var(--profile-picture-size);
+            height: var(--profile-picture-size);
+            object-fit: cover;
+        }
+
+        .user {
+            position: relative;
+            background-color: var(--primary-bg);
+            outline: 1px solid var(--primary-bg);
+            padding: var(--user-listing-padding) 0 var(--user-listing-padding) var(--user-listing-padding);
+            display: flex;
+            flex-direction: row;
+            gap: var(--user-listing-horizontal-gap);
+        }
+
+        .user>* {
+            transition: 0.5s;
+            transition-property: opacity;
+        }
+
+        #centerRight:hover .user:not(.active)>* {
+            opacity: 50%;
+        }
+
+        #centerRight:hover .user:not(.active):hover>* {
+            opacity: 100%;
+        }
+
+        .user:hover {
+            cursor: pointer;
+        }
+
+        .user.active {
+            flex: 1 1 0px;
+            outline: 1px solid transparent;
+            border-right: 0;
+            border-radius: var(--profile-picture-border-radius);
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            background: linear-gradient(90deg, var(--user-listing-0), var(--user-listing-1));
+        }
+
+        .password-box {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            z-index: 1;
+            margin: var(--password-top-margin) 0 0 var(--password-left-margin);
+        }
+
+        /*
+ * Workaround since flex gap is not
+ * yet correctly supported by the webkit
+ * version included in the lighdm package.
+ */
+        .password-box>* {
+            margin-bottom: 4px;
+        }
+
+        .password-box>*:last-child {
+            margin-bottom: 0;
+        }
+
+        .password {
+            box-shadow: 2px 2px 0 var(--shadow-color);
+            outline: none;
+            border: none;
+            padding-left: 8px;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 100%;
+            line-height: 1.15;
+            margin: 0;
+            width: var(--password-entry-length);
+            height: var(--password-entry-height);
+            overflow-x: hidden;
+            white-space: nowrap;
+        }
+
+        .password-form {
+            visibility: hidden;
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            align-items: center;
+        }
+
+        /*
+ * Workaround since flex gap is not
+ * yet correctly supported by the webkit
+ * version included in the lighdm package.
+ */
+        .password-form>* {
+            margin-right: 5px;
+        }
+
+        .password-form>*:last-child {
+            margin-right: 0;
+        }
+
+        .password-form .img-button {
+            height: var(--image-button-size);
+        }
+
+        .user.active .password-form {
+            visibility: visible;
+        }
+
+        .password-msg {
+            margin-left: var(--password-entry-offset);
+            visibility: hidden;
+            font-size: var(--message-font-size);
+            /* Disable "sort-of-bold" text shadow hack */
+            text-shadow: none;
+        }
+
+        .user.active .password-msg {
+            visibility: visible;
+        }
+
+        .password-error-popup {
+            visibility: hidden;
+            z-index: 2;
+            position: absolute;
+            margin: var(--error-popup-top-margin) 0 0 var(--error-popup-left-margin);
+            border: solid var(--popup-border-size) black;
+            border-radius: var(--popup-border-radius);
+            padding: var(--popup-padding);
+            font-size: var(--message-font-size);
+            color: black;
+            background-color: var(--popup-background-color);
+            width: max-content;
+        }
+
+        .password-error-popup.active {
+            visibility: visible;
+        }
+
+        .popup-arrow-border {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 0px solid transparent;
+            border-right: var(--popup-arrow-border-size) solid transparent;
+            border-bottom: var(--popup-arrow-border-size) solid black;
+            margin: calc(0px - var(--popup-arrow-border-size) - var(--popup-padding)) 0 0 var(--popop-arrow-position);
+        }
+
+        .popup-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 0px solid transparent;
+            border-right: var(--popup-arrow-size) solid transparent;
+            border-bottom: var(--popup-arrow-size) solid var(--popup-background-color);
+            margin: calc(var(--popup-border-size) * 2) var(--popup-border-size) 0px var(--popup-border-size);
+        }
+
+        .password-error-title {
+            font-family: sans-serif;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .password-error-icon {
+            height: var(--message-font-size);
+        }
+
+        .img-button {
+            vertical-align: middle;
+        }
+
+        .img-button:hover {
+            filter: brightness(1.25);
+        }
+
+        .img-button:active {
+            filter: brightness(0.5);
+        }
+
+        .password-entry-button {
+            margin-left: var(--password-entry-button-margin);
+            box-shadow: 2px 2px 0 var(--shadow-color);
+        }
+
+        #welcome {
+            font-family: sans-serif;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 50px;
+            text-shadow: 2px 2px 0 var(--shadow-color);
+            margin: auto 0;
+            padding-left: 300px;
+            /* 약간 오른쪽으로 이동 */
+        }
+
+        @keyframes grayFadeIn {
+            0% {
+                filter: grayscale(0);
+            }
+
+            15% {
+                filter: grayscale(0);
+            }
+
+            100% {
+                filter: grayscale(0.90);
+            }
+        }
+
+        .grayscale {
+            animation: grayFadeIn 5s;
+            animation-fill-mode: forwards;
+            animation-timing-function: steps(16, end);
+        }
+    </style>
+    <script src="../../focusController.js"></script>
+</head>
+<!-- Body -->
+
+<body>
+
+    <!-- Main Login Screen Content -->
+    <div id="main-content">
+        <!-- Header -->
+        <div id="header"></div>
+        <div id="headerStripe"></div>
+        <!-- Login Screen Content -->
+        <div id="center">
+            <div id="centerLeft">
+                <img src="../../image/logo.png" id="logo" />
+                <span class="text-under-logo">
+                    Windows is shutting down...
+                </span>
+            </div>
+            <div id="centerRight">
+            </div>
+        </div>
+        <!-- Footer -->
+        <div id="footerStripe"></div>
+        <div id="footer">
+        </div>
+    </div>
+</body>
+
+<!-- Scripts -->
+<script type="module">
+    async function init() {
+        // Play shutdown sound
+        const shutdownAudio = new Audio('../../audio/shutdown.wav');
+        shutdownAudio.play().catch(error => {
+            console.error("Audio play failed:", error);
+        });
+    }
+    window.onload = init;
+</script>
+
+</html>

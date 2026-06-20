@@ -1,0 +1,78 @@
+Windows XP 데스크톱 시뮬레이션 - 파일 확장자 및 앱 연동 가이드 (최신판)
+==========================================================
+
+이 문서는 시스템의 현재 구조(appRegistry.js 및 Payload 시스템)를 기반으로 새로운 파일 확장자와 이를 실행할 애플리케이션을 추가하는 표준 방법을 설명합니다.
+
+1. 파일 실행 아키텍처 개요
+------------------------
+사용자가 폴더에서 파일을 더블클릭하면 다음과 같은 흐름으로 실행됩니다:
+1. [folder.html] : `executeFile` 함수에서 확장자를 감지하고, 해당 앱 ID와 파일 경로(payload)를 부모 창으로 전송합니다.
+2. [appengine.js] : `launchApp` 메시지를 수신하여 `appRegistry.js` 설정을 확인하고 앱 창(iframe)을 생성합니다.
+3. [appengine.js] : 앱 iframe이 로드되면(`onload`), 전달받은 `payload`를 앱 내부로 다시 전송합니다.
+4. [App (iframe)] : 자신의 창으로 전달된 메시지를 수신하여 파일 내용을 화면에 렌더링합니다.
+
+2. 새 확장자 지원 추가 단계
+------------------------
+
+STEP 1: 애플리케이션 등록 (appRegistry.js)
+- 루트 디렉토리의 `appRegistry.js` 내 `APPS` 객체에 새 앱 정의를 추가합니다.
+- 예시:
+  'pdfviewer': {
+      id: 'pdfviewer',
+      title: 'Adobe PDF Reader',
+      iconUrl: './image/pdf.png',
+      launchOptions: {
+          title: 'Adobe PDF Reader',
+          iframeSrc: './app/pdfviewer/index.html',
+          width: 800,
+          height: 600,
+          iconUrl: './image/pdf.png'
+      },
+      desktopColumn: null // 바탕화면에 아이콘을 표시하지 않을 경우 null
+  },
+
+STEP 2: 가상 파일 시스템(VFS) 등록 (folder.html)
+- `app/folder.html` (또는 `documents.html` 등) 상단의 `vfs` 객체에 새 확장자를 가진 파일을 추가합니다.
+- 예시:
+  'manual.pdf': { type: 'file', icon: '../image/pdf.png' }
+
+STEP 3: 확장자 분기 로직 추가 (folder.html)
+- `folder.html` 내의 `executeFile(itemName)` 함수에 새로운 확장자 감지 로직을 추가합니다.
+- 반드시 `payload` 객체를 포함하여 `launchApp` 메시지를 보내야 합니다.
+- 예시:
+  } else if (fileExtension === '.pdf') {
+      const fullPath = `${currentPath}/${itemName}`;
+      if (window.parent) {
+          window.parent.postMessage({
+              type: 'launchApp',
+              appId: 'pdfviewer',
+              payload: {
+                  type: 'openPdfFile', // 앱에서 인식할 커스텀 타입
+                  filePath: fullPath
+              }
+          }, '*');
+      }
+  }
+
+STEP 4: 애플리케이션 내 메시지 수신 구현
+- 실행될 앱(예: `app/pdfviewer/index.html`)에서 `message` 이벤트를 수신하여 파일을 로드합니다.
+- 예시:
+  window.addEventListener('message', (event) => {
+      const data = event.data;
+      if (data.type === 'openPdfFile') {
+          console.log('Loading file:', data.filePath);
+          // 실제 파일 로딩 로직 구현 (fetch 등)
+      }
+  });
+
+3. 주요 구현 규칙 (중요)
+----------------------
+- [Payload 시스템 사용] : 별도의 `setTimeout`이나 추가 메시지 없이, `launchApp` 메시지의 `payload` 필드에 파일 정보를 담아 보냅니다. 시스템 엔진(`appengine.js`)이 로딩 완료 시점에 맞춰 안전하게 앱에 전달해줍니다.
+- [경로 관리] : 파일 경로는 `currentPath`를 포함한 전체 가상 경로를 사용합니다.
+- [아이콘 일관성] : 가상 파일 시스템(`vfs`)의 아이콘 경로와 `appRegistry.js`의 `iconUrl`을 일치시켜 사용자 경험을 통일합니다.
+
+4. 참고 파일
+------------
+- 앱 설정 중앙 관리: [appRegistry.js](file:///c:/Users/%EC%A0%95%EC%9B%90%EC%A4%80/Desktop/%EA%B9%83%ED%97%88%EB%B8%8C/Mainajwj/appRegistry.js)
+- 확장자 감지 및 실행: [app/folder.html](file:///c:/Users/%EC%A0%95%EC%9B%90%EC%A4%80/Desktop/%EA%B9%83%ED%97%88%EB%B8%8C/Mainajwj/app/folder.html) (executeFile 함수)
+- 시스템 실행 엔진: [appengine.js](file:///c:/Users/%EC%A0%95%EC%9B%90%EC%A4%80/Desktop/%EA%B9%83%ED%97%88%EB%B8%8C/Mainajwj/appengine.js) (launchApp 함수)

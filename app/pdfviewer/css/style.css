@@ -1,0 +1,19 @@
+body {
+    font-family: 'Lato', sans-serif;
+    background-image: url("/img/wallapaper.jpg");
+    /* The image used */
+    background-color: #cccccc;
+    /* Used if the image is unavailable */
+    height: 100vh;
+    /* You must set a specified height */
+    background-position: center;
+    /* Center the image */
+    background-repeat: no-repeat;
+    /* Do not repeat the image */
+    background-size: cover;
+    /* Resize the background image to cover the entire container */
+}
+
+.center{
+    padding: 0px 400px !important;
+}

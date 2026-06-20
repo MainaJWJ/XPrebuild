@@ -1,0 +1,27 @@
+{
+  "project_name": "Mushroom Cloud 3D VFX",
+  "version": "1.3.0",
+  "description": "A web-based 3D simulation of a mushroom cloud using HTML, CSS, JavaScript, and Three.js.",
+  "recent_changes": [
+    {
+      "date": "2026-06-16",
+      "description": "Prolonged fireball lifetime and increased proportion of flames within the smoke cloud.",
+      "details": [
+        "Extended fireball, cooling, and heat lifetimes in SimulationTimeline.js to let the fire last longer.",
+        "Prolonged the additive fireball mesh duration in Fireball.js (from 5s to 9s) and adjusted its expansion/fade curve.",
+        "Modified volumeFrag shader in shaders.js to keep temperatures higher inside the stem and cap, and lowered the threshold for blending fire colors (from 0.48 to 0.28).",
+        "Updated billowFrag shader in shaders.js to increase fire color intensity (bright yellow/orange instead of dark ember) and lowered mixing threshold (from 0.58 to 0.20).",
+        "Increased initial temperatures of smoke particles at spawn and reduced the cooling decay rate in MushroomCloud.js, making the rolling outer smoke glow with realistic fire and cool down gradually."
+      ]
+    },
+    {
+      "date": "2026-06-16",
+      "description": "Removed quality options and updated initial defaults for maximum visual appeal.",
+      "details": [
+        "Removed the 'Quality' selection dropdown and 'adaptiveQuality' checkbox from the GUI (DebugUI.js) and codebase (main.js).",
+        "Set new high-quality, cinematic default values for the simulation.",
+        "Removed adaptive quality monitoring logic to keep rendering resolution consistently sharp."
+      ]
+    }
+  ]
+}

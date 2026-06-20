@@ -1,0 +1,1511 @@
+scene_bsod {
+	display:none
+}
+:root {
+	--contentFont:"msTahoma","Tahoma",sans-serif;
+	--contentFontSize:8.5pt;
+	--systemFont:"Microsoft Sans Serif",sans-serif;
+	--systemFontSize:13px;
+	--titleFont:"Trebuchet MS",sans-serif;
+	--titleFontSize:14px;
+	--3dHighlight:#fff8;
+	--3dLightShade:#0005;
+	--3dDarkShade:#000a;
+	--accentGradient:linear-gradient( to right,var(--activePrimary),var(--activeSecondary) );
+	--lowerBoxDark:var(--3dDarkShade) var(--mainColor) var(--mainColor) var(--3dDarkShade);
+	--lowerBoxLight:var(--3dLightShade) var(--3dHighlight) var(--3dHighlight) var(--3dLightShade);
+	--raiseBoxDark:var(--mainColor) var(--3dDarkShade) var(--3dDarkShade) var(--mainColor);
+	--raiseBoxLight:var(--3dHighlight) var(--3dLightShade) var(--3dLightShade) var(--3dHighlight);
+	--insetBSLowerDark:inset 1px 1px var(--3dDarkShade),inset -1px -1px var(--mainColor);
+	--insetBSLowerLight:inset 1px 1px var(--3dLightShade),inset -1px -1px var(--3dHighlight);
+	--insetBSRaiseDark:inset 1px 1px var(--mainColor),inset -1px -1px var(--3dDarkShade);
+	--insetBSRaiseLight:inset 1px 1px var(--3dHighlight),inset -1px -1px var(--3dLightShade);
+	--BSLowerDark:-1px -1px var(--3dDarkShade),1px 1px var(--mainColor);
+	--BSLowerLight:-1px -1px var(--3dLightShade),1px 1px var(--3dHighlight);
+	--BSRaiseDark:-1px -1px var(--mainColor),1px 1px var(--3dDarkShade);
+	--BSRaiseLight:-1px -1px var(--3dHighlight),1px 1px var(--3dLightShade);
+	--menuShadow:2px 2px 2px #00000088
+}
+scene_desktop {
+	background-color:#004e98
+}
+taskbar {
+	position:absolute;
+	display:flex;
+	background:linear-gradient(to bottom,#7d7e99 0,#dadce8 4%,#fff 9%,#9a99b1 17%,#a8a9bf 30%,#ecebec 91%,#83829d 98%);
+	bottom:0;
+	height:30px;
+	width:100%;
+	z-index:999999
+}
+taskbar.autohide {
+	transform:translateY(30px);
+	transition:transform .1s linear
+}
+taskbar.autohide:before {
+	width:100%;
+	height:4px;
+	background:#40e0d0;
+	display:block;
+	content:" ";
+	position:absolute;
+	top:-4px
+}
+taskbar.autohide:hover {
+	transform:translateY(0)
+}
+taskbar startbtn {
+	width:98px;
+	height:100%;
+	filter:drop-shadow(1px 1px 1px #ffffff)
+}
+taskbar quicklaunch {
+	display:flex;
+	padding:5px 2px 3px 8px;
+	overflow:hidden;
+	text-overflow:" ≫ ";
+	white-space:nowrap
+}
+taskbar quicklaunch img {
+	display:block;
+	padding:3px;
+	width:22px;
+	height:22px;
+	box-sizing:border-box
+}
+taskbar quicklaunch img:hover {
+	border:1px solid #fff;
+	padding:2px;
+	border-radius:3px
+}
+taskbar taskarea {
+	display:flex;
+	flex:1;
+	padding:0 14px 0 8px;
+	overflow-x:hidden
+}
+taskbar taskarea task {
+	display:flex;
+	flex:1;
+	width:100%;
+	animation:grow .2s .1s linear forwards;
+	min-width:0;
+	max-width:0;
+	height:23px;
+	border-radius:4px;
+	margin-top:3px;
+	margin-right:1px;
+	padding:0 5px;
+	font-family:var(--contentFont);
+	color:#404040;
+	font-size:var(--contentFontSize);
+	line-height:22px;
+	text-overflow:ellipsis;
+	overflow:hidden;
+	white-space:nowrap;
+	background:linear-gradient(to bottom,#fff 0,#cfd0df 50%,#cbccda 51%,#cbccda 100%);
+	box-shadow:inset 0 1px 0 #fcfcfc,inset 0 -1px 0 #8a8b98,inset 1px 0 0 #fff,inset -1px 0 0 #fff;
+	border:1px solid;
+	border-color:#9d9ea6
+}
+@keyframes grow {
+	0% {
+		min-width:0;
+		max-width:0
+	}
+	100% {
+		min-width:50px;
+		max-width:146px
+	}
+}
+taskbar taskarea task:hover {
+	background:linear-gradient(to bottom,#d9dae8 0,#dadbe9 35%,#f6f6fc 60%,#fff 100%);
+	box-shadow:inset 0 1px 0 #fcfcfc,inset 1px 0 0 #fff,inset -1px 0 0 #fff;
+	border:1px solid;
+	border-color:#68787a
+}
+taskbar taskarea task.active,taskbar taskarea task:active {
+	background:linear-gradient(to bottom,#616b78 0,#77818c 47%,#7b868e 53%,#89919a 100%);
+	box-shadow:inset 1px 0 0 #616d78,inset -1px 0 0 #616d78,inset 0 1px 0 #43515b,inset 0 -1px 0 #6c7782;
+	border:1px solid #616d78;
+	border-bottom:1px solid #6c7782;
+	color:#fff
+}
+taskbar taskarea task.active:hover {
+	background:linear-gradient(to bottom,#7e8895 0,#949ea9 47%,#97a2aa 53%,#a6aeb7 100%);
+	box-shadow:inset 1px 0 0 #7e8a95,inset -1px 0 0 #7e8a95,inset 0 1px 0 #616f79,inset 0 -1px 0 #89949f;
+	border:1px solid #7e8a95;
+	border-bottom:1px solid #89949f
+}
+taskbar taskarea task img {
+	width:16px;
+	height:16px;
+	padding:3px 4px 5px 4px;
+	display:inline-block;
+	vertical-align:middle;
+	filter:drop-shadow(.5px .5px .5px #00000088)
+}
+taskbar taskarea task span {
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis
+}
+taskbar taskarea task.active img,taskbar taskarea task:active img {
+	padding:3px 4px 5px 5px
+}
+taskbar taskarea task.dialogbox {
+	display:none
+}
+taskbar trayarea {
+	background:linear-gradient(to bottom,#fff 15%,#cccddb 40%,#cbccda 72%,#aaadc2 90%,#8b8ca4 95%,#61637c 100%),linear-gradient(to left,#0f83e0ff 0,#0f83e000 15%);
+	box-shadow:inset 1px 0 0 #d7d8da,-1px 0 0 #58596d;
+	right:0;
+	height:30px;
+	padding-right:14px;
+	text-align:right;
+	font-family:var(--contentFont);
+	color:#fff;
+	font-size:var(--contentFontSize);
+	line-height:30px
+}
+taskbar trayarea traycontain {
+	display:flex;
+	flex-wrap:nowrap;
+	flex-direction:row;
+	align-items:flex-start;
+	padding-left:10px;
+	margin:0
+}
+taskbar trayarea img {
+	display:inline-block;
+	padding:8px 1px 6px;
+	filter:drop-shadow(.5px .5px .5px #00000088);
+	z-index:1
+}
+taskbar trayarea span {
+	padding-left:8px;
+	line-height:30px;
+	color:#000
+}
+startmenu {
+	position:absolute;
+	bottom:30px;
+	left:0;
+	display:grid;
+	grid-template-rows:64px auto 40px;
+	grid-template-columns:378px;
+	width:378px;
+	height:auto;
+	border-radius:5px 5px 0 0;
+	border:1px solid #6b6e73;
+	border-bottom:1px solid #464655;
+	background-color:#2b6dd1;
+	filter:drop-shadow(2px 2px 2px #00000088);
+	z-index:999999
+}
+startmenu.hidden {
+	display:none
+}
+startmenu userbar {
+	grid-column:1;
+	grid-row:1;
+	background:linear-gradient(to bottom,#a8a7bf 0,#fff 3%,#a8a7bf 5%,#b1b3c8 8%,#fff 100%);
+	border-radius:5px 5px 0 0;
+	border-bottom:1px solid #6b6e73
+}
+startmenu userbar usericon {
+	margin:6px 5px;
+	font-family:"Franklin Gothic Medium",sans-serif
+}
+startmenu userbar usericon span {
+	display:inline-block;
+	line-height:48px;
+	font-family:sans-serif;
+	color:#fff;
+	margin:13px 0 0 12px;
+	font-weight:600;
+	transform:translateY(-18px);
+	text-shadow:2px 2px 3px #000000dd;
+	font-size:19px
+}
+startmenu userbar usericon img {
+	margin-top:1px
+}
+startmenu links {
+	display:grid;
+	grid-column:1;
+	grid-row:2;
+	margin-left:1px;
+	margin-top:0;
+	grid-template-columns:188px 189px;
+	grid-template-rows:auto;
+	font-family:var(--contentFont);
+	font-size:var(--contentFontSize)
+}
+startmenu links applinks {
+	display:grid;
+	grid-column:1;
+	grid-row:1;
+	grid-template-rows:84px auto 35px;
+	background-color:#fff;
+	border-left:1px solid #fff;
+	color:#373738;
+	padding-top:2px
+}
+startmenu links applinks ul {
+	padding-left:5px;
+	margin:0
+}
+startmenu links applinks li {
+	height:32px;
+	line-height:32px;
+	padding:2px 0 2px 2px;
+	list-style:none;
+	margin:4px 5px 4px 0
+}
+startmenu links applinks ul#pinnedapps {
+	line-height:48px;
+	overflow-wrap:break-word;
+	border-bottom:1px solid;
+	border-image-slice:1;
+	border-image-source:linear-gradient(to right,#fff 0%,#fff 8.5%,#fefefe 8.6%,#d3d3c8 24.05%,#d3d3c8 51.05%,#d3d3c8 76.05%,#fefefe 93.6%,#fff 93.7%,#fff 100%);
+	padding-bottom:4px
+}
+startmenu links applinks ul#pinnedapps span.title {
+	font-weight:900;
+	position:absolute;
+	transform:translateY(-7px)
+}
+startmenu links applinks ul#pinnedapps span.name {
+	position:absolute;
+	transform:translateY(6px);
+	color:grey
+}
+startmenu links applinks ul#userapps {
+	padding-top:0
+}
+startmenu links applinks ul#allapps {
+	text-align:center;
+	font-weight:900;
+	height:24px;
+	line-height:24px;
+	display:block;
+	bottom:0;
+	padding:0;
+	margin:0 5px;
+	border-top:1px solid;
+	border-image-slice:1;
+	border-image-source:linear-gradient(to right,#fff 0%,#fff 8.5%,#fefefe 8.6%,#d3d3c8 24.05%,#d3d3c8 51.05%,#d3d3c8 76.05%,#fefefe 93.6%,#fff 93.7%,#fff 100%)
+}
+startmenu links applinks ul#allapps li {
+	height:24px;
+	line-height:24px;
+	margin:0;
+	padding:2px;
+	margin-top:3px
+}
+startmenu links applinks ul#allapps ul,startmenu links applinks ul#allapps ul#start-programs {
+	display:none;
+	list-style:none;
+	margin:0;
+	padding:0 0 0 5px;
+	position:absolute;
+	border:1px solid #3e88e3;
+	background-color:#fff;
+	color:#000;
+	box-shadow:inset 1px 0 #88b5ed,inset 2px 0 #2a79e1,inset 4px 0 #2f7ee3,inset 5px 0 #3382e8;
+	font-weight:500;
+	filter:none;
+	width:auto;
+	white-space:nowrap;
+	z-index:9999
+}
+startmenu links applinks ul#allapps ul#start-programs {
+	bottom:43px;
+	left:145px
+}
+startmenu links applinks ul#allapps ul ul {
+	top:-1px;
+	left:100%
+}
+startmenu links applinks ul#allapps.expanded ul#start-programs {
+	display:block;
+	opacity:0;
+	animation:linear .1s menuFade forwards
+}
+startmenu links applinks ul#allapps ul#start-programs li {
+	position:relative;
+	width:auto;
+	margin:0;
+	padding:0 22px 0 6px;
+	text-align:left
+}
+startmenu links applinks ul#allapps ul#start-programs li.new {
+	background:#fbe7b5
+}
+startmenu links applinks ul#allapps ul#start-programs li.divider {
+	height:1px;
+	margin:3px 20px 3px 0;
+	background:linear-gradient(to right,#fff 0,#d3d3c8 25%,#d3d3c8 75%,#fff 100%)
+}
+startmenu links applinks ul#allapps ul li a {
+	width:100%;
+	padding:0;
+	display:inline;
+	line-height:145%
+}
+startmenu links applinks ul#allapps ul li a img {
+	width:16px;
+	height:16px;
+	margin-right:4px;
+	transform:translateY(-1px)
+}
+startmenu links applinks ul#allapps.expanded ul#start-programs li.submenuHolder:after {
+	content:"▼";
+	display:inline-block;
+	position:absolute;
+	font-size:9px;
+	transform:rotate(-90deg) scaleY(.6);
+	right:6px;
+	line-height:26px
+}
+startmenu links applinks ul#allapps.expanded ul#start-programs li.expanded:not(.divider),startmenu links applinks ul#allapps.expanded ul#start-programs li:not(.divider):hover {
+	background-color:#1665cb;
+	color:#fff
+}
+startmenu links applinks ul#allapps.expanded ul#start-programs li.expanded>ul {
+	display:block;
+	opacity:0;
+	animation:linear .2s .3s menuFade forwards
+}
+startmenu links applinks li:hover {
+	background-color:#b2b4bf;
+	color:#000
+}
+startmenu links applinks li:hover span.name {
+	color:#000!important
+}
+startmenu links applinks li img {
+	height:32px;
+	width:32px;
+	vertical-align:middle;
+	padding-right:4px
+}
+startmenu links syslinks {
+	display:flex;
+	grid-column:2;
+	grid-row:1;
+	flex-direction:column;
+	padding-top:2px;
+	background-color:#e2e7eb;
+	border-left:1px solid #b4bdc7;
+	border-right:1px solid #e9e6ee;
+	color:#0a246a
+}
+startmenu links syslinks ul {
+	padding-left:7px;
+	margin:0
+}
+startmenu links syslinks ul#syslocations {
+	font-weight:900;
+	padding-top:5px
+}
+startmenu links syslinks ul#syslocations:after {
+	content:" ";
+	height:1px;
+	width:75%;
+	background:linear-gradient(to right,#e6e8e4 0,#b2bbcf 50%,#e6e8e4 100%);
+	display:block;
+	margin-left:20px
+}
+startmenu links syslinks ul#settings:before {
+	content:" ";
+	height:1px;
+	width:75%;
+	background:linear-gradient(to right,#dbe7f6 0,#ededed 50%,#dbe7f6 100%);
+	display:block;
+	margin-left:20px
+}
+startmenu links syslinks ul#settings:after {
+	content:" ";
+	height:1px;
+	width:75%;
+	background:linear-gradient(to right,#e6e8e4 0,#b2bbcf 50%,#e6e8e4 100%);
+	display:block;
+	margin-left:20px
+}
+startmenu links syslinks ul#support:before {
+	content:" ";
+	height:1px;
+	width:75%;
+	background:linear-gradient(to right,#dbe7f6 0,#ededed 50%,#dbe7f6 100%);
+	display:block;
+	margin-left:20px
+}
+startmenu links syslinks li {
+	line-height:24px;
+	list-style:none;
+	margin:1px 5px 3px 0;
+	padding:1px 3px
+}
+startmenu links syslinks li:hover {
+	background-color:#b2b4bf;
+	color:#000
+}
+startmenu links syslinks li img {
+	height:24px;
+	width:24px;
+	vertical-align:middle;
+	padding-right:4px;
+	filter:drop-shadow(.5px .5px .5px #00000088)
+}
+startmenu poweropt {
+	display:grid;
+	grid-column:1;
+	grid-row:3;
+	font-family:var(--contentFont);
+	font-size:var(--contentFontSize);
+	background:linear-gradient(to bottom,#e6e6ec 2%,#b1b3c8 91%,#acabc4 94%,#a8a7bf 100%);
+	box-shadow:inset 1px 0 0 #c6c5d5,inset -1px 0 0 #c6c5d5;
+	border-top:1px solid #6b6e73;
+	border-right:1px solid #777792;
+	border-left:1px solid #777792
+}
+startmenu poweropt powercontain {
+	display:flex;
+	flex-wrap:nowrap;
+	flex-direction:row;
+	justify-content:flex-end;
+	margin-top:7px;
+	right:0
+}
+startmenu poweropt btncontain {
+	display:inherit
+}
+startmenu poweropt softbutton {
+	display:inline;
+	width:22px;
+	height:22px;
+	border-radius:3px
+}
+startmenu poweropt softbutton:before {
+	margin:0 0 0 -1px;
+	border-radius:3px
+}
+startmenu poweropt span {
+	display:inline;
+	color:#000;
+	line-height:24px;
+	margin-left:4px;
+	margin-right:11px
+}
+startmenu.classic {
+	display:grid;
+	grid-template-columns:21px auto;
+	grid-template-rows:100%;
+	width:unset;
+	height:unset;
+	background:var(--contentColor);
+	border:1px solid;
+	border-color:var(--3dLightShade);
+	box-shadow:none;
+	position:absolute;
+	bottom:30px;
+	left:0;
+	z-index:999999;
+	font-family:var(--contentFont);
+	font-size:var(--contentFontSize);
+	color:var(--menuText);
+	border-radius:0
+}
+startmenu.classic.hidden {
+	display:none
+}
+startmenu.classic #banner {
+	background-position:0 100%;
+	background-repeat:no-repeat;
+	margin:0;
+	grid-column:1
+}
+startmenu.classic links {
+	display:flex;
+	flex-direction:column;
+	grid-row:1;
+	grid-column:2;
+	border-top:none;
+	margin-left:0
+}
+startmenu.classic links ul {
+	list-style:none;
+	margin:0;
+	padding:0;
+	border-bottom:1px solid var(--3dLightShade);
+	box-shadow:0 1px var(--3dHighlight)
+}
+startmenu.classic links ul:last-child {
+	box-shadow:none;
+	border-bottom:none
+}
+startmenu.classic links li {
+	line-height:32px;
+	height:32px;
+	padding-left:6px;
+	padding-right:32px
+}
+startmenu.classic links li.submenuholder:after {
+	content:"▼";
+	display:inline-block;
+	position:absolute;
+	font-size:10px;
+	transform:rotate(-90deg) scaleY(.6);
+	right:6px;
+	text-shadow:none
+}
+startmenu.classic links li:hover {
+	background-color:var(--highlightColor);
+	color:var(--highlightText)
+}
+startmenu.classic links li img {
+	height:32px;
+	width:32px;
+	display:inline-block;
+	padding-right:8px;
+	vertical-align:middle
+}
+startmenu.classic links ul#links li ul {
+	display:none;
+	list-style:none;
+	margin:0;
+	padding:0;
+	position:absolute;
+	border:1px solid;
+	border-color:var(--3dLightShade);
+	background-color:var(--contentColor);
+	color:var(--menuText);
+	box-shadow:none;
+	font-weight:500;
+	filter:none;
+	width:auto;
+	white-space:nowrap;
+	z-index:1
+}
+startmenu.classic links ul#userapps {
+	padding-bottom:3px
+}
+startmenu.classic links ul#links {
+	padding:4px 0 3px 0
+}
+startmenu.classic links ul#poweropt {
+	padding-top:4px
+}
+startmenu.classic links ul#links li ul {
+	left:100%;
+	margin-left:-3px;
+	box-shadow:none
+}
+startmenu.classic links ul#links li ul#start-programs {
+	bottom:3px
+}
+startmenu.classic links ul#links li ul#start-favorites {
+	top:72px
+}
+startmenu.classic links ul#links li ul#start-documents {
+	top:104px
+}
+startmenu.classic links ul#links li ul#start-settings {
+	top:136px
+}
+startmenu.classic links ul#links li ul#start-find {
+	top:168px
+}
+startmenu.classic links ul#links ul ul {
+	top:-1px;
+	left:100%;
+	margin-left:-3px
+}
+startmenu.classic links ul#links li.expanded>ul {
+	display:block
+}
+startmenu.classic links ul#links ul li {
+	position:relative;
+	width:auto;
+	margin:0;
+	padding:0 22px 0 6px;
+	text-align:left;
+	height:20px;
+	line-height:20px
+}
+startmenu.classic links ul#links ul li.new {
+	background:#fbe7b5
+}
+startmenu.classic links ul#links ul li.empty img {
+	visibility:hidden
+}
+startmenu.classic links ul#links ul li.empty a {
+	color:var(--3dLightShade)
+}
+startmenu.classic links ul#links ul li.divider {
+	height:2px;
+	margin:3px;
+	box-sizing:border-box;
+	border:1px solid;
+	border-color:var(--3dLightShade) var(--3dLightShade) var(--3dHighlight) var(--3dHighlight)
+}
+startmenu.classic links ul#links ul li a {
+	width:100%;
+	padding:0;
+	display:inline;
+	line-height:145%
+}
+startmenu.classic links ul#links ul li a img {
+	width:16px;
+	height:16px;
+	margin-right:4px;
+	transform:translateY(-1px)
+}
+startmenu.classic links ul#links ul li.submenuHolder:after {
+	content:"▼";
+	display:inline-block;
+	position:absolute;
+	font-size:9px;
+	transform:rotate(-90deg) scaleY(.6);
+	right:6px;
+	line-height:21px
+}
+startmenu.classic links ul#links ul li:not(.divider):hover {
+	background-color:var(--highlightColor);
+	color:var(--highlightText)
+}
+startmenu.classic links ul#links ul li.submenuHolder:hover>ul {
+	display:block
+}
+contextmenu {
+	display:none;
+	position:absolute;
+	top:0;
+	left:0;
+	font-family:var(--contentFont);
+	font-size:var(--contentFontSize);
+	font-weight:500;
+	z-index:999999;
+	animation:linear .2s menuFade forwards
+}
+contextmenu.visible {
+	display:block
+}
+contextmenu ul {
+	list-style:none;
+	margin:0;
+	padding:2px;
+	border:1px solid var(--3dLightShade);
+	background-color:#fff;
+	box-shadow:var(--menuShadow)
+}
+contextmenu ul li {
+	position:relative;
+	height:17px;
+	line-height:17px;
+	margin:0;
+	padding:0 22px 0 1px;
+	width:auto;
+	white-space:nowrap;
+	display:grid;
+	grid-template-rows:auto;
+	grid-template-columns:16px auto;
+	color:var(--menuText)
+}
+contextmenu ul li img {
+	grid-column:1;
+	grid-row:1
+}
+contextmenu ul li.disabled img {
+	opacity:.4;
+	filter:saturate(0)
+}
+contextmenu ul li img.windowcontrols {
+	padding:3px
+}
+contextmenu ul li span {
+	padding-left:4px;
+	grid-column:2;
+	grid-row:1
+}
+contextmenu>ul ul {
+	top:-3px;
+	left:100%;
+	position:absolute
+}
+contextmenu>ul li.submenuholder>ul {
+	display:none
+}
+contextmenu>ul li.submenuholder:hover>ul {
+	display:block;
+	animation:linear .2s menuFade forwards
+}
+contextmenu ul li.default {
+	font-weight:600
+}
+contextmenu ul li.submenuholder:after {
+	content:"▼";
+	display:inline-block;
+	position:absolute;
+	font-size:9px;
+	transform:rotate(-90deg) scaleY(.6);
+	right:6px;
+	line-height:19px
+}
+contextmenu ul li.disabled {
+	color:#8c8a7e;
+	pointer-events:none
+}
+contextmenu ul li.divider {
+	height:1px;
+	margin:3px 1px 5px 1px;
+	background:var(--3dLightShade);
+	pointer-events:none
+}
+contextmenu ul li:hover {
+	background-color:var(--highlightColor);
+	color:var(--highlightText)
+}
+@keyframes menuFade {
+	0% {
+		opacity:0;
+		pointer-events:none
+	}
+	100% {
+		opacity:1;
+		pointer-events:all
+	}
+}
+scene_windowspace {
+	height:calc(100% - 26px)
+}
+app {
+	display:block;
+	position:absolute;
+	left:calc(50% - 150px);
+	top:calc(50% - 60px);
+	pointer-events:all;
+	border-radius:8px 8px 0 0;
+	border:1px solid;
+	border-color:#66667e;
+	background-color:#fbfcfd;
+	box-sizing:border-box
+}
+appanimator,appheader {
+	height:21px;
+	display:block;
+	padding:5px 4px 2px 5px;
+	font-family:"Trebuchet MS",sans-serif;
+	font-weight:600;
+	font-size:14px;
+	letter-spacing:.1px;
+	color:#0e1010;
+	text-shadow:1px 1px #c7c2d1;
+	line-height:21px;
+	background:radial-gradient(circle at 0 0,#7d7e99 0,#ffffffaa 1%,#ffffff00 1.2%,#ffffff00 100%),radial-gradient(circle at 100% 0,#7d7e99 0,#ffffffaa 1%,#ffffff00 1.2%,#ffffff00 100%),linear-gradient(to bottom,#7d7e99 0,#dadce8 3%,#fff 7%,#9a99b1 14%,#a8a9bf 19%,#fff 93%,#83829d 100%);
+	border-radius:7px 7px 0 0
+}
+appanimator {
+	background:linear-gradient(to right,var(--activePrimary),var(--activeSecondary));
+	position:fixed;
+	display:none;
+	padding-right:2px;
+	pointer-events:none;
+	z-index:999;
+	border-radius:0
+}
+appanimator.animating {
+	display:block;
+	animation:titlebarAnim .25s steps(8,start) forwards
+}
+@keyframes titlebarAnim {
+	0% {
+		width:var(--srcWidth);
+		top:var(--srcTop);
+		left:var(--srcLeft)
+	}
+	100% {
+		width:var(--destWidth);
+		top:var(--destTop);
+		left:var(--destLeft)
+	}
+}
+appanimator img,appheader img {
+	vertical-align:middle;
+	padding-right:4px;
+	margin-bottom:3px;
+	width:16px;
+	height:16px
+}
+appanimator span,appheader span {
+	text-overflow:ellipsis;
+	overflow:hidden;
+	white-space:nowrap;
+	width:calc(100% - 100px);
+	display:inline-block;
+	vertical-align:middle;
+	margin-bottom:2px;
+	pointer-events:none
+}
+app.dialogbox appanimator span,app.dialogbox appheader span {
+	width:calc(100% - 45px)
+}
+app.inactive {
+	border-color:#babac5
+}
+app.inactive appheader {
+	background:radial-gradient(circle at 0 0,#7d7e99 0,#ffffffaa 1%,#ffffff00 1.2%,#ffffff00 100%),radial-gradient(circle at 100% 0,#7d7e99 0,#ffffffaa 1%,#ffffff00 1.2%,#ffffff00 100%),linear-gradient(to bottom,#babac5 0,#eceef5 3%,#fff 7%,#d7d7e3 14%,#dbdde6 19%,#fff 93%,#cccbd9 100%);
+	color:#a2a1a1;
+	text-shadow:none
+}
+appcontrols {
+	position:absolute;
+	right:4px;
+	top:5px;
+	transform:translateY(0)
+}
+appcontrols captionbutton div {
+	width:19px;
+	height:19px;
+	display:block;
+	background-size:contain;
+	image-rendering:pixelated;
+	margin-left:-1px
+}
+app.inactive appcontrols captionbutton:hover,appcontrols captionbutton {
+	display:inline-block;
+	width:19px;
+	height:19px;
+	margin:1px 1px 1px -3px;
+	border-radius:3px;
+	padding-left:2px;
+	background:linear-gradient(#fff 0,#f0f1f6 5%,#dfdfeb 15%,#a8a7bf 90%,#848ab0 100%)
+}
+app.inactive appcontrols captionbutton:hover div,appcontrols captionbutton img {
+	filter:invert(80%) sepia(300%) hue-rotate(180deg) saturate(200%) drop-shadow(-1px 1px 0px #fff)
+}
+app.inactive appcontrols captionbutton:hover:after,appcontrols captionbutton:after {
+	height:inherit;
+	width:inherit;
+	content:" ";
+	display:block;
+	margin:-20px 0 0 -2px;
+	border-radius:3px;
+	box-shadow:inset 1px 0 0 #d3d4e088,inset -1px 0 0 #d3d4e088;
+	border:1px solid #6b758f
+}
+appcontrols captionbutton:hover {
+	background:linear-gradient(#fff 0,#fff 10%,#faf9fe 15%,#eaeaf9 30%,#b0b1cd 90%,#8488b1 100%)
+}
+appcontrols captionbutton:hover:after {
+	box-shadow:inset 1px 0 0 #ededfc88,inset -1px 0 0 #ededfc88;
+	background:0 0;
+	border:1px solid #5f6a85
+}
+app.inactive appcontrols captionbutton:active,appcontrols captionbutton:active {
+	background:linear-gradient(#9c9eb5 0,#d8d7e9 90%,#fefbff 100%);
+	box-shadow:inset 0 1px 0 #ece9f8
+}
+app.inactive appcontrols captionbutton:active:after,appcontrols captionbutton:active:after {
+	filter:multiply;
+	box-shadow:inset 1px 0 0 #8387ad77,inset -1px 0 0 #8387ad77;
+	border:1px solid #4f596f
+}
+app.inactive appcontrols captionbutton.closebtn:hover,appcontrols captionbutton.closebtn {
+	background:linear-gradient(#f3b59d 0,#e97a6e 33%,#da6263 66%,#d05a5e 85%,#c6545b 95%,#aa3c55 98%)
+}
+app.inactive appcontrols captionbutton.closebtn:hover div,appcontrols captionbutton.closebtn div {
+	filter:drop-shadow(0px -1px 0px #4a1320)
+}
+app.inactive appcontrols captionbutton.closebtn:hover:after,appcontrols captionbutton.closebtn:after {
+	border:1px solid #a63944;
+	box-shadow:inset 0 1px 0 #fbe7b5cc,inset 0 -1px 0 #aa3c55aa,inset 1px 0 1px #d75f5f,inset -1px 0 1px #d75f5f
+}
+appcontrols captionbutton.closebtn:hover {
+	background:linear-gradient(#ffcba4 0,#ffa28a 10%,#fe8671 33%,#fb806b 50%,#f17062 70%,#df6157 95%,#c23f4b 100%)
+}
+appcontrol captionbutton.closebtn:hover div {
+	filter:drop-shadow(0px -1px 0px #591b30)
+}
+appcontrols captionbutton.closebtn:hover:after {
+	border:1px solid #be3f3b;
+	box-shadow:inset 0 1px 0 #f9e9b6cc,inset 0 -1px 0 #c23f4baa,inset 1px 0 1px #f27562,inset -1px 0 1px #f27562
+}
+app.inactive appcontrols captionbutton.closebtn:active,appcontrols captionbutton.closebtn:active {
+	background:linear-gradient(#db5b54 0,#f27063 20%,#f47865 25%,#fe8b72 75%,#ffbea1 90%,#ffd5b7 100%)
+}
+app.inactive appcontrols captionbutton.closebtn:active div,appcontrols captionbutton.closebtn:active div {
+	filter:drop-shadow(0 -1px 0px #591b30)
+}
+app.inactive appcontrols captionbutton.closebtn:active:after,appcontrols captionbutton.closebtn:active:after {
+	border:1px solid #be3f3b;
+	box-shadow:inset 0 1px 0 #db5b54,inset 0 2px 0 #fae9b6bb,inset 0 -1px 0 #fae9b6bb,inset 1px 0 1px #e7685c,inset -1px 0 1px #e7685c
+}
+app.inactive appcontrols captionbutton {
+	background:linear-gradient(#fff 0,#f0f1f6 5%,#e9e9ef 15%,#cacbd8 90%,#bdbed2 100%)
+}
+app.inactive appcontrols captionbutton div {
+	filter:invert(70%) drop-shadow(-1px 1px 0px #fff) opacity(60%)
+}
+app.inactive appcontrols captionbutton:after {
+	box-shadow:inset 1px 0 0 #e6e6edaa,inset -1px 0 0 #e6e6edaa;
+	border:1px solid #a9adb9
+}
+app.inactive appcontrols captionbutton.closebtn {
+	background:linear-gradient(#fac8c4 0,#f2bab9 33%,#eab0b0 66%,#e1a7ab 85%,#dca4a7 95%,#c994a0 98%)
+}
+app.inactive appcontrols captionbutton.closebtn div {
+	filter:drop-shadow(0px -1px 0px #ad819a)
+}
+app.inactive appcontrols captionbutton.closebtn:after {
+	box-shadow:inset 0 1px 0 #fff9e0,inset 1px 0 1px #e0a7aa66,inset -1px 0 1px #e0a7aa66;
+	border:1px solid #c79297
+}
+app.maximized {
+	width:calc(100%+9px)!important;
+	height:calc(100%)!important;
+	top:0!important;
+	left:-4px!important;
+	border-radius:0
+}
+app.fullscreen {
+	width:calc(100%+2px)!important;
+	height:calc(100%+28px)!important;
+	top:-30px!important;
+	left:-4px!important;
+	z-index:9999999!important;
+	visibility:hidden
+}
+app.fullscreen appcontents {
+	visibility:visible
+}
+app.fullscreen appresizers,app.maximized appresizers {
+	display:none
+}
+app.fullscreen appcontents {
+	width:calc(100%+2px)!important;
+	height:calc(100%+2px)!important
+}
+app.minimized {
+	display:none
+}
+app.minimized.unminimizing {
+	display:inline-block;
+	visibility:hidden
+}
+app.minimized.unminimizing appanimator {
+	visibility:visible
+}
+app.maximized appheader {
+	border-radius:0;
+	background:linear-gradient(to bottom,#7d7e99 0,#dadce8 3%,#fff 7%,#9a99b1 14%,#a8a9bf 19%,#fff 93%,#83829d 100%)
+}
+app.maximized.inactive appheader {
+	background:linear-gradient(to bottom,#babac5 0,#eceef5 3%,#fff 7%,#d7d7e3 14%,#dbdde6 19%,#fff 93%,#cccbd9 100%)
+}
+app.maximized appcontrols captionbutton.max {
+	display:none
+}
+app:not(.maximized) appcontrols captionbutton.res {
+	display:none
+}
+app.dialogbox captionbutton.max,app.dialogbox captionbutton.min,app.dialogbox captionbutton.res {
+	display:none
+}
+app.noresize captionbutton.max {
+	filter:opacity(.7);
+	pointer-events:none
+}
+app.noclose captionbutton.closebtn {
+	filter:opacity(.7);
+	pointer-events:none
+}
+app:not(.hashelp) appcontrols captionbutton.help {
+	display:none
+}
+app.hashelp captionbutton.help {
+	display:inline-block
+}
+appcontents {
+	margin:0 2px 2px;
+	background-color:var(--contentColor);
+	color:var(--contentText);
+	display:block;
+	position:relative;
+	border:1px solid;
+	border-color:#777792 #66667e #66667e #66667e;
+	box-shadow:-1px 0 0 #a8a9bb,1px 0 0 #a8a9bb,0 1px 0 #a8a9bb;
+	font-family:var(--systemFont);
+	font-size:var(--systemFontSize);
+	letter-spacing:-.2px;
+	box-sizing:border-box
+}
+app.inactive appcontents {
+	border-color:#cccbd9 #c9c9d7 #c9c9d7 #c9c9d7
+}
+app.maximized appcontents {
+	width:calc(100% - 5px)!important;
+	height:calc(100% - 30px)!important
+}
+app.dialogbox appcontents {
+	box-shadow:-1px 0 0 #fbfcfd,1px 0 0 #fbfcfd,0 1px 0 #fbfcfd;
+	margin:0 1px 1px;
+	background-color:var(--mainColor);
+	color:var(--mainText)
+}
+app.noresize appcontents {
+	background-color:var(--mainColor);
+	color:var(--mainText)
+}
+app.dialogbox appcontents appcontentholder {
+	padding:7px 10px
+}
+appcontentholder {
+	display:block;
+	box-sizing:border-box
+}
+app.dialogbox appcontentholder img.dialogicon {
+	height:32px;
+	width:auto;
+	vertical-align:middle;
+	margin-right:4px
+}
+app.dialogbox appcontentholder span.dialogtext {
+	margin:0 auto;
+	display:inline-block;
+	width:calc(100% - 48px);
+	vertical-align:top
+}
+app.dialogbox appcontentholder div.dialogbuttons {
+	margin:0 auto;
+	width:fit-content
+}
+appcontentholder iframe.embeddedAppFrame {
+	width:100%;
+	height:100%;
+	border:none
+}
+app.inactive iframe {
+	pointer-events:none
+}
+app.inactive iframe:after {
+	content:" ";
+	position:absolute;
+	width:100%;
+	height:100%;
+	display:block;
+	top:0;
+	left:0
+}
+appcontentholder appnavigation {
+	display:block;
+	background:var(--mainColor)
+}
+appcontentholder appnavigation.rich {
+	background:linear-gradient(to right,#f4f4ee,#e0e2eb);
+	display:grid;
+	grid-template-columns:100%;
+	grid-template-rows:23px 39px 25px
+}
+appcontentholder appnavigation ul {
+	font-family:var(--contentFont);
+	font-size:var(--contentFontSize);
+	color:#000;
+	margin:0;
+	padding:0;
+	display:inline-block;
+	list-style-type:none;
+	width:calc(100% - 2px);
+	padding-left:2px;
+	border-bottom:1px solid #d8d2bd
+}
+appcontentholder appnavigation ul:nth-of-type(n+2) {
+	border-top:1px solid #fff
+}
+appcontentholder appnavigation ul li {
+	display:inline
+}
+appcontentholder appnavigation ul img {
+	border:none
+}
+appcontentholder appnavigation ul.appmenus {
+	padding-top:4px;
+	padding-bottom:1px;
+	width:calc(100% - 6px);
+	height:15px;
+	margin-top:2px;
+	line-height:11px
+}
+appcontentholder appnavigation ul.appmenus .submenu {
+	display:none;
+	position:absolute;
+	background:var(--menuColor)!important;
+	border:1px solid var(--3dLightShade);
+	flex-direction:column;
+	z-index:999;
+	width:auto;
+	top:20px;
+	padding:2px;
+	box-shadow:var(--menuShadow)
+}
+appcontentholder appnavigation ul.appmenus .submenu.visible {
+	display:flex
+}
+appcontentholder appnavigation ul.appmenus .submenu li {
+	padding:3px 17px 3px
+}
+appcontentholder appnavigation ul.appmenus .submenu li.disabled {
+	color:var(--3dLightShade)
+}
+appcontentholder appnavigation ul.appmenus .submenu li.divider {
+	width:calc(100% - 2px);
+	height:1px;
+	background:var(--3dLightShade);
+	padding:0;
+	margin:3px 1px 4px 1px
+}
+appcontentholder appnavigation ul.appmenus li {
+	padding:4px 7px 2px
+}
+appcontentholder appnavigation ul.appmenus li:hover {
+	background-color:var(--highlightColor)
+}
+appcontentholder appnavigation ul.navbuttons {
+	border-top:1px solid #fff;
+	width:calc(100% - 3px);
+	overflow:hidden;
+	text-overflow:" ≫ ";
+	white-space:nowrap
+}
+appcontentholder appnavigation ul.navbuttons li {
+	line-height:24px;
+	border:1px solid #00000000;
+	border-radius:4px;
+	padding:0 5px 0 2px;
+	height:100%;
+	display:inline-block;
+	box-sizing:border-box
+}
+appcontentholder appnavigation ul.navbuttons img {
+	display:inline-block;
+	height:24px;
+	width:24px;
+	padding:6px 1px 8px 4px;
+	vertical-align:middle;
+	margin-right:4px
+}
+appcontentholder appnavigation ul.navbuttons li.divider {
+	display:inline;
+	width:1px;
+	margin:2px 2px 1px -2px;
+	padding:8px 0 9px 0;
+	content:" ";
+	border-right:1px solid #cac6af
+}
+appcontentholder appnavigation ul.navbuttons pointer {
+	font-size:8px;
+	display:inline-block;
+	transform:scaleY(.75);
+	padding:12px 0 12px 2px;
+	margin:-7px 0;
+	margin-right:-3px;
+	border-left:1px solid transparent
+}
+appcontentholder appnavigation ul.navbuttons li:hover {
+	border:1px solid #d8d2bd;
+	background:linear-gradient(to bottom,#f9f9f5,#f1f1ea);
+	box-shadow:inset 0 1px 2px #fefefd,inset 0 -1px 2px #d7d2c6,inset -1px 0 1px #e8e5dc
+}
+appcontentholder appnavigation ul.navbuttons li:hover img {
+	filter:brightness(80%) saturate(110%) contrast(150%)
+}
+appcontentholder appnavigation ul.navbuttons li:hover pointer {
+	border-left:1px solid #d8d2bd;
+	box-shadow:inset 1px 0 0 #f6f6f3
+}
+appcontentholder appnavigation ul.navbuttons li:active {
+	border:1px solid #9d9d92;
+	background:linear-gradient(to bottom,#e7e5e0,#e0dfd7);
+	box-shadow:inset 1px 1px 1px #dcdad1,inset 0 -1px 1px #ebeae5
+}
+appcontentholder appnavigation ul.navbuttons li:active img {
+	padding:7px 0 7px 5px
+}
+app appcontentholder appnavigation ul.navbuttons li[disabled] {
+	filter:grayscale(100)
+}
+app appcontentholder appnavigation ul.navbuttons li[disabled]:hover {
+	border:1px solid transparent;
+	background:0 0;
+	box-shadow:none
+}
+app appcontentholder appnavigation ul.navbuttons li[disabled]:hover pointer {
+	border-left:1px solid transparent;
+	box-shadow:none
+}
+app appcontentholder appnavigation ul.navbuttons li[disabled]:hover img {
+	filter:grayscale(100%)
+}
+appcontentholder appnavigation xp-popup.viewpicker {
+	top:62px;
+	z-index:2;
+	position:absolute;
+	display:none;
+	width:100px;
+	height:73px;
+	border:1px solid #9d9da1;
+	background:#fff;
+	box-shadow:var(--menuShadow);
+	padding:2px 0 1px 0
+}
+appcontentholder appnavigation xp-popup.viewpicker ul {
+	border-bottom:none
+}
+appcontentholder appnavigation xp-popup.viewpicker li {
+	display:block;
+	height:18px;
+	width:initial;
+	margin-right:2px;
+	font-size:var(--contentFontSize);
+	line-height:18px;
+	border:none;
+	border-radius:0;
+	padding:0 0 0 10px
+}
+appcontentholder appnavigation xp-popup.viewpicker li span {
+	display:inline-block;
+	padding-right:10px;
+	opacity:0;
+	font-size:16px;
+	line-height:12px;
+	transform:translateY(0);
+	vertical-align:middle
+}
+appcontentholder appnavigation xp-popup.viewpicker li.activeView span {
+	opacity:1
+}
+appcontentholder appnavigation ul.navbuttons xp-popup.viewpicker li:hover {
+	background:var(--highlightColor);
+	color:var(--highlightText);
+	border:none;
+	box-shadow:none
+}
+appcontentholder appnavigation ul.addressbar {
+	line-height:20px;
+	padding-bottom:0
+}
+appcontentholder appnavigation ul.addressbar combobox {
+	width:calc(100% - 99px)
+}
+appcontentholder appnavigation ul.addressbar combobox img {
+	width:16px;
+	height:16px
+}
+appcontentholder appnavigation ul.addressbar img {
+	height:20px;
+	width:20px;
+	line-height:20px;
+	vertical-align:middle
+}
+appcontentholder contentpane {
+	border:1px solid;
+	border-color:#839fbd;
+	box-shadow:none;
+	overflow:auto;
+	background-color:var(--contentColor);
+	color:var(--contentText);
+	display:block
+}
+appcontentholder contentpane items entry {
+	display:grid;
+	grid-template-rows:auto;
+	grid-template-columns:21px 120px 120px auto;
+	box-sizing:border-box;
+	border:1px solid transparent;
+	height:18px
+}
+appcontentholder contentpane items entry * {
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis
+}
+appcontentholder contentpane items entry.details-header {
+	position:relative;
+	width:calc(100% - 1px);
+	height:18px;
+	grid-row:1;
+	grid-column:1;
+	background:#efece0;
+	box-shadow:inset 0 -1px 2px #cec9bf;
+	color:#000;
+	margin:1px 0 0 1px
+}
+appcontentholder contentpane items entry.details-header * {
+	display:inline-block;
+	border-left:1px solid #c8c8b7;
+	box-shadow:inset 1px 0 #fff;
+	margin:0 0 2px -10px;
+	padding-left:10px
+}
+appcontentholder contentpane items entry:not(.details-header).selected,appcontentholder contentpane items entry:not(.details-header):active,appcontentholder contentpane li item.selected,appcontentholder contentpane li item:active {
+	background:var(--highlightColor);
+	color:var(--highlightText);
+	border:1px dotted #fff;
+	box-sizing:border-box
+}
+appcontentholder contentpane items entry:not(.details-header).selected icon,appcontentholder contentpane items entry:not(.details-header):active icon {
+	background:unset;
+	filter:var(--iconFilter)
+}
+appcontentholder resizer {
+	background-color:#efece0
+}
+appcontentholder contentpane .expander {
+	width:7px;
+	height:7px;
+	border:1px solid #839bb6;
+	background:linear-gradient(to bottom,#fff,#c6bca7);
+	box-shadow:inset -1px 0 #cfccbf88;
+	border-radius:2px;
+	display:inline-block;
+	position:absolute;
+	top:8px;
+	left:-20px;
+	z-index:1
+}
+appcontentholder statusbar {
+	background:linear-gradient(to bottom,#efece0,#e7e4d0);
+	border-top:1px solid #959386;
+	box-shadow:inset 0 1px 1px #d7d8c8,inset 0 -1px 4px #ded8c8;
+	margin-top:0;
+	padding:2px 5px;
+	overflow:hidden;
+	width:-webkit-fill-available;
+	width:-moz-available;
+	display:flex;
+	position:absolute;
+	bottom:0
+}
+appcontentholder statusbar span {
+	overflow:hidden;
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	display:block;
+	width:100%;
+	line-height:18px
+}
+appcontentholder statusbar span:nth-child(n+2) {
+	margin-left:2px
+}
+appcontentholder statusbar span img {
+	vertical-align:middle;
+	margin-right:5px
+}
+appcontentholder statusbar #grabber {
+	position:absolute;
+	bottom:2px;
+	right:2px;
+	width:11px;
+	height:11px;
+	filter:contrast(0) sepia(1) drop-shadow(1px 1px #fff) opacity(.9)
+}
+appcontentholder systemfilesprompt {
+	background-color:#b1b3c8;
+	background-position:bottom right;
+	background-repeat:no-repeat;
+	display:block;
+	height:calc(100% - 91px);
+	padding:2px 14px;
+	position:absolute
+}
+appcontentholder systemfilesprompt h1 {
+	color:#dfe5f7;
+	font-family:"Franklin Gothic Medium",sans-serif;
+	font-size:28px;
+	letter-spacing:.3px
+}
+appcontentholder systemfilesprompt h2 {
+	color:#fff;
+	font-family:"Franklin Gothic Medium",sans-serif;
+	font-weight:500;
+	font-size:18px
+}
+appcontentholder systemfilesprompt span {
+	color:#fff;
+	font-weight:900;
+	letter-spacing:.1px
+}
+appcontentholder systemfilesprompt span:hover {
+	text-decoration:underline;
+	content:"I'll do it anyway bitch"
+}
+app.noresize captionbutton.max {
+	opacity:.7;
+	pointer-events:none
+}
+app.noresize captionbutton.max div {
+	opacity:.4
+}
+app.dialogbox grabber.resize,app.noresize grabber.resize {
+	display:none
+}
+app appcontents.resizing {
+	pointer-events:none
+}
+appresizers grabber.resize {
+	background-color:red;
+	min-height:4px;
+	min-width:4px;
+	position:absolute;
+	visibility:visible;
+	z-index:10;
+	opacity:0;
+	touch-action:none
+}
+grabber.resize.n {
+	top:-1px;
+	right:15px;
+	left:15px
+}
+grabber.resize.s {
+	bottom:-1px;
+	right:15px;
+	left:15px
+}
+grabber.resize.w {
+	top:15px;
+	bottom:15px;
+	left:-1px
+}
+grabber.resize.e {
+	top:15px;
+	bottom:15px;
+	right:-1px
+}
+grabber.resize.ne,grabber.resize.nw,grabber.resize.se,grabber.resize.sw {
+	min-width:16px;
+	min-height:16px;
+	background-color:#00f
+}
+grabber.resize.nw {
+	top:-1px;
+	left:-1px;
+	clip-path:polygon(0 0,100% 0,100% 4px,4px 4px,4px 100%,0 100%)
+}
+grabber.resize.ne {
+	top:-1px;
+	right:-1px;
+	clip-path:polygon(0 0,100% 0,100% 100%,12px 100%,12px 4px,0 4px)
+}
+grabber.resize.sw {
+	bottom:-1px;
+	left:-1px;
+	clip-path:polygon(0 0,4px 0,4px 12px,100% 12px,100% 100%,0 100%)
+}
+grabber.resize.se {
+	bottom:-1px;
+	right:-1px;
+	clip-path: polygon(0 12px,12px 12px,12px 0,100% 0,100% 100%,0 100%)
+}

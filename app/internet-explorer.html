@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Internet Explorer</title>
+    <link rel="stylesheet" href="../scroll.css">
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background: none;
+            overflow: hidden;
+            font-family: Tahoma, 'Noto Sans', sans-serif;
+            font-size: 11px;
+        }
+
+        /* winXP-master의 MyComputer 스타일 */
+        .my-computer-window {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            display: flex;
+            overflow: hidden;
+            flex-direction: column;
+            background: linear-gradient(to right, #edede5 0%, #ede8cd 100%);
+        }
+
+        .com__toolbar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            line-height: 100%;
+            height: 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .com__options {
+            height: 24px;
+            border-bottom: 0px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0px 0 0px 2px;
+            border-left: 0;
+            flex: 1;
+            display: flex;
+        }
+
+        .com__options .menu-item {
+            position: relative;
+            padding: 6px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .com__options .menu-item:hover,
+        .com__options .menu-item.active {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        .com__options .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #888;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            list-style: none;
+            padding: 2px;
+            margin: 0;
+            z-index: 100;
+            color: black;
+        }
+
+        .com__options .menu-item.active .dropdown-menu {
+            display: block;
+        }
+
+        .com__options .dropdown-menu li {
+            padding: 2px 20px 2px 25px;
+            /* Left padding increased for checkmark space */
+            white-space: nowrap;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .com__options .dropdown-menu li:hover {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        /* Disabled item style */
+        .com__options .dropdown-menu li.disabled {
+            color: #888;
+            pointer-events: none;
+        }
+
+        .com__options .dropdown-menu li.disabled:hover {
+            background-color: transparent;
+            color: #888;
+            cursor: default;
+        }
+
+        /* Checkmark style for toggles */
+        .com__options .dropdown-menu li.checked::before {
+            content: '✓';
+            position: absolute;
+            left: 7px;
+            font-weight: bold;
+        }
+
+        .com__options .dropdown-menu li.separator {
+            height: 1px;
+            background-color: #ccc;
+            /* 구분선으로서의 시각적 표현 */
+            padding: 0;
+            margin: 4px 0;
+            cursor: default;
+        }
+
+        .com__options .dropdown-menu li.separator:hover {
+            background-color: #ccc;
+            /* 원래 색상 유지 */
+            color: inherit;
+            /* 원래 글자색 유지 */
+        }
+
+        .com__windows-logo {
+            height: 36px;
+            border-left: 1px solid white;
+            border-bottom: 0px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .com__function_bar {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            padding: 1px 3px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .com__function_bar__button {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0);
+            border-radius: 3px;
+            padding: 0 4px;
+        }
+
+        .com__function_bar__button:hover {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .com__function_bar__button:hover:active {
+            border: 1px solid rgb(185, 185, 185);
+            background-color: #dedede;
+            box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.7);
+        }
+
+        .com__function_bar__button:hover:active>* {
+            transform: translate(1px, 1px);
+        }
+
+        .com__function_bar__button--disable {
+            filter: grayscale(1);
+            opacity: 0.7;
+            display: flex;
+            height: 100%;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0);
+            padding: 0 4px;
+        }
+
+        .com__function_bar__icon {
+            height: 22px;
+            width: 22px;
+        }
+
+        .com__function_bar__text {
+            margin-left: 4px;
+        }
+
+        .com__function_bar__separate {
+            height: 90%;
+            width: 1px;
+            background-color: rgba(0, 0, 0, 0.2);
+            margin: 0 2px;
+        }
+
+        .com__address_bar {
+            flex-shrink: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            height: 22px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            padding: 0 2px;
+            box-shadow: inset 0 -2px 3px -1px #b0b0b0;
+        }
+
+        .com__address_bar__title {
+            color: rgba(0, 0, 0, 0.5);
+            padding: 7px;
+            height: 15px;
+        }
+
+        .com__address_bar__content {
+            border: rgba(122, 122, 255, 0.6) 1px solid;
+            height: calc(100% - 1px);
+            display: flex;
+            flex: 1;
+            align-items: center;
+            background-color: white;
+            position: relative;
+            padding: 0 4px;
+        }
+
+        .com__address_bar__content__img {
+            width: 16px;
+            height: 16px;
+            padding-right: 5px;
+        }
+
+        .com__address_bar__right_space {
+            display: flex;
+            align-items: center;
+            padding: 0 16px 0 4px;
+            flex: 0 0 30px;
+        }
+
+        .com__address_bar__right__img {
+            width: 20px;
+            height: 20px;
+            padding-right: 7px;
+        }
+
+        .com__address_bar__right__text {
+            font-size: 11px;
+        }
+
+        .com__content {
+            flex: 1;
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            border-top-width: 0;
+            background-color: #f1f1f1;
+            overflow: auto;
+            font-size: 11px;
+            position: relative;
+        }
+
+        .com__content__inner {
+            display: flex;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .com__content__right {
+            height: calc(100%-10px);
+            overflow: auto;
+            background-color: #fff;
+            flex: 1;
+            padding: 10px;
+            position: relative;
+        }
+
+        .com__content__right__card {
+            margin-bottom: 10px;
+        }
+
+        .com__content__right__card__header {
+            font-weight: 700;
+            padding: 2px 0 3px 12px;
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .com__content__right__card__header:after {
+            content: '';
+            display: block;
+            background: linear-gradient(to right, #70bfff 0, #fff 100%);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 1px;
+            width: 100%;
+        }
+
+        .com__content__right__card__content {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 5px 15px 0;
+        }
+
+        .com__content__right__card__item {
+            width: 80px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .com__content__right__card__img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 8px;
+            transition: filter 0.01s ease;
+            /* 부드러운 필터 전환 효과 */
+        }
+
+        .com__content__right__card__text {
+            font-family: 'Tahoma', sans-serif;
+            font-size: 11px;
+            color: black;
+            text-align: center;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 2px 4px;
+        }
+
+        /* 폴더 아이콘 선택 시 이미지에 파란색 필터 적용 */
+        .com__content__right__card__item.selected .com__content__right__card__img {
+            filter: sepia(95%) hue-rotate(185deg) saturate(4) brightness(0.6) opacity(0.9);
+        }
+
+        /* 폴더 아이콘 선택 시 텍스트 스타일 */
+        .com__content__right__card__item.selected .com__content__right__card__text {
+            background-color: #000080;
+            /* Windows 98 스타일의 진한 파란색 */
+            color: white;
+            border: 1px dotted white;
+            /* 흰색 점선 테보리 */
+            padding: 1px 3px;
+            border-radius: 0;
+            /* 사각형 테두리 */
+        }
+
+        /* 드래그 선택 상자 스타일 제거 */
+
+        /* 상태 표시줄 스타일 */
+        .status-bar {
+            margin: 0 1px;
+            /* 좌우 여백 */
+            display: flex;
+            /* 내부 요소들을 가로로 나란히 배치 */
+            gap: 1px;
+            /* 내부 요소 사이의 간격 */
+            height: 22px;
+            /* 상태 표시줄 높이 */
+        }
+
+        .status-bar-field {
+            /* 입체적인 테두리 효과 */
+            box-shadow: inset -1px -1px #dfdfdf, inset 1px 1px grey;
+            flex-grow: 1;
+            /* 남은 공간을 모두 차지 */
+            padding: 4px 3px;
+            /* 내부 여백 */
+            margin: 0;
+            /* 외부 여백 없음 */
+            /* 필요시 배경색과 글자색 지정 */
+            /* background-color: #fff; */
+            /* color: #000; */
+        }
+    </style>
+    <script src="../focusController.js"></script>
+</head>
+
+<body>
+    <div class="my-computer-window">
+        <section class="com__toolbar">
+            <div class="com__options">
+                <div class="menu-item"><span><u>F</u>ile</span>
+                    <ul class="dropdown-menu">
+                        <li class="disabled">Create Shortcut</li>
+                        <li class="disabled">Delete</li>
+                        <li class="disabled">Rename</li>
+                        <li class="disabled">Properties</li>
+                        <li class="separator"></li>
+                        <li data-action="Close">Close</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>E</u>dit</span>
+                    <ul class="dropdown-menu">
+                        <li class="disabled">Undo</li>
+                        <li class="separator"></li>
+                        <li class="disabled">Cut</li>
+                        <li class="disabled">Copy</li>
+                        <li class="disabled">Paste</li>
+                        <li class="separator"></li>
+                        <li>Select All</li>
+                        <li>Invert Selection</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>V</u>iew</span>
+                    <ul class="dropdown-menu">
+                        <li>Toolbars</li>
+                        <li>Status Bar</li>
+                        <li>Explorer Bar</li>
+                        <li class="separator"></li>
+                        <li>Thumbnails</li>
+                        <li>Tiles</li>
+                        <li>Icons</li>
+                        <li>List</li>
+                        <li>Details</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>F</u>avorites</span>
+                    <ul class="dropdown-menu">
+                        <li>Add to Favorites...</li>
+                        <li>Organize Favorites...</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>T</u>ools</span>
+                    <ul class="dropdown-menu">
+                        <li>Map Network Drive...</li>
+                        <li>Disconnect Network Drive...</li>
+                        <li class="separator"></li>
+                        <li>Folder Options...</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>H</u>elp</span>
+                    <ul class="dropdown-menu">
+                        <li>Help and Support Center</li>
+                        <li class="separator"></li>
+                        <li>About Windows</li>
+                    </ul>
+                </div>
+
+                <!-- 오른쪽 끝에 이미지 추가 -->
+                <div class="com__windows-logo"
+                    style="margin-left: auto; display: flex; align-items: center; justify-content: center; padding: 0 0px; height: 100%; border-left: 1px solid rgba(0, 0, 0, 0.1);">
+                    <img src="../image/windows.png" alt="Windows Logo"
+                        style="height: 100%; object-fit: contain; padding: 0;">
+                </div>
+            </div>
+        </section>
+        <section class="com__function_bar">
+            <div class="com__function_bar__button--disable"><img class="com__function_bar__icon" src="../image/back.png"
+                    alt=""> <span class="com__function_bar__text">Back</span></div>
+            <div class="com__function_bar__button--disable"><img class="com__function_bar__icon"
+                    src="../image/front.png" alt=""></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/iestop.png"
+                    alt=""></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/ierefresh.png"
+                    alt=""></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/iehome.png"
+                    alt=""></div>
+            <div class="com__function_bar__separate"></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/search.png"
+                    alt=""> <span class="com__function_bar__text">Search</span></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/favorites.png"
+                    alt=""> <span class="com__function_bar__text">Favorites</span></div>
+            <div class="com__function_bar__separate"></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/email.png" alt="">
+                <span class="com__function_bar__text">Favorites</span>
+            </div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/printer.png"
+                    alt=""> <span class="com__function_bar__text">Favorites</span></div>
+
+        </section>
+        <section class="com__address_bar" style="margin-bottom: 1px;">
+            <div class="com__address_bar__title">Address</div>
+            <div class="com__address_bar__content">
+                <img src="../image/explore.png" alt="icon" class="com__address_bar__content__img">
+                <div class="com__address_bar__content__text">https://www.google.com/webhp?igu=1</div>
+            </div>
+            <div class="com__address_bar__right_space">
+                <img src="../image/continue.png" alt="icon" class="com__address_bar__right__img">
+                <span class="com__address_bar__right__text">Go</span>
+            </div>
+        </section>
+        <div class="com__content">
+            <div class="com__content__inner">
+                <div class="com__content__right" style="padding: 0; display: flex;">
+                    <iframe src="https://www.google.com/webhp?igu=1"
+                        style="width:100%; height:100%; border:none; flex: 1;" frameborder="0"
+                        sandbox="allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-forms allow-popups allow-pointer-lock allow-downloads">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상태 표시줄 추가 -->
+        <div class="status-bar">
+            <div class="status-bar-field">https://www.google.com/webhp?igu=1 - Google</div>
+        </div>
+
+    </div>
+
+    <script>
+        // 상단 드롭다운 메뉴 기능 (개선된 버전)
+        const menuItems = document.querySelectorAll('.com__options .menu-item');
+        let isMenuActive = false; // 메뉴가 활성화된 상태인지 추적
+
+        menuItems.forEach(menuItem => {
+            // 클릭 이벤트: 메뉴 활성화/비활성화의 시작점
+            menuItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const wasActive = menuItem.classList.contains('active');
+
+                // 일단 모든 메뉴를 닫고 상태를 초기화
+                menuItems.forEach(item => item.classList.remove('active'));
+                isMenuActive = false;
+
+                // 이전에 비활성 상태였다면, 현재 메뉴를 열고 활성 상태로 변경
+                if (!wasActive) {
+                    menuItem.classList.add('active');
+                    isMenuActive = true;
+                }
+            });
+
+            // 마우스 진입 이벤트: 메뉴가 하나라도 열려있을 때만 동작
+            menuItem.addEventListener('mouseenter', () => {
+                if (isMenuActive) {
+                    // 다른 메뉴는 닫고 현재 메뉴를 염
+                    menuItems.forEach(item => item.classList.remove('active'));
+                    menuItem.classList.add('active');
+                }
+            });
+        });
+
+        // 메뉴 바깥 영역 클릭하면 모든 메뉴 닫기
+        document.addEventListener('click', () => {
+            menuItems.forEach(item => item.classList.remove('active'));
+            isMenuActive = false; // 비활성화
+        });
+
+        // 사이드바 링크 클릭 기능
+        const sidebarLinks = document.querySelectorAll('.com__content__left__card__text.link');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                alert(`'${link.textContent}' 기능은 아직 구현되지 않았습니다.`);
+            });
+        });
+
+        // 폴더 아이콘 상호작용 기능 (드래그 선택 제외)
+        document.addEventListener('DOMContentLoaded', () => {
+            // 폴더 아이콘 요소들 참조
+            const folderItems = document.querySelectorAll('.com__content__right__card__item');
+
+            // 선택 해제 함수
+            const clearAllSelections = () => {
+                document.querySelectorAll('.com__content__right__card__item.selected').forEach(item => {
+                    item.classList.remove('selected');
+                });
+            };
+
+            // 아이콘 위치 정보 캐싱
+            let iconRects = [];
+            const cacheIconRects = () => {
+                iconRects = [];
+                document.querySelectorAll('.com__content__right__card__item').forEach(iconEl => {
+                    iconRects.push({
+                        element: iconEl,
+                        rect: iconEl.getBoundingClientRect()
+                    });
+                });
+            };
+
+            // 초기 캐싱 및 리사이즈 이벤트 등록
+            cacheIconRects();
+            window.addEventListener('resize', cacheIconRects);
+
+            // 각 폴더 아이템에 클릭 및 더블 클릭 이벤트 추가
+            folderItems.forEach(item => {
+                // 단일 클릭 이벤트
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    clearAllSelections();
+                    item.classList.add('selected');
+                });
+
+                // 더블 클릭 이벤트
+                item.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    // 더블 클릭 시 동작 (예: 새 창 열기 또는 파일 실행)
+                    const itemName = item.querySelector('.com__content__right__card__text').textContent;
+                    alert(`'${itemName}' 항목을 실행합니다.`);
+                });
+            });
+
+            // 키보드 이벤트 리스너 추가
+            document.addEventListener('keydown', (e) => {
+                // 아이콘 배열이 비어있으면 처리하지 않음
+                if (iconRects.length === 0) return;
+
+                // 현재 선택된 아이콘 찾기
+                const selectedIcon = document.querySelector('.com__content__right__card__item.selected');
+
+                // Esc 키: 선택 해제
+                if (e.key === 'Escape') {
+                    clearAllSelections();
+                    return;
+                }
+
+                // Enter 키: 선택된 아이콘 실행
+                if (e.key === 'Enter' && selectedIcon) {
+                    e.stopPropagation();
+                    const itemName = selectedIcon.querySelector('.com__content__right__card__text').textContent;
+                    alert(`'${itemName}' 항목을 실행합니다.`);
+                    return;
+                }
+
+                // 방향키 처리
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // 현재 선택된 아이콘이 없으면 첫 번째 아이콘 선택
+                    if (!selectedIcon) {
+                        const firstIcon = document.querySelector('.com__content__right__card__item');
+                        if (firstIcon) {
+                            clearAllSelections();
+                            firstIcon.classList.add('selected');
+                        }
+                        return;
+                    }
+
+                    // 현재 선택된 아이콘의 위치 정보 가져오기
+                    const selectedRect = selectedIcon.getBoundingClientRect();
+
+                    // 방향에 따라 다음 아이콘 찾기
+                    let nextIcon = null;
+                    let minDistance = Infinity;
+
+                    iconRects.forEach(icon => {
+                        // 자기 자신은 제외
+                        if (icon.element === selectedIcon) return;
+
+                        const iconRect = icon.rect;
+                        let isValid = false;
+                        let distance = 0;
+
+                        // 방향키에 따라 유효한 아이콘과 거리 계산
+                        switch (e.key) {
+                            case 'ArrowUp':
+                                isValid = iconRect.bottom <= selectedRect.top;
+                                if (isValid) {
+                                    distance = Math.abs(iconRect.bottom - selectedRect.top) +
+                                        Math.abs((iconRect.left + iconRect.right) / 2 - (selectedRect.left + selectedRect.right) / 2) * 0.1;
+                                }
+                                break;
+                            case 'ArrowDown':
+                                isValid = iconRect.top >= selectedRect.bottom;
+                                if (isValid) {
+                                    distance = Math.abs(iconRect.top - selectedRect.bottom) +
+                                        Math.abs((iconRect.left + iconRect.right) / 2 - (selectedRect.left + selectedRect.right) / 2) * 0.1;
+                                }
+                                break;
+                            case 'ArrowLeft':
+                                isValid = iconRect.right <= selectedRect.left;
+                                if (isValid) {
+                                    distance = Math.abs(iconRect.right - selectedRect.left) +
+                                        Math.abs((iconRect.top + iconRect.bottom) / 2 - (selectedRect.top + selectedRect.bottom) / 2) * 0.1;
+                                }
+                                break;
+                            case 'ArrowRight':
+                                isValid = iconRect.left >= selectedRect.right;
+                                if (isValid) {
+                                    distance = Math.abs(iconRect.left - selectedRect.right) +
+                                        Math.abs((iconRect.top + iconRect.bottom) / 2 - (selectedRect.top + selectedRect.bottom) / 2) * 0.1;
+                                }
+                                break;
+                        }
+
+                        // 유효하고 더 가까운 아이콘이면 업데이트
+                        if (isValid && distance < minDistance) {
+                            minDistance = distance;
+                            nextIcon = icon.element;
+                        }
+                    });
+
+                    // 다음 아이콘이 있으면 선택
+                    if (nextIcon) {
+                        clearAllSelections();
+                        nextIcon.classList.add('selected');
+                    }
+                }
+            });
+
+
+            // 빈 공간 클릭 시 선택 해제
+            const contentArea = document.querySelector('.com__content__right');
+            contentArea.addEventListener('click', (e) => {
+                if (e.target === contentArea) {
+                    clearAllSelections();
+                }
+            });
+
+            // 메뉴 액션 처리 (Close 등)
+            const closeItem = document.querySelector('[data-action="Close"]');
+            if (closeItem) {
+                closeItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // 메뉴 닫기
+                    menuItems.forEach(item => item.classList.remove('active'));
+                    isMenuActive = false;
+
+                    // 경고창 및 닫기
+                    if (confirm('Do you want to close this window?')) {
+                        window.parent.postMessage({ type: 'closeWindow' }, '*');
+                    }
+                });
+            }
+        });
+
+        // 참고: 기존에 있던 다른 스크립트들은 이 파일과 관련이 없으므로 포함하지 않았습니다.
+    </script>
+
+</body>
+
+</html>

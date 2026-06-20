@@ -1,0 +1,68 @@
+[Three.js 잔상 효과(Frame Ghosting) 구현 가이드]
+
+단일 쉐이더(Single Pass)로는 구현이 불가능한 잔상 효과를 Three.js 엔진 수준에서 구현하는 핵심 방법입니다.
+
+1. 원리: 핑퐁 버퍼링(Ping-Pong Buffering)
+   - 두 개의 렌더 타겟(RenderTarget)을 만듭니다. (A와 B)
+   - 이번 프레임의 결과물과 '이전 프레임'이 담긴 텍스처를 아주 연하게(예: 90% 불투명도) 섞습니다.
+   - 섞인 결과를 다음 프레임에서 다시 '이전 프레임'으로 사용합니다.
+
+2. 구현 코드 스니펫:
+
+// (1) 두 개의 렌더 타겟 생성
+const targetA = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+const targetB = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+let currentTarget = targetA;
+let previousTarget = targetB;
+
+// (2) 잔상용 블렌딩 재질 (단순히 두 텍스처를 섞음)
+const ghostMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+        tNew: { value: null },     // 방금 렌더링된 씬
+        tOld: { value: null },     // 이전 프레임의 씬
+        ghostAmount: { value: 0.9 } // 잔상의 강도 (0.9 = 길게 남음, 0.5 = 짧게 남음)
+    },
+    vertexShader: `
+        varying vec2 vUv;
+        void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+    `,
+    fragmentShader: `
+        uniform sampler2D tNew;
+        uniform sampler2D tOld;
+        uniform float ghostAmount;
+        varying vec2 vUv;
+        void main() {
+            vec4 newCol = texture2D(tNew, vUv);
+            vec4 oldCol = texture2D(tOld, vUv);
+            // 두 프레임을 섞음
+            gl_FragColor = mix(newCol, oldCol, ghostAmount);
+        }
+    `
+});
+
+// (3) 렌더 루프에서의 처리
+function render() {
+    // 1. 현재 씬을 별도의 버퍼(임시 타겟)에 렌더링
+    renderer.setRenderTarget(tempTarget);
+    renderer.render(scene, camera);
+
+    // 2. 임시 타겟(새로운 것)과 previousTarget(옛날 것)을 섞어서 currentTarget에 저장
+    ghostMaterial.uniforms.tNew.value = tempTarget.texture;
+    ghostMaterial.uniforms.tOld.value = previousTarget.texture;
+    
+    renderer.setRenderTarget(currentTarget);
+    renderer.render(ghostScene, ghostCamera); // 섞기용 전용 씬 실행
+
+    // 3. 최종 결과를 화면에 출력
+    renderer.setRenderTarget(null);
+    renderer.render(ghostScene, ghostCamera);
+
+    // 4. 타겟 스왑 (A <-> B 핑퐁)
+    let temp = currentTarget;
+    currentTarget = previousTarget;
+    previousTarget = temp;
+}
+
+3. 활용 팁:
+   - 'ghostAmount'를 0.0으로 두면 잔상이 사라지고, 1.0에 가까울수록 잔상이 화면에 아주 오래 머뭅니다.
+   - 글리치 효과(RGB Shift)와 함께 사용하면 색상이 번지면서 잔상이 남는 훨씬 화려한 효과를 낼 수 있습니다.

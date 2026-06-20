@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XP Filter Module - Ultimate Test Bench</title>
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #controls {
+            padding: 20px;
+            background: #222;
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            z-index: 10;
+            border-bottom: 1px solid #444;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #4c76c2;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        button:hover { background: #364b76; transform: translateY(-2px); }
+        button.active { background: #f39332; box-shadow: 0 0 15px rgba(243, 147, 50, 0.5); }
+        
+        #canvas-container {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: radial-gradient(circle, #333 0%, #111 100%);
+        }
+        canvas {
+            max-width: 95%;
+            max-height: 95%;
+            box-shadow: 0 0 100px rgba(0,0,0,0.8);
+        }
+        .label {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #888;
+            padding: 8px 15px;
+            font-size: 11px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <button id="btn-combined" class="active">Ultimate Combined</button>
+        <button id="btn-crt">CRT Monitor</button>
+        <button id="btn-pixel">Pixel Art</button>
+        <button id="btn-glitch">Digital Glitch</button>
+        <button id="btn-none">Original</button>
+    </div>
+
+    <div id="canvas-container">
+        <div class="label">XP FILTER MODULE - ALL FILTERS ACTIVE</div>
+    </div>
+
+    <!-- Libraries (Local) -->
+    <script src="./three.min.js"></script>
+    <script src="./lil-gui@0.17"></script>
+    
+    <script type="module">
+        import { XPFilterFactory } from './XPFilterFactory.js';
+
+        let scene, camera, renderer, mesh, material, gui;
+        let currentType = 'combined';
+        const container = document.getElementById('canvas-container');
+
+        // Mouse Velocity State
+        const mouseState = {
+            px: new THREE.Vector2(0, 0),
+            lastPx: new THREE.Vector2(0, 0),
+            velocity: 0,
+            targetEffectScale: 1.0,
+            currentEffectScale: 1.0
+        };
+
+        const init = () => {
+            scene = new THREE.Scene();
+            const aspect = window.innerWidth / window.innerHeight;
+            camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 1000);
+            camera.position.z = 1;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            const img = new Image();
+            img.src = './wallpaper.bmp';
+            
+            const startEngine = () => {
+                setTimeout(() => {
+                    const texture = new THREE.Texture(img);
+                    texture.needsUpdate = true;
+                    
+                    const geometry = new THREE.PlaneGeometry(2 * aspect, 2);
+                    material = new THREE.MeshBasicMaterial({ map: texture });
+                    mesh = new THREE.Mesh(geometry, material);
+                    scene.add(mesh);
+                    
+                    animate();
+                    setupGUI();
+                    
+                    // Set default filter
+                    applyFilter('combined');
+                }, 300);
+            };
+
+            if (img.complete) startEngine();
+            else img.onload = startEngine;
+
+            window.addEventListener('resize', onWindowResize);
+        };
+
+        const setupGUI = () => {
+            if (gui) gui.destroy();
+            gui = new lil.GUI({ title: 'XP COMPLETE CONTROL CENTER' });
+            gui.domElement.style.zIndex = "9999";
+            
+            const params = {
+                intensity: 1.0,
+                radiusPx: 150,
+                interactionShape: 0,
+                velocityEnabled: true,
+                // CRT
+                crtEnabled: true,
+                curvature: 5.0,
+                scanlineIntensity: 0.7,
+                scanlineCount: 240,
+                brightness: 1.1,
+                flicker: false,
+                lineMovement: false,
+                chromaticAberration: 0.0,
+                // Glitch
+                glitchEnabled: true,
+                rgbShift: 0.005,
+                digitalNoise: 0.05,
+                lineDisplacement: 0.0,
+                bitCrushDepth: 0.0,
+                signalDropoutFreq: 0.0,
+                syncErrorFreq: 0.0,
+                datamoshStrength: 0.0,
+                // Pixelation
+                pixelationEnabled: true,
+                pixelSize: 2.0,
+                pixelShape: 0,
+                bitDepth: 0,
+                dithering: 0
+            };
+
+            const commonFolder = gui.addFolder('Global & Interaction');
+            commonFolder.add(params, 'intensity', 0, 2).onChange(v => updateUniforms('intensity', v));
+            commonFolder.add(params, 'radiusPx', 10, 500).onChange(v => updateUniforms('radiusPx', v));
+            commonFolder.add(params, 'interactionShape', { Circle: 0, Square: 1, Diamond: 2, Cross: 3, Plus: 4 }).onChange(v => updateUniforms('interactionShape', parseInt(v)));
+            commonFolder.add(params, 'velocityEnabled').name('Mouse Velocity Scale');
+
+            const crtFolder = gui.addFolder('CRT Monitor');
+            crtFolder.add(params, 'crtEnabled').onChange(v => updateUniforms('crtEnabled', v));
+            crtFolder.add(params, 'curvature', 0, 30).onChange(v => updateUniforms('curvature', v));
+            crtFolder.add(params, 'scanlineIntensity', 0, 1).onChange(v => updateUniforms('scanlineIntensity', v));
+            crtFolder.add(params, 'scanlineCount', 10, 1000).onChange(v => updateUniforms('scanlineCount', v));
+            crtFolder.add(params, 'brightness', 0, 3).onChange(v => updateUniforms('brightness', v));
+            crtFolder.add(params, 'flicker').onChange(v => updateUniforms('flicker', v));
+            crtFolder.add(params, 'lineMovement').onChange(v => updateUniforms('lineMovement', v));
+            crtFolder.add(params, 'chromaticAberration', 0, 0.1).onChange(v => updateUniforms('chromaticAberration', v));
+            
+            const glitchFolder = gui.addFolder('Digital Glitch');
+            glitchFolder.add(params, 'glitchEnabled').onChange(v => updateUniforms('glitchEnabled', v));
+            glitchFolder.add(params, 'rgbShift', 0, 0.2).onChange(v => updateUniforms('rgbShift', v));
+            glitchFolder.add(params, 'digitalNoise', 0, 1).onChange(v => updateUniforms('digitalNoise', v));
+            glitchFolder.add(params, 'lineDisplacement', 0, 0.5).onChange(v => updateUniforms('lineDisplacement', v));
+            glitchFolder.add(params, 'bitCrushDepth', 0, 31).onChange(v => updateUniforms('bitCrushDepth', v));
+            glitchFolder.add(params, 'signalDropoutFreq', 0, 1).onChange(v => updateUniforms('signalDropoutFreq', v));
+            glitchFolder.add(params, 'syncErrorFreq', 0, 1).onChange(v => updateUniforms('syncErrorFreq', v));
+            glitchFolder.add(params, 'datamoshStrength', 0, 1).onChange(v => updateUniforms('datamoshStrength', v));
+
+            const pixelFolder = gui.addFolder('Pixelation & Retro');
+            pixelFolder.add(params, 'pixelationEnabled').onChange(v => updateUniforms('pixelationEnabled', v));
+            pixelFolder.add(params, 'pixelSize', 1, 20).onChange(v => updateUniforms('pixelSize', v));
+            pixelFolder.add(params, 'pixelShape', { Square: 0, Circle: 1, Diamond: 2 }).onChange(v => updateUniforms('pixelShape', parseInt(v)));
+            pixelFolder.add(params, 'bitDepth', { None: 0, '1-bit': 1, '2-bit': 2, '4-bit': 4, '8-bit': 8 }).onChange(v => updateUniforms('bitDepth', parseInt(v)));
+            pixelFolder.add(params, 'dithering', { Off: 0, Bayer: 1 }).onChange(v => updateUniforms('dithering', parseInt(v)));
+
+            window.guiParams = params;
+            crtFolder.open();
+        };
+
+        const updateUniforms = (key, value) => {
+            if (material && material.uniforms && material.uniforms[key]) {
+                material.uniforms[key].value = value;
+            }
+        };
+
+        const setupMouseEvents = () => {
+            window.addEventListener('mousemove', (e) => {
+                if (!material || !material.uniforms || !renderer) return;
+                
+                const rect = renderer.domElement.getBoundingClientRect();
+                
+                // Normalized coordinates: 0.0 to 1.0
+                const x = (e.clientX - rect.left) / rect.width;
+                const y = 1.0 - (e.clientY - rect.top) / rect.height;
+                
+                mouseState.px.set(x, y); // px here actually stores normalized value
+                if (material.uniforms.mouse) material.uniforms.mouse.value.copy(mouseState.px);
+                
+                // Velocity calculation (still uses movement distance)
+                const dist = mouseState.px.distanceTo(mouseState.lastPx) * 1000;
+                mouseState.velocity = Math.min(dist / 50, 1.0);
+                mouseState.lastPx.copy(mouseState.px);
+            });
+        };
+
+        const onWindowResize = () => {
+            const aspect = window.innerWidth / window.innerHeight;
+            camera.left = -aspect; camera.right = aspect;
+            camera.updateProjectionMatrix();
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            if (mesh) mesh.geometry = new THREE.PlaneGeometry(2 * aspect, 2);
+            
+            if (material && material.uniforms) {
+                if (material.uniforms.resolution) material.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+                if (material.uniforms.pixelRatio) material.uniforms.pixelRatio.value = window.devicePixelRatio;
+            }
+        };
+
+        const applyFilter = (type) => {
+            if (!mesh) return;
+            const oldMap = material.map || (material.uniforms && material.uniforms.u_texture ? material.uniforms.u_texture.value : null);
+            if (type === 'none') {
+                material = new THREE.MeshBasicMaterial({ map: oldMap });
+            } else {
+                material = XPFilterFactory.createMaterial(type, {
+                    u_texture: oldMap,
+                    resolution: new THREE.Vector2(window.innerWidth, window.innerHeight),
+                    pixelRatio: window.devicePixelRatio,
+                    interactionEnabled: true
+                });
+            }
+            mesh.material = material;
+            currentType = type;
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            const targetBtn = document.getElementById(`btn-${type}`);
+            if (targetBtn) targetBtn.classList.add('active');
+        };
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+            if (material && material.uniforms) {
+                material.uniforms.time.value += 0.01;
+                if (window.guiParams && window.guiParams.velocityEnabled) mouseState.targetEffectScale = 0.5 + (mouseState.velocity * 3.0);
+                else mouseState.targetEffectScale = 1.0;
+                mouseState.currentEffectScale += (mouseState.targetEffectScale - mouseState.currentEffectScale) * 0.1;
+                if (material.uniforms.effectScale) material.uniforms.effectScale.value = mouseState.currentEffectScale;
+                mouseState.velocity *= 0.95;
+            }
+            renderer.render(scene, camera);
+        };
+
+        document.getElementById('btn-combined').addEventListener('click', () => applyFilter('combined'));
+        document.getElementById('btn-crt').addEventListener('click', () => applyFilter('crt'));
+        document.getElementById('btn-pixel').addEventListener('click', () => applyFilter('pixelation'));
+        document.getElementById('btn-glitch').addEventListener('click', () => applyFilter('glitch'));
+        document.getElementById('btn-none').addEventListener('click', () => applyFilter('none'));
+
+        init(); setupMouseEvents();
+    </script>
+</body>
+</html>

@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Award Modular BIOS v4.51PG</title>
+    <style>
+        @font-face {
+            font-family: 'IBM BIOS';
+            src: url('./Web437_IBM_VGA_8x14-D3oywau_.woff') format('woff');
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: #000000;
+            color: #aaaaaa;
+            font-family: 'IBM BIOS', 'Courier New', Courier, monospace;
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* CRT 모니터 효과 (코드는 보존하되 display: none으로 임시 비활성화) */
+        body::after {
+            display: none;
+            /* 꺼두기 */
+            content: " ";
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        @keyframes crt-flicker {
+            0% {
+                opacity: 0.985;
+            }
+
+            50% {
+                opacity: 0.995;
+            }
+
+            100% {
+                opacity: 0.985;
+            }
+        }
+
+        @keyframes crt-power-on {
+            0% {
+                transform: scaleY(0.005) scaleX(0.005);
+                filter: brightness(10);
+                opacity: 1;
+            }
+
+            40% {
+                transform: scaleY(0.005) scaleX(1);
+                filter: brightness(5);
+            }
+
+            70% {
+                transform: scale(1);
+                filter: brightness(2);
+            }
+
+            100% {
+                transform: scale(1);
+                filter: brightness(1.1) contrast(1.1) saturate(1.1);
+            }
+        }
+
+        #monitor {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            /* animation: crt-flicker 0.15s infinite, crt-power-on 0.5s ease-out forwards; */
+            /* 꺼두기 */
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* 1. BIOS 부팅 화면 스타일 */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .award-logo {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        .bios-title {
+            font-size: 16px;
+            white-space: pre-line;
+            color: #aaaaaa;
+        }
+
+        .energy-star-logo {
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+            margin-top: 10px;
+        }
+
+        main::-webkit-scrollbar {
+            display: none;
+        }
+
+        .line {
+            white-space: pre-wrap;
+            margin-bottom: 2px;
+            min-height: 1.2em;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 15px;
+            background-color: #aaaaaa;
+            animation: blink 0.8s steps(2, start) infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            to {
+                visibility: hidden;
+            }
+        }
+
+        footer {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #aaaaaa;
+            border-top: 1px solid #333;
+            padding-top: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* 가상 단축키 키보드 버튼 */
+        .key-btn {
+            background-color: #222;
+            color: #ffaa00;
+            border: 1px solid #444;
+            padding: 1px 6px;
+            font-family: 'IBM BIOS', monospace;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 3px;
+            margin: 0 4px;
+            text-transform: uppercase;
+        }
+
+        .key-btn:hover {
+            background-color: #333;
+            color: #ffcc00;
+            border-color: #666;
+        }
+
+        /* 2. CMOS SETUP UTILITY 화면 스타일 (DEL 클릭 시) */
+        .cmos-screen {
+            background-color: #0000a8;
+            color: #ffffff;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cmos-header {
+            text-align: center;
+            color: #ffffff;
+            font-size: 18px;
+            border-bottom: 2px double #ffffff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .cmos-subtitle {
+            color: #ffff55;
+            font-size: 16px;
+            margin-top: -5px;
+            margin-bottom: 10px;
+        }
+
+        .cmos-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 30px;
+            margin-top: 10px;
+            flex-grow: 1;
+        }
+
+        .cmos-menu-item {
+            padding: 5px 15px;
+            color: #ffffff;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .cmos-menu-item.selected {
+            background-color: #a80000;
+            color: #ffff55;
+            border: 1px dashed #ffff55;
+        }
+
+        .cmos-footer {
+            border-top: 2px double #ffffff;
+            padding-top: 10px;
+            color: #ffff55;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* 3. Startup Menu 화면 스타일 (F8 클릭 시) */
+        .startup-screen {
+            background-color: #000000;
+            color: #aaaaaa;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 40px;
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+        }
+
+        .startup-title {
+            color: #ffffff;
+            font-size: 18px;
+            border-bottom: 1px solid #aaaaaa;
+            padding-bottom: 10px;
+        }
+
+        .startup-options {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .startup-item {
+            cursor: pointer;
+            padding: 3px 5px;
+        }
+
+        .startup-item:hover {
+            color: #ffffff;
+            background-color: #222;
+        }
+
+        .startup-choice-row {
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .startup-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: 'IBM BIOS', monospace;
+            font-size: 16px;
+            width: 20px;
+            outline: none;
+        }
+
+        .startup-footer {
+            margin-top: auto;
+            border-top: 1px solid #444;
+            padding-top: 15px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 모니터 전체 영역 -->
+    <div id="monitor">
+
+        <!-- 1. 기본 BIOS 부팅 화면 -->
+        <div id="boot-view"
+            style="display: flex; flex-direction: column; height: 100%; justify-content: space-between; flex-grow: 1;">
+            <header>
+                <div class="header-left">
+                    <img class="award-logo" src="./award.png" alt="Award Logo">
+                    <div class="bios-title">
+                        Award Modular BIOS v4.51PG, An Energy Star Ally
+                        Copyright (C) 1984-85, Award Software, Inc.
+                    </div>
+                </div>
+                <img class="energy-star-logo" src="./energystar.png" alt="Energy Star Logo">
+            </header>
+
+            <main id="console">
+                <!-- 진단 메세지 빌드 -->
+            </main>
+
+            <footer>
+                <div>
+                    Press <button class="key-btn" onclick="enterCMOS()">DEL</button> to enter Setup
+                </div>
+                <div>
+                    Press <button class="key-btn" onclick="enterStartupMenu()">F8</button> for Startup Menu
+                </div>
+            </footer>
+        </div>
+
+        <!-- 2. CMOS SETUP UTILITY 화면 -->
+        <div id="cmos-view" class="cmos-screen hidden">
+            <div class="cmos-header">
+                ROM PCI/ISA BIOS (2A69KS2A)<br>
+                <span class="cmos-subtitle">CMOS SETUP UTILITY<br>AWARD SOFTWARE, INC.</span>
+            </div>
+
+            <div class="cmos-grid" id="cmos-menu-container">
+                <!-- 왼편 칼럼 -->
+                <div style="display: flex; flex-direction: column;">
+                    <div class="cmos-menu-item selected" data-index="0">STANDARD CMOS SETUP</div>
+                    <div class="cmos-menu-item" data-index="1">BIOS FEATURES SETUP</div>
+                    <div class="cmos-menu-item" data-index="2">CHIPSET FEATURES SETUP</div>
+                    <div class="cmos-menu-item" data-index="3">POWER MANAGEMENT SETUP</div>
+                    <div class="cmos-menu-item" data-index="4">PNP/PCI CONFIGURATION</div>
+                    <div class="cmos-menu-item" data-index="5">LOAD BIOS DEFAULTS</div>
+                    <div class="cmos-menu-item" data-index="6">LOAD SETUP DEFAULTS</div>
+                </div>
+                <!-- 오른편 칼럼 -->
+                <div style="display: flex; flex-direction: column;">
+                    <div class="cmos-menu-item" data-index="7">INTEGRATED PERIPHERALS</div>
+                    <div class="cmos-menu-item" data-index="8">SUPERVISOR PASSWORD</div>
+                    <div class="cmos-menu-item" data-index="9">USER PASSWORD</div>
+                    <div class="cmos-menu-item" data-index="10">IDE HDD AUTO DETECTION</div>
+                    <div class="cmos-menu-item" data-index="11">SAVE & EXIT SETUP</div>
+                    <div class="cmos-menu-item" data-index="12">EXIT WITHOUT SAVING</div>
+                </div>
+            </div>
+
+            <div class="cmos-footer">
+                Esc : Quit
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                ↑ ↓ → ← : Select Item<br>
+                F10 : Save & Exit Setup &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                (Shift)F2 : Change Color
+            </div>
+        </div>
+
+        <!-- 3. Microsoft Windows Startup Menu 화면 -->
+        <div id="startup-view" class="startup-screen hidden">
+            <div class="startup-title">
+                Microsoft Windows 98 Startup Menu
+            </div>
+
+            <div class="startup-options">
+                <div class="startup-item" onclick="selectStartup(1)">1. Normal</div>
+                <div class="startup-item" onclick="selectStartup(2)">2. Logged (\BOOTLOG.TXT)</div>
+                <div class="startup-item" onclick="selectStartup(3)">3. Safe mode</div>
+                <div class="startup-item" onclick="selectStartup(4)">4. Step-by-step confirmation</div>
+                <div class="startup-item" onclick="selectStartup(5)">5. Command prompt only</div>
+                <div class="startup-item" onclick="selectStartup(6)">6. Safe mode command prompt only</div>
+            </div>
+
+            <div class="startup-choice-row">
+                <span>Enter a choice:</span>
+                <input type="text" id="choice-input" class="startup-input" value="1" maxlength="1" autofocus>
+                <span class="cursor"></span>
+            </div>
+
+            <div class="startup-footer">
+                <span>F5=Safe mode &nbsp;&nbsp; Shift+F5=Command prompt &nbsp;&nbsp; Shift+F8=Step-by-step
+                    confirmation</span>
+                <span id="countdown-timer">Time remaining: 30</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const consoleEl = document.getElementById('console');
+        const bootView = document.getElementById('boot-view');
+        const cmosView = document.getElementById('cmos-view');
+        const startupView = document.getElementById('startup-view');
+        const choiceInput = document.getElementById('choice-input');
+        const countdownTimer = document.getElementById('countdown-timer');
+
+        let audioCtx = null;
+        let isBootingFinished = false;
+        let bootLoopTimer = null;
+        let currentScreen = 'boot'; // boot, cmos, startup
+        let startupCountdown = 30;
+        let countdownInterval = null;
+
+        // CMOS Menu Navigation
+        let selectedCmosIndex = 0;
+        const cmosMenuItems = document.querySelectorAll('.cmos-menu-item');
+
+        // 레트로 사각파 비프음 재생
+        function playBeep(frequency = 800, duration = 100) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.frequency.value = frequency;
+                osc.type = 'square';
+
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration / 1000);
+
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + duration / 1000);
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+
+        function addLine(text, className = "") {
+            const div = document.createElement('div');
+            div.className = 'line ' + className;
+            div.textContent = text;
+            consoleEl.appendChild(div);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+            return div;
+        }
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        // 부팅 흐름 전체
+        async function runBootSequence() {
+            if (currentScreen !== 'boot') return;
+            isBootingFinished = false;
+            consoleEl.innerHTML = '';
+
+            playBeep(800, 150); // 메인 부팅음
+
+            addLine("");
+            addLine("Intel(R) Pentium(R) II Processor - 300MHz");
+
+            // RAM 테스트 진행
+            const ramLine = addLine("Memory Test :  0K OK");
+            const targetRAM = 65536;
+            let currentRAM = 0;
+            const ramStep = 1024;
+
+            while (currentRAM < targetRAM && currentScreen === 'boot') {
+                currentRAM += ramStep;
+                ramLine.textContent = `Memory Test :  ${currentRAM}K OK`;
+                await delay(12);
+            }
+            if (currentScreen !== 'boot') return;
+            playBeep(1000, 80);
+
+            await delay(200);
+            addLine("");
+
+            // 오리지널 진단 로그 출력
+            const diagnosticLogs = [
+                { text: "Detecting mouse...", success: "OK" },
+                { text: "Detecting touch support...", success: "OK" },
+                { text: "Connecting to network...", success: "OK" },
+                { text: "Initializing file system...", success: "OK" },
+                { text: "Loading system themes...", success: "OK" },
+                { text: "Initializing Recycle Bin...", success: "OK" },
+                { text: "Preloading default theme assets...", success: "OK" },
+                { text: "Loading custom applications...", success: "OK" },
+                { text: "Creating main UI...", success: "OK" },
+                { text: "Initializing taskbar...", success: "OK" },
+                { text: "Setting up desktop...", success: "OK" }
+            ];
+
+            for (const log of diagnosticLogs) {
+                if (currentScreen !== 'boot') return;
+                const line = addLine(log.text);
+                await delay(150 + Math.random() * 200);
+
+                let status = log.success;
+                if (log.text.includes("network") && !navigator.onLine) {
+                    status = "FAILED";
+                }
+
+                line.textContent = `${log.text} ${status}`;
+                playBeep(900, 30);
+            }
+
+            if (currentScreen !== 'boot') return;
+            await delay(400);
+            addLine("");
+            addLine("WindowsXP Ready!");
+
+            addLine("");
+            addLine("Booting...");
+
+            const cursor = document.createElement('span');
+            cursor.className = 'cursor';
+            addLine("").appendChild(cursor);
+
+            // 완료 신호음
+            isBootingFinished = true;
+            playBeep(880, 80);
+            await delay(100);
+            playBeep(880, 120);
+
+            // 2초 Booting 표시
+            await delay(2000);
+            if (currentScreen !== 'boot') return;
+
+            // 완전히 까만 화면으로 전환 (boot-view 콘텐츠 숨김, body는 이미 #000)
+            bootView.style.transition = 'opacity 0.1s ease';
+            bootView.style.opacity = '0';
+
+            // 1초 완전 까만 화면 유지
+            await delay(1000);
+            if (currentScreen !== 'boot') return;
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'bios-boot-complete' }, '*');
+            }
+
+        }
+
+        // 2. CMOS 화면 진입
+        function enterCMOS() {
+            currentScreen = 'cmos';
+            bootView.classList.add('hidden');
+            startupView.classList.add('hidden');
+            cmosView.classList.remove('hidden');
+            playBeep(1200, 50);
+            updateCmosMenuHighlight();
+        }
+
+        function updateCmosMenuHighlight() {
+            cmosMenuItems.forEach((item, idx) => {
+                if (idx === selectedCmosIndex) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        // CMOS 메뉴 클릭 처리
+        cmosMenuItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                selectedCmosIndex = parseInt(e.target.getAttribute('data-index'));
+                updateCmosMenuHighlight();
+                playBeep(1000, 40);
+
+                // Exit 메뉴들을 누르면 리부팅
+                if (selectedCmosIndex === 11 || selectedCmosIndex === 12) {
+                    rebootSystem();
+                }
+            });
+        });
+
+        // 3. Startup Menu 진입
+        function enterStartupMenu() {
+            currentScreen = 'startup';
+            bootView.classList.add('hidden');
+            cmosView.classList.add('hidden');
+            startupView.classList.remove('hidden');
+            choiceInput.focus();
+            playBeep(1200, 50);
+
+            // 타이머 초기화 및 실행
+            startupCountdown = 30;
+            countdownTimer.textContent = `Time remaining: ${startupCountdown}`;
+
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                startupCountdown--;
+                countdownTimer.textContent = `Time remaining: ${startupCountdown}`;
+                if (startupCountdown <= 0) {
+                    clearInterval(countdownInterval);
+                    selectStartup(1); // 타임아웃 시 Normal 모드로 진행
+                }
+            }, 1000);
+        }
+
+        function selectStartup(choice) {
+            if (countdownInterval) clearInterval(countdownInterval);
+            playBeep(1000, 80);
+
+            // 부팅 화면으로 다시 복귀하여 부팅 마무리 모사
+            startupView.classList.add('hidden');
+            bootView.classList.remove('hidden');
+            currentScreen = 'boot';
+            runBootSequence();
+        }
+
+        // 재부팅
+        function rebootSystem() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            cmosView.classList.add('hidden');
+            startupView.classList.add('hidden');
+            bootView.classList.remove('hidden');
+            currentScreen = 'boot';
+
+            // 리부팅 시 CRT 깜빡임 리셋 효과
+            const monitor = document.getElementById('monitor');
+            monitor.style.animation = 'none';
+            void monitor.offsetHeight; // reflow
+            monitor.style.animation = 'crt-flicker 0.15s infinite, crt-power-on 0.5s ease-out forwards';
+
+            runBootSequence();
+        }
+
+        // 키보드 이벤트 네비게이션
+        window.addEventListener('keydown', (e) => {
+            // 브라우저 키 해제 리스너 겸함
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (currentScreen === 'boot') {
+                if (e.key === 'Delete' || e.key === 'Del') {
+                    e.preventDefault();
+                    enterCMOS();
+                } else if (e.key === 'F8') {
+                    e.preventDefault();
+                    enterStartupMenu();
+                }
+            } else if (currentScreen === 'cmos') {
+                if (e.key === 'Escape') {
+                    rebootSystem();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (selectedCmosIndex > 0) {
+                        // 칼럼별 이동 처리
+                        selectedCmosIndex--;
+                        playBeep(1000, 30);
+                    }
+                    updateCmosMenuHighlight();
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (selectedCmosIndex < 12) {
+                        selectedCmosIndex++;
+                        playBeep(1000, 30);
+                    }
+                    updateCmosMenuHighlight();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    if (selectedCmosIndex >= 7) {
+                        selectedCmosIndex -= 7;
+                        playBeep(1000, 30);
+                    }
+                    updateCmosMenuHighlight();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    if (selectedCmosIndex < 7 && selectedCmosIndex + 7 <= 12) {
+                        selectedCmosIndex += 7;
+                        playBeep(1000, 30);
+                    }
+                    updateCmosMenuHighlight();
+                } else if (e.key === 'Enter') {
+                    playBeep(1000, 80);
+                    if (selectedCmosIndex === 11 || selectedCmosIndex === 12) {
+                        rebootSystem();
+                    }
+                }
+            } else if (currentScreen === 'startup') {
+                if (e.key === 'Enter') {
+                    const val = parseInt(choiceInput.value);
+                    if (val >= 1 && val <= 6) {
+                        selectStartup(val);
+                    } else {
+                        selectStartup(1);
+                    }
+                }
+            }
+        });
+
+        // 부팅 자동 초기화
+        window.addEventListener('DOMContentLoaded', () => {
+            runBootSequence();
+            // 화면 클릭 유도 및 비프음 초기화 용도
+            document.body.addEventListener('click', () => {
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

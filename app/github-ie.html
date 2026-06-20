@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Internet Explorer</title>
+    <link rel="stylesheet" href="../scroll.css">
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background: none;
+            overflow: hidden;
+            font-family: Tahoma, 'Noto Sans', sans-serif;
+            font-size: 11px;
+        }
+
+        .my-computer-window {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            display: flex;
+            overflow: hidden;
+            flex-direction: column;
+            background: linear-gradient(to right, #edede5 0%, #ede8cd 100%);
+        }
+
+        .com__toolbar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            line-height: 100%;
+            height: 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .com__options {
+            height: 24px;
+            border-bottom: 0px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0px 0 0px 2px;
+            border-left: 0;
+            flex: 1;
+            display: flex;
+        }
+
+        .com__options .menu-item {
+            position: relative;
+            padding: 6px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .com__options .menu-item:hover,
+        .com__options .menu-item.active {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        .com__options .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #888;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            list-style: none;
+            padding: 2px;
+            margin: 0;
+            z-index: 100;
+            color: black;
+        }
+
+        .com__options .menu-item.active .dropdown-menu {
+            display: block;
+        }
+
+        .com__options .dropdown-menu li {
+            padding: 2px 20px 2px 25px;
+            white-space: nowrap;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .com__options .dropdown-menu li:hover {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        .com__options .dropdown-menu li.disabled {
+            color: #888;
+            pointer-events: none;
+        }
+
+        .com__options .dropdown-menu li.separator {
+            height: 1px;
+            background-color: #ccc;
+            padding: 0;
+            margin: 4px 0;
+            cursor: default;
+        }
+
+        .com__options .dropdown-menu li.separator:hover {
+            background-color: #ccc;
+            color: inherit;
+        }
+
+        .com__windows-logo {
+            height: 36px;
+            border-left: 1px solid white;
+            border-bottom: 0px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .com__function_bar {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            padding: 1px 3px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .com__function_bar__button {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0);
+            border-radius: 3px;
+            padding: 0 4px;
+        }
+
+        .com__function_bar__button:hover {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .com__function_bar__button:hover:active {
+            border: 1px solid rgb(185, 185, 185);
+            background-color: #dedede;
+            box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.7);
+        }
+
+        .com__function_bar__button:hover:active>* {
+            transform: translate(1px, 1px);
+        }
+
+        .com__function_bar__button--disable {
+            filter: grayscale(1);
+            opacity: 0.7;
+            display: flex;
+            height: 100%;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0);
+            padding: 0 4px;
+        }
+
+        .com__function_bar__icon {
+            height: 22px;
+            width: 22px;
+        }
+
+        .com__function_bar__text {
+            margin-left: 4px;
+        }
+
+        .com__function_bar__separate {
+            height: 90%;
+            width: 1px;
+            background-color: rgba(0, 0, 0, 0.2);
+            margin: 0 2px;
+        }
+
+        .com__address_bar {
+            flex-shrink: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            height: 22px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            padding: 0 2px;
+            box-shadow: inset 0 -2px 3px -1px #b0b0b0;
+        }
+
+        .com__address_bar__title {
+            color: rgba(0, 0, 0, 0.5);
+            padding: 7px;
+            height: 15px;
+        }
+
+        .com__address_bar__content {
+            border: rgba(122, 122, 255, 0.6) 1px solid;
+            height: calc(100% - 1px);
+            display: flex;
+            flex: 1;
+            align-items: center;
+            background-color: white;
+            position: relative;
+            padding: 0 4px;
+        }
+
+        .com__address_bar__content__img {
+            width: 16px;
+            height: 16px;
+            padding-right: 5px;
+        }
+
+        .com__address_bar__right_space {
+            display: flex;
+            align-items: center;
+            padding: 0 16px 0 4px;
+            flex: 0 0 30px;
+        }
+
+        .com__address_bar__right__img {
+            width: 20px;
+            height: 20px;
+            padding-right: 7px;
+        }
+
+        .com__address_bar__right__text {
+            font-size: 11px;
+        }
+
+        .com__content {
+            flex: 1;
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            border-top-width: 0;
+            background-color: #f1f1f1;
+            overflow: auto;
+            font-size: 11px;
+            position: relative;
+        }
+
+        .com__content__inner {
+            display: flex;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .com__content__right {
+            height: calc(100%-10px);
+            overflow: auto;
+            background-color: #fff;
+            flex: 1;
+            padding: 10px;
+            position: relative;
+        }
+
+        .status-bar {
+            margin: 0 1px;
+            display: flex;
+            gap: 1px;
+            height: 22px;
+        }
+
+        .status-bar-field {
+            box-shadow: inset -1px -1px #dfdfdf, inset 1px 1px grey;
+            flex-grow: 1;
+            padding: 4px 3px;
+            margin: 0;
+        }
+    </style>
+    <script src="../focusController.js"></script>
+</head>
+
+<body>
+    <div class="my-computer-window">
+        <section class="com__toolbar">
+            <div class="com__options">
+                <div class="menu-item"><span><u>F</u>ile</span>
+                    <ul class="dropdown-menu">
+                        <li class="disabled">Create Shortcut</li>
+                        <li class="disabled">Delete</li>
+                        <li class="disabled">Rename</li>
+                        <li class="disabled">Properties</li>
+                        <li class="separator"></li>
+                        <li data-action="Close">Close</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>E</u>dit</span>
+                    <ul class="dropdown-menu">
+                        <li class="disabled">Undo</li>
+                        <li class="separator"></li>
+                        <li class="disabled">Cut</li>
+                        <li class="disabled">Copy</li>
+                        <li class="disabled">Paste</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>V</u>iew</span>
+                    <ul class="dropdown-menu">
+                        <li>Toolbars</li>
+                        <li>Status Bar</li>
+                        <li class="separator"></li>
+                        <li>Icons</li>
+                        <li>List</li>
+                        <li>Details</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>F</u>avorites</span>
+                    <ul class="dropdown-menu">
+                        <li>Add to Favorites...</li>
+                        <li>Organize Favorites...</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>H</u>elp</span>
+                    <ul class="dropdown-menu">
+                        <li>Help and Support Center</li>
+                        <li class="separator"></li>
+                        <li>About Windows</li>
+                    </ul>
+                </div>
+
+                <div class="com__windows-logo"
+                    style="margin-left: auto; display: flex; align-items: center; justify-content: center; padding: 0 0px; height: 100%; border-left: 1px solid rgba(0, 0, 0, 0.1);">
+                    <img src="../image/windows.png" alt="Windows Logo"
+                        style="height: 100%; object-fit: contain; padding: 0;">
+                </div>
+            </div>
+        </section>
+        <section class="com__function_bar">
+            <div class="com__function_bar__button--disable"><img class="com__function_bar__icon" src="../image/back.png"
+                    alt=""> <span class="com__function_bar__text">Back</span></div>
+            <div class="com__function_bar__button--disable"><img class="com__function_bar__icon"
+                    src="../image/front.png" alt=""></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/iestop.png"
+                    alt=""></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/ierefresh.png"
+                    alt=""></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/iehome.png"
+                    alt=""></div>
+            <div class="com__function_bar__separate"></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/search.png"
+                    alt=""> <span class="com__function_bar__text">Search</span></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/favorites.png"
+                    alt=""> <span class="com__function_bar__text">Favorites</span></div>
+        </section>
+        <section class="com__address_bar" style="margin-bottom: 1px;">
+            <div class="com__address_bar__title">Address</div>
+            <div class="com__address_bar__content">
+                <img src="../image/windowslogo.png" alt="icon" class="com__address_bar__content__img">
+                <div class="com__address_bar__content__text">https://mainajwj.github.io/xprebuild/</div>
+            </div>
+            <div class="com__address_bar__right_space">
+                <img src="../image/continue.png" alt="icon" class="com__address_bar__right__img">
+                <span class="com__address_bar__right__text">Go</span>
+            </div>
+        </section>
+        <div class="com__content">
+            <div class="com__content__inner">
+                <div class="com__content__right" style="padding: 0; display: flex;">
+                    <iframe src="https://mainajwj.github.io/xprebuild/"
+                        style="width:100%; height:100%; border:none; flex: 1;" frameborder="0"
+                        sandbox="allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-forms allow-popups allow-pointer-lock allow-downloads">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-bar-field">https://github.com/MainaJWJ/xprebuild</div>
+        </div>
+
+    </div>
+
+    <script>
+        const menuItems = document.querySelectorAll('.com__options .menu-item');
+        let isMenuActive = false;
+
+        menuItems.forEach(menuItem => {
+            menuItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const wasActive = menuItem.classList.contains('active');
+                menuItems.forEach(item => item.classList.remove('active'));
+                isMenuActive = false;
+                if (!wasActive) {
+                    menuItem.classList.add('active');
+                    isMenuActive = true;
+                }
+            });
+
+            menuItem.addEventListener('mouseenter', () => {
+                if (isMenuActive) {
+                    menuItems.forEach(item => item.classList.remove('active'));
+                    menuItem.classList.add('active');
+                }
+            });
+        });
+
+        document.addEventListener('click', () => {
+            menuItems.forEach(item => item.classList.remove('active'));
+            isMenuActive = false;
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const closeItem = document.querySelector('[data-action="Close"]');
+            if (closeItem) {
+                closeItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    menuItems.forEach(item => item.classList.remove('active'));
+                    isMenuActive = false;
+                    if (confirm('Do you want to close this window?')) {
+                        window.parent.postMessage({ type: 'closeWindow' }, '*');
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

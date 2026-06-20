@@ -1,0 +1,368 @@
+{
+  "project_name": "Windows XP Web Emulator",
+  "framework": "Vanilla HTML/CSS/JS",
+  "features": [
+    "Desktop UI with Window Manager",
+    "Taskbar & Start Menu",
+    "App Engine & App Registry",
+    "Logon/Shutdown Managers",
+    "Built-in Apps (Calculator, Notepad, Minesweeper, etc.)",
+    "3D Simulator Modules (Solar System, Flight)"
+  ],
+  "recent_changes": [
+    {
+      "date": "2026-06-05",
+      "action": "Consolidated WebGL effect controls, decoupled Grayscale, and cleaned up CRT overlay filters",
+      "description": [
+        "Consolidated all WebGL background effect switches (Pixel Size, Curvature, RGB Shift, Digital Noise, Glitch Split) into a single master checkbox toggle 'Enable WebGL Background Effects' in the Glitch tab, removing redundant individual parameter checkboxes and resetting grid labels to plain text.",
+        "Decoupled the Grayscale filter from the CRT overlay in app/properties/crt.js, allowing grayscale to work independently of the CRT filter overlay state.",
+        "Completely cleaned up the scanlines, flicker, and curvature SVG filters from the screen-wide overlay in app/properties/crt.js.",
+        "Removed the redundant 'Master Intensity' slider from the Glitch tab to simplify the interface.",
+        "Re-aligned the WebGL settings grid to a clean 100px layout in app/properties/displayProperties.html.",
+        "Simplified the UI event loop and defaults reset handling in app/properties/bg-glitch-ui.js."
+      ]
+    },
+    {
+      "date": "2026-06-02",
+      "action": "Upgraded Missile Smoke Trail to Use Volumetric smoke_2 Texture and Continuous Position Interpolation",
+      "description": [
+        "Copied the realistic volumetric smoke texture (smoke_2.png) from explosions-demo-main/assets/ to app/flight/images/.",
+        "Modified particleSystem.js to load smoke_2.png as missileSmokeTexture.",
+        "Updated spawnMissileTrails in particleSystem.js to apply the new texture and random sprite rotation (rotation: Math.random() * Math.PI * 2) to missile smoke particles, creating a realistic, diverse, and volumetric contrail.",
+        "Implemented position interpolation between the previous and current frame positions of the missile engine nozzle to eliminate dotted-line gap artifacts at high speeds.",
+        "Added dynamic particle count calculation based on the frame-to-frame travel distance to maintain a perfectly uniform and dense smoke trail regardless of missile velocity.",
+        "Implemented raycast-based static target collision detection (NIMITZ, RUNWAY) for enemy missiles in enemySystem.js, ensuring consistent collision behavior across player and enemy weapons.",
+        "Implemented Area of Effect (AOE) splash damage with linear distance-based falloff (0% to 100%) for both player weapons in weaponSystem.js and enemy weapons in enemySystem.js, excluding direct hit entities to avoid double-damage.",
+        "Added real-time 2D radar tracking and rendering for both allied (cyan blips) and enemy (red blips) missiles in uiManager.js, complete with velocity vector indicator lines and HUD dirty-check exclusions to guarantee smooth radar animations."
+      ]
+    },
+    {
+      "date": "2026-05-29",
+      "action": "Integrated Persistent Flame Particle System at Missile & Bomb Impact Locations",
+      "description": [
+        "Loaded threeJenParticle.js module in index.html to enable custom fire particles.",
+        "Configured and initialized dual-layer custom fire particles (jenP, jenP2) with 10x scale, 10x speed, and 10x gravity in particleSystem.js.",
+        "Updated threeJenParticle.js to use ShaderMaterial and logarithmic depth chunks, set instanceCount, corrected depthFunc to LessEqualDepth, and normalized shader stretching math by dividing by max(0.0001, length(Badd)) in clip space for perspective-correct scale-invariance.",
+        "Fixed laser-like line artifacts on particle expiration by discarding/clipping inactive particles (time == 0.0 / vTime < 0.0) in both vertex and fragment shaders.",
+        "Hooked spawnPersistentFire calls into weaponSystem.js and enemySystem.js to ensure fire only appears at missile and bomb detonation points.",
+        "Refactored spawnPersistentFire in particleSystem.js to spawn a cluster of 3 to 5 smaller persistent fires with random offsets, scales, and lifetimes around the detonation point, and increased the spread radius to 150.0 units for improved visual scale."
+      ]
+    },
+    {
+      "date": "2026-05-28",
+      "action": "Implemented Aircraft Stall Speed Physics & UI Warnings",
+      "description": [
+        "Configured stallSpeed parameter (e.g. 250) dynamically in F-18.json and F18_2.json performance configs.",
+        "Modified myShipControl.js to remove hard minSpeed clamps, allowing speed to drop naturally from airbrakes or extreme pitch gravity.",
+        "Implemented stall physics: when speed drops below stallSpeed, the aircraft loses altitude proportionally and the nose (pitch) is forced downward.",
+        "Added a flashing red 'STALL WARNING' UI on the HUD in uiManager.js that bypasses dirty-check optimizations for real-time alerting."
+      ]
+    },
+    {
+      "date": "2026-05-28",
+      "action": "Implemented Dynamic Aircraft Carrier Forward Movement & Physics",
+      "description": [
+        "Added EnvironmentManager.update loop to move the aircraft carrier (NIMITZ) forward continuously at 15 m/s (approx 30 knots) along its local -Z axis.",
+        "Hooked EnvironmentManager.update into the main index.html animation loop.",
+        "Updated landingSystem.js to track carrier displacement per frame and apply it to the player's aircraft position when landed/taxiing on the flight deck, preventing slip-off.",
+        "Verified catapult and 3D ILS tunnel systems automatically track the moving carrier due to the dynamic matrixWorld architecture previously implemented."
+      ]
+    },
+    {
+      "date": "2026-05-28",
+      "action": "Implemented Dynamic Aircraft Carrier Landing and Catapult System",
+      "description": [
+        "Refactored landingSystem.js to replace hardcoded world coordinates (4476, 574, -9825) with dynamic coordinate transformations using the carrier's matrixWorld.",
+        "Calculated the exact local offset on the carrier model (0.21875, 0.7175, 8.2925) and applied applyMatrix4 to calculate the catapult/landing point in real-time.",
+        "Used transformDirection on the local runway vector to dynamically calculate runway orientation (yawRad) and alignment.",
+        "Reduced aircraft carrier (NIMITZ) scale to 560 (70% of original 800) in nimitz.json, verifying that the flight deck catapult alignment and ILS HUD tunnel scale dynamically."
+      ]
+    },
+    {
+      "date": "2026-05-26",
+      "action": "Unified Object Specifications under Model JSON Configs",
+      "description": [
+        "Eliminated hardcoded physical specs across flight and combat entities, transferring them to their respective model JSON configurations.",
+        "Configured player collision radius, enemy sensors radar detection range, lock-on time, and missile fire cooldown dynamically from aircraft and target configurations.",
+        "Configured flare countermeasure specs (lifespan, gravity, drag, interval, burst count, cooldown) and missile gravity drop rates dynamically from model JSONs."
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "action": "Consolidated Ocean Normal Maps and Cleaned Up Unused Directory",
+      "description": [
+        "Copied waterNormal1.png and waterNormal2.png from Three.js-Ocean-Scene-main/images/ to a new local app/flight/images/ folder.",
+        "Updated oceanSystem.js to load the textures from the local images/ folder.",
+        "Deleted the unused Three.js-Ocean-Scene-main directory, keeping only the two active normal map files to optimize project structure and size."
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "action": "Brightened Flight Simulator to Summer Noon Atmosphere",
+      "description": [
+        "Brightened the sky background color to 0x7ec2f6 (Bright Summer Sky Blue) in index.html.",
+        "Increased ambient light intensity to 1.2 and directional sunlight to 1.8 in index.html to eliminate dark sunset-like shadows.",
+        "Adjusted oceanSystem.js baseColor to vec3(0.08, 0.34, 0.72) (brighter cobalt), boosted diffuse lighting minimums to 0.85, tripled specular glint reflection to 1.5, and lightened the sky reflection color to vec3(0.35, 0.68, 0.95)."
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "action": "Adjusted Ocean to East Sea Cobalt Indigo Style",
+      "description": [
+        "Changed ocean baseColor to a deep, rich indigo/navy blue (vec3(0.04, 0.24, 0.58)) in oceanSystem.js to simulate the East Sea of Korea (Donghae).",
+        "Refined diffuse shading brightness and set a high opacity alpha multiplier (0.95) to retain a solid, deep-water appearance."
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "action": "Fixed Ocean Horizon Tearing and Shimmering Noise",
+      "description": [
+        "Re-enabled GPU mipmapping (LinearMipmapLinearFilter) and anisotropic filtering on ocean normal maps in oceanSystem.js.",
+        "Scaled down the camera-following ocean surface half-size to 700,000 units to prevent it from exceeding the camera far plane (1,000,000) and causing clipping artifacts."
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "action": "Subdivided Ocean Mesh to Solve Horizon Jitter",
+      "description": [
+        "Replaced the single-quad ocean surface BufferGeometry with a subdivided PlaneGeometry (128x128 segments) in oceanSystem.js.",
+        "Resolves perspective correct varying interpolation precision errors, preventing far-distance waves from warping or jittering at the center of the screen."
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "action": "Cleaned Up Unused Ocean Code",
+      "description": [
+        "Removed unused FOG_DISTANCE_VAL configuration constant and global/parallax ShaderChunks from oceanSystem.js.",
+        "Cleaned up unused GLSL declarations including SPECULAR_SIZE and sampleFog to simplify shader compilation and maintain code cleanliness."
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "action": "Restored Flight Simulator Ocean Transparency",
+      "description": [
+        "Re-enabled transparency on the ocean ShaderMaterial (transparent = true) in oceanSystem.js.",
+        "Reverted the hardcoded alpha values (1.0) in the fragment shader back to using max(reflectivity, specular) and depth coefficients (t) respectively, matching the original blending behaviors."
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "action": "Adjusted Flight Simulator to Clear Daylight Weather",
+      "description": [
+        "Updated index.html background clear color to a vibrant sky blue (0x3a9fe9) representing a clear day.",
+        "Strengthened and warmed the directional sun light (0xfffaed, intensity 1.3) and added blue-tinted ambient sky light (0xdbebff, intensity 0.8) to simulate realistic day scattering.",
+        "Reflected the clear blue sky color in the ocean surface's shader reflection settings and base cobalt blue color in oceanSystem.js."
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "action": "Enhanced Ocean Wave Distance Visibility",
+      "description": [
+        "Disabled GPU mipmapping (minFilter = THREE.LinearFilter and generateMipmaps = false) on ocean normal maps in oceanSystem.js.",
+        "Prevents normal vectors from averaging/flattening out at far distances and high altitudes, ensuring wave details remain sharp and visible all the way to the horizon."
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "action": "Upgraded Flight Simulator Reflective Ocean",
+      "description": [
+        "Integrated the advanced double-mapped reflective ocean surface from Three.js-Ocean-Scene-main.",
+        "Created oceanSystem.js that loads textures, implements Fresnel reflections, and handles volume rendering.",
+        "Integrated reflections and fog to blend seamlessly with the solid sky background color (0x5b9ec9), removing the procedural 3D skybox mesh per user request.",
+        "Restored index.html background and renderer clear settings to the original solid color.",
+        "Configured the ocean surface material to be fully opaque (transparent: false and alpha = 1.0) to ensure high-altitude visibility.",
+        "Removed all fog calculations from the ocean shader to make the water details and reflections completely clear and sharp.",
+        "Blended reflections with a deep ocean blue base color, clamped Fresnel reflectivity to 0.5 to keep the ocean horizon visible at high altitudes, and darkened the reflection color.",
+        "Scaled up the physical wave size (NORMAL_MAP_SCALE = 0.0005) and set its strength to 3.0 so that waves are 200x larger than original (5x increase from previous step) and clearly visible at y = 5000.",
+        "Brightened the water base color to a cobalt blue and implemented Half-Lambert shading on the normal map slopes to show water waves and volume details clearly across the entire map.",
+        "Enabled anisotropic filtering on normal maps to keep ripples sharp at high altitudes and steep angles."
+      ]
+    },
+    {
+      "date": "2026-05-20",
+      "action": "Created and Enhanced Standalone BIOS Boot Simulator Application",
+      "description": [
+        "Extracted and replicated the classic BIOS diagnostics screen in a standalone page under app/logon/bios/index.html.",
+        "Implemented retro CRT styling, motherboard beeps using Web Audio API, RAM counting animation, and device diagnostics logs.",
+        "Downloaded and integrated the exact original WOFF IBM BIOS font, Award Logo, and Energy Star Logo offline.",
+        "Added CRT power-on monitor distortion animations (horizontal/vertical scale and brightness adjustments).",
+        "Implemented full keyboard and mouse interactive screens for the CMOS Setup Utility (DEL key) and Windows 98 Startup Menu (F8 key).",
+        "Deactivated the CRT filter overlay and power-on animations per user preference while retaining the CSS rules in code.",
+        "Replaced the 5-second DOS countdown timer with a 2-second 'Booting...' delay screen showing a blinking cursor and completing double beeps before loading the logon screen.",
+        "Moved the 'bios' directory inside the 'app/logon/' directory and removed its registration ('bios-sim') from appRegistry.js as requested.",
+        "Created biosManager.js and integrated it in appengine.js so that the BIOS boot screen plays first when index.html is loaded, and then transitions to logon.html upon completion. Later, relocated biosManager.js to the app/logon/bios/ directory to keep the BIOS module self-contained."
+      ]
+    },
+    {
+      "date": "2026-05-18",
+      "action": "Integrated Windows XP Run Dialog & Start Menu App Connections",
+      "description": [
+        "Created app/run.html simulating Windows XP Run dialog, matching properties style.",
+        "Polished Run dialog combobox arrow using the global scroll.css styles and HTML overlay structure from displayProperties.html.",
+        "Implemented real-time command execution (e.g. notepad, calc, paint, winmine, messenger) and website URL launcher via postMessage to parent shell.",
+        "Added functional Command History dropdown autocompletion triggering from the bevel arrow button.",
+        "Integrated Browse... button to open the My Documents (documents) system application.",
+        "Registered the 'run' app in appRegistry.js with dimensions (350x190) and iconUrl.",
+        "Connected existing Start Menu UI items (Windows Messenger, Backup Wizard, Sound Recorder) to their respective registered applications via data-app-id.",
+        "Linked 'Run...' menu item to the registered 'run' application with correct icon."
+      ]
+    },
+    {
+      "date": "2026-05-16",
+      "action": "Integrated Windows Messenger (MSN) Application",
+      "description": [
+        "Extracted MSN Messenger UI and assets from yyyy folder snapshot.",
+        "Implemented full login workflow and contacts list view in app/msnmsgr/index.html.",
+        "Modularized the app with local 'xpdesign.css' and images for independent operation.",
+        "Registered 'msnmsgr' in appRegistry.js with accurate dimensions (270x500).",
+        "Cleaned up the temporary 'yyyy' directory."
+      ]
+    },
+    {
+      "date": "2026-05-16",
+      "action": "Integrated Backup or Restore Wizard Application",
+      "description": [
+        "Extracted 'Backup or Restore Wizard' UI from tttt folder (Reborn XP simulator).",
+        "Created a localized app/ntbackup/ directory with index.html and associated assets (backup.png, ntbackup.png).",
+        "Applied the project's standard 'xpdesign.css' to ensure visual consistency with other system wizards.",
+        "Registered 'ntbackup' in appRegistry.js as a non-resizable wizard window.",
+        "Modularized 'ntbackup' by localizing 'xpdesign.css' and its associated 'images/' folder into the app directory for independent operation.",
+        "Cleaned up the temporary 'tttt' directory after successful integration."
+      ]
+    },
+    {
+      "date": "2026-05-16",
+      "action": "Integrated System Properties Application",
+      "description": [
+        "Extracted core 'System Properties' UI from a saved Reborn XP simulator (abcd folder).",
+        "Created a standalone, tab-less app/system-properties/index.html using the project's 'xpdesign.css' system.",
+        "Localized app assets (sys.png, rebuild.png) into the app directory for better modularity.",
+        "Registered 'system-properties' app in appRegistry.js with non-resizable window settings.",
+        "Implemented 'OK' and 'Cancel' button logic using window.parent.postMessage for shell integration.",
+        "Cleaned up the temporary 'abcd' directory after successful extraction and localization."
+      ]
+    },
+    {
+      "date": "2026-05-15",
+      "action": "Integrated Standalone Clock & Date Application",
+      "description": [
+        "Extracted UI components from qqqq simulator to create a functional app/clock.html.",
+        "Implemented real-time analog/digital clock logic and a dynamic calendar system.",
+        "Registered 'timedate' app in appRegistry.js and assigned to desktop column 1.",
+        "Added double-click event to taskbar clock to launch the Date and Time properties window.",
+        "Copied original timedate.png icon to the project image folder for UI consistency."
+      ]
+    },
+    {
+      "date": "2026-05-11",
+      "action": "Enhanced Flight Simulator Realism & Physics",
+      "description": [
+        "Fixed Z-fighting and distant grid flickering by implementing logarithmicDepthBuffer and increasing camera.near distance.",
+        "Adjusted sky background color for better contrast against terrain and engine particle effects.",
+        "Created a native, DOM-based FPS counter directly in index.html, updating every 500ms for stable performance tracking.",
+        "Implemented smooth engine acceleration (lerp) in myShipControl.js to simulate realistic jet engine spool-up when boosting.",
+        "Added 'drop-launch' mechanics to missiles in weaponSystem.js, allowing them to free-fall slightly before engine ignition."
+      ]
+    },
+    {
+      "date": "2026-05-11",
+      "action": "Modularized Flight Simulator Particle Effects",
+      "description": [
+        "Created a standalone particleSystem.js module to manage engine trails independently.",
+        "Refactored myShipControl.js to remove legacy particle functions (spawnParticles, updateTrails).",
+        "Integrated ParticleManager to render distinct visual effects for normal flight (orange flames) and boosting/missiles (white/blue plasma).",
+        "Implemented a temporary 'R' keybinding in weaponSystem.js and myShipControl.js to reload missiles during testing."
+      ]
+    },
+    {
+      "date": "2026-05-04",
+      "action": "Integrated 5 New Screensavers",
+      "description": [
+        "Added 5 new screensavers (Fish, Flying Toasters, Hard Rain, Rainstorm, Starry Night) to app/screensaver/.",
+        "Registered new screensavers in appRegistry.js for system-wide recognition.",
+        "Updated app/properties/displayProperties.html to include new screensavers in the selection list.",
+        "Integrated preview functionality for the new screensavers in app/properties/properties.js."
+      ]
+    },
+    {
+      "date": "2026-04-30",
+      "action": "Implemented Update Screen Overlay Management",
+      "description": [
+        "Created updateManager.js to manage the update screen as a full-screen system overlay.",
+        "Modified update.html to communicate completion status to the parent window via postMessage.",
+        "Integrated UpdateManager into appengine.js, providing a global window.startUpdate() function and message listener to trigger the update sequence.",
+        "Ensured update screen overlay uses a higher z-index (1100) to correctly cover other system components including the logon screen."
+      ]
+    },
+    {
+      "date": "2026-04-30",
+      "action": "Fixed UI gap in Update Screen",
+      "description": [
+        "Reduced vertical spacing between 'Installing Windows Updates...' and warning text in update.html.",
+        "Refactored #text-under-logo ID to .text-under-logo class across update.html, logon.html, and logoff.html for better consistency and to fix duplicate ID usage.",
+        "Implemented dynamic percentage increment logic for the update screen to simulate a realistic Windows update process."
+      ]
+    },
+    {
+      "date": "2026-04-24",
+      "action": "Finalized WMP Full-Screen Playback",
+      "description": [
+        "Implemented .fullscreen-video CSS mode in wmp8.css and integrated Browser Fullscreen API for monitor-level full-screen playback.",
+        "Updated wmplayerManager.js to allow full-screen permissions for the WMP iframe.",
+        "Added event listeners for full-screen toggle button, video double-click, and automatic UI sync via fullscreenchange event."
+      ]
+    },
+    {
+      "date": "2026-04-19",
+      "action": "Integrated Spider Solitaire Menu Bar",
+      "description": [
+        "Enabled functional integration for Spider Solitaire menu bar (New Game, Restart, Difficulty, Hint, Undo, Sound).",
+        "Integrated Windows XP-style menu bar (File, Edit, View, Help) into Spider Solitaire."
+      ]
+    },
+    {
+      "date": "2026-04-19",
+      "action": "Integrated Spider Solitaire",
+      "description": "Added Spider Solitaire to the app registry, placed its icon on the desktop (Column 2), and enabled the shortcut in the Start Menu's Games folder."
+    },
+    {
+      "date": "2026-04-19",
+      "action": "Reorganized Logon Files",
+      "description": "Moved logonManager.js and logon.html into app/logon/ directory and updated all identified references and relative paths."
+    },
+    {
+      "date": "2026-04-14",
+      "action": "Expanded Start Menu App Launcher Integration",
+      "description": "Refactored startMenu.js to use global event delegation utilizing data-app-id and appRegistry.js. Expanded integration beyond the left panel to include right panel items (My Computer, My Documents) and deeply nested functional apps within the 'All Programs' submenu (e.g. Calculator, Pinball, Minesweeper, IE, WMP)."
+    },
+    {
+      "date": "2026-04-14",
+      "action": "Applied window focus controller to apps",
+      "description": "Added focusController.js script to Pikachu Volleyball, HWP Viewer (index.html & editor.html), WMPlayer, PowerPoint, Excel, Word, Flight simulator, Pinball, and Webamp to enable window focus on click."
+    },
+    {
+      "date": "2026-04-13",
+      "action": "Conditional Clippy appearance",
+      "description": "Refactored clippyManager.js to show Clippy only after a successful logon by listening for the 'logonSuccess' message from logonManager."
+    },
+    {
+      "date": "2026-04-13",
+      "action": "Changed Clippy character",
+      "description": "Updated clippyManager.js to load the default 'Clippy' character instead of 'Rover'."
+    },
+    {
+      "date": "2026-04-13",
+      "action": "Registered HWP Viewer and Pikachu Volleyball",
+      "description": "Added configuration for HWP Viewer and Pikachu Volleyball to appRegistry.js and assigned them to Desktop Column 4."
+    },
+    {
+      "date": "2026-03-30",
+      "action": "Created app/displayProperties.html",
+      "description": "Mockup of Windows XP Display Properties window inspired by wins95Portfolio-main."
+    }
+  ],
+  "lastUpdate": "2026-05-20T10:47:00.000Z",
+  "significantChanges": [
+    "Integrated new Windows XP Image Viewer (imagefolder) into the desktop shell, registered it in appRegistry, and enabled seamless image opening from documents.html via postMessage."
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "category": "missile",
+  "model": {
+    "file": "model/aim120d/aim120d.glb",
+    "scale": 1,
+    "initialRotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "initialPosition": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "performance": {
+    "speed": 0,
+    "acceleration": 4000,
+    "maxSpeed": 5000,
+    "agility": 2.0,
+    "accelerationRate": 4.0,
+    "minSpeed": 0,
+    "gravityEffect": 0.0,
+    "gravity": 400.0,
+    "turnDrag": 0.0,
+    "turnSensitivity": 0,
+    "lifespan": 15.0,
+    "ignitionDelay": 0.3,
+    "pitchLimits": {
+      "up": 0,
+      "down": 0
+    },
+    "maxRollAngle": 0
+  },
+  "camera": {
+    "lerpSpeed": 0,
+    "minDistance": 0,
+    "maxDistance": 0,
+    "lookAtDistance": 0,
+    "follow": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "visuals": {
+    "engineHardpoints": [
+      {
+        "x": -110,
+        "y": 0,
+        "z": 0
+      }
+    ]
+  },
+  "destruction": {
+    "explosionScale": 6.0,
+    "health": 10,
+    "damage": 34
+  },
+  "hardpoints": {}
+}

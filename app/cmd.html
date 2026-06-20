@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>cmd.exe</title>
+    <link rel="stylesheet" href="../fonts/fonts.css">
+    <link rel="stylesheet" href="../scroll.css">
+    <script src="../focusController.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #000;
+            color: #c0c0c0;
+            font-family: 'Raster', 'Lucida Console', 'Courier New', monospace;
+            font-size: 14px;
+            height: 100vh;
+            overflow: hidden;
+            cursor: text;
+        }
+
+        #terminal {
+            width: 100%;
+            height: 100%;
+            padding: 4px 6px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #output {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.45;
+        }
+
+        #output::-webkit-scrollbar { width: 8px; }
+        #output::-webkit-scrollbar-track { background: #000; }
+        #output::-webkit-scrollbar-thumb { background: #444; }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            line-height: 1.45;
+        }
+
+        #prompt-span {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        #cmd-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #c0c0c0;
+            font-family: 'Raster', 'Lucida Console', 'Courier New', monospace;
+            font-size: 14px;
+            caret-color: #c0c0c0;
+            min-width: 0;
+        }
+
+        .err  { color: #ff5555; }
+        .warn { color: #ffff55; }
+        .dim  { color: #808080; }
+        .bold { color: #ffffff; }
+        .dir-entry { color: #55ffff; }
+    </style>
+</head>
+<body>
+<div id="terminal">
+    <div id="output"></div>
+    <div class="input-line">
+        <span id="prompt-span">C:\&gt;</span>
+        <input type="text" id="cmd-input" autocomplete="off"
+               spellcheck="false" autocorrect="off" autocapitalize="off" autofocus>
+    </div>
+</div>
+<script>
+// ============================================================
+// Virtual File System
+// ============================================================
+const VFS = {
+    'C:': {
+        type: 'dir',
+        children: {
+            'Documents and Settings': { type: 'dir', children: {
+                'Administrator': { type: 'dir', children: {
+                    'Desktop': { type: 'dir', children: {
+                        'My Computer.lnk':    { type: 'file', size: 1,    date: '2004-08-04' },
+                        'Recycle Bin.lnk':    { type: 'file', size: 1,    date: '2004-08-04' },
+                        'My Documents.lnk':   { type: 'file', size: 1,    date: '2004-08-04' },
+                    }},
+                    'My Documents': { type: 'dir', children: {
+                        'readme.txt':         { type: 'file', size: 1234, date: '2024-01-15',
+                            content: 'Welcome to Windows XP.\r\nThis is a demo readme file.\r\n' },
+                        'My Pictures': { type: 'dir', children: {
+                            'sample.jpg':     { type: 'file', size: 45120, date: '2024-02-20' },
+                        }},
+                        'My Music': { type: 'dir', children: {} },
+                    }},
+                    'Local Settings': { type: 'dir', hidden: true, children: {
+                        'Temp': { type: 'dir', children: {} },
+                    }},
+                    'NTUSER.DAT':   { type: 'file', size: 262144, hidden: true, date: '2024-01-01' },
+                    'ntuser.ini':   { type: 'file', size: 20,     hidden: true, date: '2024-01-01' },
+                }},
+                'All Users':      { type: 'dir', children: {} },
+                'Default User':   { type: 'dir', hidden: true, children: {} },
+            }},
+            'Program Files': { type: 'dir', children: {
+                'Internet Explorer': { type: 'dir', children: {
+                    'iexplore.exe':  { type: 'file', size: 93184,   date: '2004-08-04' },
+                    'IEXPLORE.EXE':  { type: 'file', size: 93184,   date: '2004-08-04' },
+                }},
+                'Windows Media Player': { type: 'dir', children: {
+                    'wmplayer.exe':  { type: 'file', size: 126976,  date: '2004-08-04' },
+                }},
+                'Accessories': { type: 'dir', children: {
+                    'wordpad.exe':   { type: 'file', size: 56320,   date: '2004-08-04' },
+                    'mspaint.exe':   { type: 'file', size: 169984,  date: '2004-08-04' },
+                    'calc.exe':      { type: 'file', size: 114688,  date: '2004-08-04' },
+                }},
+                'Common Files':   { type: 'dir', children: {} },
+            }},
+            'WINDOWS': { type: 'dir', children: {
+                'system32': { type: 'dir', children: {
+                    'cmd.exe':       { type: 'file', size: 388608,  date: '2004-08-04' },
+                    'notepad.exe':   { type: 'file', size: 69120,   date: '2004-08-04' },
+                    'calc.exe':      { type: 'file', size: 114688,  date: '2004-08-04' },
+                    'mspaint.exe':   { type: 'file', size: 169984,  date: '2004-08-04' },
+                    'taskmgr.exe':   { type: 'file', size: 141824,  date: '2004-08-04' },
+                    'regedit.exe':   { type: 'file', size: 146432,  date: '2004-08-04' },
+                    'explorer.exe':  { type: 'file', size: 1032192, date: '2004-08-04' },
+                    'kernel32.dll':  { type: 'file', size: 983552,  date: '2004-08-04' },
+                    'ntdll.dll':     { type: 'file', size: 696832,  date: '2004-08-04' },
+                    'user32.dll':    { type: 'file', size: 577536,  date: '2004-08-04' },
+                    'wininet.dll':   { type: 'file', size: 659456,  date: '2004-08-04' },
+                    'shell32.dll':   { type: 'file', size: 8460288, date: '2004-08-04' },
+                    'svchost.exe':   { type: 'file', size: 14336,   date: '2004-08-04' },
+                    'lsass.exe':     { type: 'file', size: 13312,   date: '2004-08-04' },
+                    'services.exe':  { type: 'file', size: 108544,  date: '2004-08-04' },
+                    'winlogon.exe':  { type: 'file', size: 507904,  date: '2004-08-04' },
+                    'ipconfig.exe':  { type: 'file', size: 17408,   date: '2004-08-04' },
+                    'ping.exe':      { type: 'file', size: 17408,   date: '2004-08-04' },
+                    'net.exe':       { type: 'file', size: 22016,   date: '2004-08-04' },
+                    'netstat.exe':   { type: 'file', size: 24576,   date: '2004-08-04' },
+                    'attrib.exe':    { type: 'file', size: 6656,    date: '2004-08-04' },
+                    'format.com':    { type: 'file', size: 30208,   date: '2004-08-04' },
+                    'chkdsk.exe':    { type: 'file', size: 27648,   date: '2004-08-04' },
+                    'xcopy.exe':     { type: 'file', size: 43008,   date: '2004-08-04' },
+                    'tree.com':      { type: 'file', size: 2048,    date: '2004-08-04' },
+                    'find.exe':      { type: 'file', size: 16896,   date: '2004-08-04' },
+                    'more.com':      { type: 'file', size: 6144,    date: '2004-08-04' },
+                    'sort.exe':      { type: 'file', size: 7168,    date: '2004-08-04' },
+                }},
+                'system': { type: 'dir', children: {} },
+                'Fonts': { type: 'dir', children: {
+                    'tahoma.ttf':    { type: 'file', size: 233472,  date: '2004-08-04' },
+                    'arial.ttf':     { type: 'file', size: 354576,  date: '2004-08-04' },
+                    'times.ttf':     { type: 'file', size: 261088,  date: '2004-08-04' },
+                    'cour.ttf':      { type: 'file', size: 257592,  date: '2004-08-04' },
+                    'lucon.ttf':     { type: 'file', size: 161720,  date: '2004-08-04' },
+                }},
+                'inf': { type: 'dir', hidden: true, children: {} },
+                'Prefetch': { type: 'dir', hidden: true, children: {} },
+                'Temp': { type: 'dir', children: {} },
+                'regedit.exe':   { type: 'file', size: 146432, date: '2004-08-04' },
+                'explorer.exe':  { type: 'file', size: 1032192, date: '2004-08-04' },
+                'notepad.exe':   { type: 'file', size: 69120,  date: '2004-08-04' },
+                'winhelp.exe':   { type: 'file', size: 256512, date: '2004-08-04' },
+            }},
+            'Recycled':       { type: 'dir', hidden: true, children: {} },
+            'pagefile.sys':   { type: 'file', size: 805306368, hidden: true, date: '2024-01-01' },
+            'AUTOEXEC.BAT':   { type: 'file', size: 0,  date: '2004-08-04', content: '' },
+            'CONFIG.SYS':     { type: 'file', size: 0,  date: '2004-08-04', content: '' },
+            'boot.ini':       { type: 'file', size: 211, hidden: true, date: '2004-08-04',
+                content: '[boot loader]\r\ntimeout=30\r\ndefault=multi(0)disk(0)rdisk(0)partition(1)\\WINDOWS\r\n[operating systems]\r\nmulti(0)disk(0)rdisk(0)partition(1)\\WINDOWS="Microsoft Windows XP Professional" /noexecute=optin /fastdetect\r\n' },
+            'ntdetect.com':   { type: 'file', size: 47564, hidden: true, date: '2004-08-04' },
+            'ntldr':          { type: 'file', size: 251184, hidden: true, date: '2004-08-04' },
+        }
+    }
+};
+
+// ============================================================
+// State
+// ============================================================
+let currentPath = 'C:\\';
+let currentDrive = 'C:';
+let promptTemplate = '$P$G'; // Windows default prompt
+let titleOverride = null;
+let historyBuffer = [];
+let historyIndex = -1;
+let bgColor = '#000000';
+let fgColor = '#c0c0c0';
+let showHidden = false;
+
+// Environment variables
+const ENV = {
+    'ALLUSERSPROFILE': 'C:\\Documents and Settings\\All Users',
+    'APPDATA': 'C:\\Documents and Settings\\Administrator\\Application Data',
+    'COMSPEC': 'C:\\WINDOWS\\system32\\cmd.exe',
+    'HOMEDRIVE': 'C:',
+    'HOMEPATH': '\\Documents and Settings\\Administrator',
+    'LOGONSERVER': '\\\\ADMINISTRATOR',
+    'NUMBER_OF_PROCESSORS': '1',
+    'OS': 'Windows_NT',
+    'PATHEXT': '.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH',
+    'PROCESSOR_ARCHITECTURE': 'x86',
+    'PROCESSOR_IDENTIFIER': 'x86 Family 6 Model 37 Stepping 5, GenuineIntel',
+    'PROCESSOR_LEVEL': '6',
+    'PROCESSOR_REVISION': '2505',
+    'ProgramFiles': 'C:\\Program Files',
+    'SESSIONNAME': 'Console',
+    'SystemDrive': 'C:',
+    'SystemRoot': 'C:\\WINDOWS',
+    'TEMP': 'C:\\WINDOWS\\TEMP',
+    'TMP': 'C:\\WINDOWS\\TEMP',
+    'PATH': 'C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem',
+    'USERNAME': 'Administrator',
+    'USERPROFILE': 'C:\\Documents and Settings\\Administrator',
+    'WINDIR': 'C:\\WINDOWS',
+};
+
+// ============================================================
+// DOM references
+// ============================================================
+const output   = document.getElementById('output');
+const input    = document.getElementById('cmd-input');
+const promptEl = document.getElementById('prompt-span');
+
+// ============================================================
+// Helpers
+// ============================================================
+function scrollToBottom() {
+    output.scrollTop = output.scrollHeight;
+}
+
+function appendLine(text, cls) {
+    const span = document.createElement('span');
+    if (cls) span.className = cls;
+    span.textContent = text + '\n';
+    output.appendChild(span);
+    scrollToBottom();
+}
+
+function appendRaw(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    output.appendChild(div);
+    scrollToBottom();
+}
+
+function getPromptStr() {
+    let p = promptTemplate;
+    p = p.replace(/\$P/gi, currentPath);
+    p = p.replace(/\$G/gi, '>');
+    p = p.replace(/\$L/gi, '<');
+    p = p.replace(/\$B/gi, '|');
+    p = p.replace(/\$Q/gi, '=');
+    p = p.replace(/\$N/gi, currentDrive.replace(':', ''));
+    p = p.replace(/\$_/gi, '\n');
+    p = p.replace(/\$\$/gi, '$');
+    const d = new Date();
+    p = p.replace(/\$D/gi, d.toLocaleDateString('en-US'));
+    p = p.replace(/\$T/gi, d.toLocaleTimeString('en-US'));
+    return p;
+}
+
+function updatePrompt() {
+    promptEl.textContent = getPromptStr();
+    if (titleOverride) {
+        document.title = titleOverride;
+    } else {
+        document.title = `${currentPath} - cmd.exe`;
+    }
+}
+
+// ============================================================
+// VFS Navigation
+// ============================================================
+function resolvePath(path, base) {
+    if (!path) return base || currentPath;
+
+    // Drive-absolute
+    if (/^[A-Z]:\\/i.test(path)) {
+        return normalizePath(path);
+    }
+    // Drive-relative (e.g., C:foo)
+    if (/^[A-Z]:/i.test(path)) {
+        return normalizePath(path.slice(0, 2) + '\\' + path.slice(2));
+    }
+    // Absolute from current drive
+    if (path.startsWith('\\')) {
+        return normalizePath(currentDrive + path);
+    }
+
+    // Relative
+    const b = base || currentPath;
+    return normalizePath(b + '\\' + path);
+}
+
+function normalizePath(p) {
+    // Collapse separators
+    p = p.replace(/\//g, '\\');
+    const drive = p.match(/^[A-Z]:/i)?.[0]?.toUpperCase() || '';
+    let rest = p.slice(drive.length);
+    const parts = rest.split('\\').filter(Boolean);
+    const stack = [];
+    for (const part of parts) {
+        if (part === '.') continue;
+        if (part === '..') { stack.pop(); }
+        else stack.push(part);
+    }
+    return drive + '\\' + stack.join('\\');
+}
+
+function getVFSNode(path) {
+    const norm = normalizePath(path);
+    const drive = norm.match(/^([A-Z]:)/i)?.[1]?.toUpperCase();
+    if (!drive || !VFS[drive]) return null;
+
+    let node = VFS[drive];
+    const rest = norm.slice(drive.length + 1); // strip "C:\"
+    if (!rest) return node;
+
+    for (const part of rest.split('\\').filter(Boolean)) {
+        if (!node.children) return null;
+        const key = Object.keys(node.children).find(k => k.toLowerCase() === part.toLowerCase());
+        if (!key) return null;
+        node = node.children[key];
+    }
+    return node;
+}
+
+function setVFSNode(path, value) {
+    const norm = normalizePath(path);
+    const drive = norm.match(/^([A-Z]:)/i)?.[1]?.toUpperCase();
+    if (!drive || !VFS[drive]) return false;
+
+    const parts = norm.slice(drive.length + 1).split('\\').filter(Boolean);
+    if (parts.length === 0) return false;
+
+    let node = VFS[drive];
+    for (let i = 0; i < parts.length - 1; i++) {
+        const key = Object.keys(node.children || {}).find(k => k.toLowerCase() === parts[i].toLowerCase());
+        if (!key) return false;
+        node = node.children[key];
+    }
+    const last = parts[parts.length - 1];
+    if (!node.children) node.children = {};
+    if (value === null) {
+        const key = Object.keys(node.children).find(k => k.toLowerCase() === last.toLowerCase());
+        if (key) delete node.children[key];
+    } else {
+        node.children[last] = value;
+    }
+    return true;
+}
+
+function formatSize(bytes) {
+    return bytes.toLocaleString().padStart(14);
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) dateStr = new Date().toISOString().slice(0,10);
+    const d = new Date(dateStr);
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+}
+
+// ============================================================
+// Commands
+// ============================================================
+const CMDS = {};
+
+CMDS.help = function(args) {
+    const lines = [
+        'For more information on a specific command, type HELP command-name',
+        '',
+        'ATTRIB    Displays or changes file attributes.',
+        'CD        Displays the name of or changes the current directory.',
+        'CHKDSK    Checks a disk and displays a status report.',
+        'CLS       Clears the screen.',
+        'COLOR     Sets the default console foreground and background colors.',
+        'COPY      Copies one or more files to another location.',
+        'DATE      Displays or sets the date.',
+        'DEL       Deletes one or more files.',
+        'DIR       Displays a list of files and subdirectories in a directory.',
+        'ECHO      Displays messages, or turns command echoing on or off.',
+        'EXIT      Quits the CMD.EXE program (command interpreter).',
+        'FORMAT    Formats a disk for use with Windows.',
+        'HELP      Provides Help information for Windows commands.',
+        'IPCONFIG  Displays all current TCP/IP network configuration values.',
+        'MD        Creates a directory.',
+        'MKDIR     Creates a directory.',
+        'MOVE      Moves one or more files from one directory to another.',
+        'NETSTAT   Displays active TCP connections.',
+        'PATH      Displays or sets a search path for executable files.',
+        'PAUSE     Suspends processing of a batch program.',
+        'PING      Tests network connectivity.',
+        'PROMPT    Changes the Windows command prompt.',
+        'RD        Removes a directory.',
+        'REN       Renames a file or files.',
+        'RENAME    Renames a file or files.',
+        'RMDIR     Removes a directory.',
+        'SET       Displays, sets, or removes Windows environment variables.',
+        'SHUTDOWN  Allows proper local or remote shutdown of machine.',
+        'SORT      Sorts input.',
+        'SYSTEMINFO Displays machine specific properties and configuration.',
+        'TASKLIST  Displays current running processes (Task List).',
+        'TIME      Displays or sets the system time.',
+        'TITLE     Sets the window title for a CMD.EXE session.',
+        'TREE      Graphically displays the directory structure of a drive.',
+        'TYPE      Displays the contents of a text file.',
+        'VER       Displays the Windows version.',
+        'XCOPY     Copies files and directory trees.',
+        '',
+        'Application shortcuts:',
+        '  NOTEPAD   Opens Notepad',
+        '  CALC      Opens Calculator',
+        '  MSPAINT   Opens Paint',
+        '  WMPLAYER  Opens Windows Media Player',
+        '  EXPLORER  Opens Windows Explorer',
+    ];
+    lines.forEach(l => appendLine(l));
+};
+
+CMDS.ver = function() {
+    appendLine('');
+    appendLine('Microsoft Windows XP [Version 5.1.2600]');
+    appendLine('(C) Copyright 1985-2001 Microsoft Corp.');
+    appendLine('');
+};
+
+CMDS.cls = function() {
+    output.innerHTML = '';
+};
+
+CMDS.echo = function(args) {
+    if (args.length === 0) {
+        appendLine('ECHO is on.');
+        return;
+    }
+    const text = args.join(' ');
+    if (text.toLowerCase() === 'on' || text.toLowerCase() === 'off') {
+        appendLine(`ECHO is ${text.toLowerCase()}.`);
+        return;
+    }
+    appendLine(text);
+};
+
+CMDS.dir = function(args) {
+    let target = currentPath;
+    let showAll = false;
+    const filteredArgs = args.filter(a => {
+        if (a === '/a' || a === '/a:h' || a === '/ah') { showAll = true; return false; }
+        if (a.startsWith('/')) return false;
+        return true;
+    });
+    if (filteredArgs.length > 0) {
+        target = resolvePath(filteredArgs[0]);
+    }
+
+    const node = getVFSNode(target);
+    if (!node) {
+        appendLine(`The system cannot find the path specified.`, 'err');
+        return;
+    }
+    if (node.type === 'file') {
+        appendLine(`File Not Found`, 'err');
+        return;
+    }
+
+    appendLine('');
+    appendLine(` Volume in drive C has no label.`);
+    appendLine(` Volume Serial Number is 2C9F-4D2A`);
+    appendLine('');
+    appendLine(` Directory of ${normalizePath(target)}`);
+    appendLine('');
+
+    const children = node.children || {};
+    let fileCount = 0, dirCount = 0, totalSize = 0;
+
+    const entries = Object.entries(children);
+    // Add . and ..
+    const now = formatDate(new Date().toISOString().slice(0,10));
+    appendLine(`${now}  12:00 PM    <DIR>          .`);
+    appendLine(`${now}  12:00 PM    <DIR>          ..`);
+
+    entries.sort(([a, av], [b, bv]) => {
+        if (av.type === 'dir' && bv.type !== 'dir') return -1;
+        if (av.type !== 'dir' && bv.type === 'dir') return 1;
+        return a.localeCompare(b);
+    }).forEach(([name, item]) => {
+        if (item.hidden && !showAll) return;
+        const d = formatDate(item.date || '');
+        if (item.type === 'dir') {
+            appendLine(`${d}  12:00 PM    <DIR>          ${name}`);
+            dirCount++;
+        } else {
+            const sz = formatSize(item.size || 0);
+            appendLine(`${d}  12:00 PM  ${sz} ${name}`);
+            fileCount++;
+            totalSize += item.size || 0;
+        }
+    });
+
+    appendLine(`${' '.repeat(15)}${fileCount} File(s)${formatSize(totalSize)} bytes`);
+    appendLine(`${' '.repeat(15)}${dirCount} Dir(s)  ${formatSize(1073741824)} bytes free`);
+    appendLine('');
+};
+
+CMDS.cd = function(args) {
+    if (args.length === 0 || args[0] === '/d') {
+        if (args[0] === '/d' && args[1]) {
+            const newPath = resolvePath(args[1]);
+            const node = getVFSNode(newPath);
+            if (!node || node.type !== 'dir') {
+                appendLine(`The system cannot find the path specified.`, 'err');
+                return;
+            }
+            currentPath = normalizePath(newPath);
+            currentDrive = currentPath.match(/^([A-Z]:)/i)?.[1]?.toUpperCase() || currentDrive;
+        } else {
+            appendLine(currentPath);
+        }
+        return;
+    }
+
+    const target = args[0];
+    const newPath = resolvePath(target);
+    const node = getVFSNode(newPath);
+    if (!node || node.type !== 'dir') {
+        appendLine(`The system cannot find the path specified.`, 'err');
+        return;
+    }
+    currentPath = normalizePath(newPath);
+};
+
+CMDS.chdir = CMDS.cd;
+
+CMDS.mkdir = function(args) {
+    if (args.length === 0) {
+        appendLine('The syntax of the command is incorrect.', 'err');
+        return;
+    }
+    const newPath = resolvePath(args[0]);
+    const existing = getVFSNode(newPath);
+    if (existing) {
+        appendLine(`A subdirectory or file ${args[0]} already exists.`, 'err');
+        return;
+    }
+    setVFSNode(newPath, { type: 'dir', children: {}, date: new Date().toISOString().slice(0,10) });
+};
+CMDS.md = CMDS.mkdir;
+
+CMDS.rmdir = function(args) {
+    if (args.length === 0) {
+        appendLine('The syntax of the command is incorrect.', 'err');
+        return;
+    }
+    const filteredArgs = args.filter(a => a !== '/s' && a !== '/q');
+    const target = resolvePath(filteredArgs[0]);
+    const node = getVFSNode(target);
+    if (!node) {
+        appendLine(`The system cannot find the path specified.`, 'err');
+        return;
+    }
+    if (node.type !== 'dir') {
+        appendLine(`The directory name is invalid.`, 'err');
+        return;
+    }
+    if (Object.keys(node.children || {}).length > 0 && !args.includes('/s')) {
+        appendLine(`The directory is not empty.`, 'err');
+        return;
+    }
+    setVFSNode(target, null);
+};
+CMDS.rd = CMDS.rmdir;
+
+CMDS.del = function(args) {
+    if (args.length === 0) {
+        appendLine('The syntax of the command is incorrect.', 'err');
+        return;
+    }
+    const filteredArgs = args.filter(a => !a.startsWith('/'));
+    const target = resolvePath(filteredArgs[0]);
+    const node = getVFSNode(target);
+    if (!node) {
+        appendLine(`Could Not Find ${normalizePath(target)}`, 'err');
+        return;
+    }
+    if (node.type === 'dir') {
+        appendLine(`Access is denied.`, 'err');
+        return;
+    }
+    setVFSNode(target, null);
+};
+CMDS.erase = CMDS.del;
+
+CMDS.copy = function(args) {
+    const filtered = args.filter(a => !a.startsWith('/'));
+    if (filtered.length < 2) {
+        appendLine('The syntax of the command is incorrect.', 'err');
+        return;
+    }
+    const src = resolvePath(filtered[0]);
+    const dst = resolvePath(filtered[1]);
+    const srcNode = getVFSNode(src);
+    if (!srcNode || srcNode.type !== 'file') {
+        appendLine(`The system cannot find the file specified.`, 'err');
+        return;
+    }
+    setVFSNode(dst, { ...srcNode, date: new Date().toISOString().slice(0,10) });
+    appendLine(`        1 file(s) copied.`);
+};
+
+CMDS.move = function(args) {
+    const filtered = args.filter(a => !a.startsWith('/'));
+    if (filtered.length < 2) {
+        appendLine('The syntax of the command is incorrect.', 'err');
+        return;
+    }
+    const src = resolvePath(filtered[0]);
+    const srcNode = getVFSNode(src);
+    if (!srcNode) {
+        appendLine(`The system cannot find the file specified.`, 'err');
+        return;
+    }
+    let dst = resolvePath(filtered[1]);
+    const dstNode = getVFSNode(dst);
+    if (dstNode && dstNode.type === 'dir') {
+        const fileName = src.split('\\').pop();
+        dst = normalizePath(dst + '\\' + fileName);
+    }
+    setVFSNode(dst, srcNode);
+    setVFSNode(src, null);
+    appendLine(`        1 file(s) moved.`);
+};
+
+CMDS.ren = function(args) {
+    if (args.length < 2) {
+        appendLine('The syntax of the command is incorrect.', 'err');
+        return;
+    }
+    const src = resolvePath(args[0]);
+    const srcNode = getVFSNode(src);
+    if (!srcNode) {
+        appendLine(`The system cannot find the file specified.`, 'err');
+        return;
+    }
+    const parentPath = src.substring(0, src.lastIndexOf('\\'));
+    const dst = normalizePath(parentPath + '\\' + args[1]);
+    setVFSNode(dst, srcNode);
+    setVFSNode(src, null);
+};
+CMDS.rename = CMDS.ren;
+
+CMDS.type = function(args) {
+    if (args.length === 0) {
+        appendLine('The syntax of the command is incorrect.', 'err');
+        return;
+    }
+    const target = resolvePath(args[0]);
+    const node = getVFSNode(target);
+    if (!node || node.type !== 'file') {
+        appendLine(`The system cannot find the file specified.`, 'err');
+        return;
+    }
+    if (node.content !== undefined) {
+        node.content.split('\n').forEach(l => appendLine(l.replace('\r', '')));
+    } else {
+        appendLine(`[Binary file - cannot display content]`, 'dim');
+    }
+};
+
+CMDS.attrib = function(args) {
+    const target = resolvePath(args.find(a => !a.startsWith('/') && !a.startsWith('+') && !a.startsWith('-')) || '');
+    const node = getVFSNode(target || currentPath);
+    if (!node) {
+        appendLine(`File not found - ${args[0]}`, 'err');
+        return;
+    }
+    if (node.type === 'dir') {
+        appendLine(`           ${normalizePath(target || currentPath)}`);
+        return;
+    }
+    const h = node.hidden ? 'H' : ' ';
+    const r = node.readOnly ? 'R' : ' ';
+    appendLine(`${r}  ${h}      ${normalizePath(target)}`);
+};
+
+CMDS.tree = function(args) {
+    const target = args.find(a => !a.startsWith('/')) || currentPath;
+    const resolved = resolvePath(target);
+    const node = getVFSNode(resolved);
+    if (!node || node.type !== 'dir') {
+        appendLine(`Invalid path.`, 'err');
+        return;
+    }
+    appendLine(`Folder PATH listing for volume Windows XP`);
+    appendLine(`Volume serial number is 2C9F-4D2A`);
+    appendLine(normalizePath(resolved));
+    renderTree(node, '');
+};
+
+function renderTree(node, prefix) {
+    if (!node.children) return;
+    const entries = Object.entries(node.children)
+        .filter(([,v]) => v.type === 'dir')
+        .sort(([a],[b]) => a.localeCompare(b));
+    entries.forEach(([name, child], i) => {
+        const isLast = i === entries.length - 1;
+        appendLine(`${prefix}${isLast ? '└───' : '├───'}${name}`);
+        renderTree(child, prefix + (isLast ? '    ' : '│   '));
+    });
+}
+
+CMDS.date = function(args) {
+    const d = new Date();
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const day = days[d.getDay()];
+    appendLine(`The current date is: ${day} ${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`);
+    appendLine(`Enter the new date: (Press ENTER to skip)`);
+};
+
+CMDS.time = function(args) {
+    const d = new Date();
+    const h = String(d.getHours()).padStart(2,'0');
+    const m = String(d.getMinutes()).padStart(2,'0');
+    const s = String(d.getSeconds()).padStart(2,'0');
+    const cs = String(d.getMilliseconds()).slice(0,2).padStart(2,'0');
+    appendLine(`The current time is: ${h}:${m}:${s}.${cs}`);
+    appendLine(`Enter the new time: (Press ENTER to skip)`);
+};
+
+CMDS.pause = function() {
+    appendLine(`Press any key to continue . . .`);
+};
+
+CMDS.set = function(args) {
+    if (args.length === 0) {
+        Object.entries(ENV).sort().forEach(([k,v]) => appendLine(`${k}=${v}`));
+        return;
+    }
+    const eq = args[0].indexOf('=');
+    if (eq === -1) {
+        const key = args[0].toUpperCase();
+        const val = Object.entries(ENV).find(([k]) => k.toUpperCase() === key);
+        if (val) appendLine(`${val[0]}=${val[1]}`);
+        else appendLine(`Environment variable ${args[0]} not defined`, 'err');
+    } else {
+        const key = args[0].slice(0, eq);
+        const val = args[0].slice(eq + 1);
+        if (val === '') delete ENV[key];
+        else ENV[key] = val;
+    }
+};
+
+CMDS.path = function(args) {
+    if (args.length === 0) {
+        appendLine(`PATH=${ENV['PATH']}`);
+    } else {
+        ENV['PATH'] = args.join(' ');
+    }
+};
+
+CMDS.prompt = function(args) {
+    if (args.length === 0) {
+        promptTemplate = '$P$G';
+    } else {
+        promptTemplate = args.join(' ');
+    }
+    updatePrompt();
+};
+
+CMDS.title = function(args) {
+    const t = args.join(' ');
+    titleOverride = t || null;
+    document.title = t || `${currentPath} - cmd.exe`;
+};
+
+CMDS.color = function(args) {
+    const COLORS = {
+        '0': '#000000', '1': '#000080', '2': '#008000', '3': '#008080',
+        '4': '#800000', '5': '#800080', '6': '#808000', '7': '#c0c0c0',
+        '8': '#808080', '9': '#0000ff', 'a': '#00ff00', 'b': '#00ffff',
+        'c': '#ff0000', 'd': '#ff00ff', 'e': '#ffff00', 'f': '#ffffff',
+    };
+    if (args.length === 0) {
+        document.body.style.backgroundColor = '#000000';
+        document.body.style.color = '#c0c0c0';
+        input.style.color = '#c0c0c0';
+        promptEl.style.color = '#c0c0c0';
+        return;
+    }
+    const code = args[0].toLowerCase();
+    if (code.length !== 2 || !COLORS[code[0]] || !COLORS[code[1]]) {
+        appendLine(`Invalid color code.`, 'err');
+        return;
+    }
+    if (code[0] === code[1]) {
+        appendLine(`The specified colors cannot be the same.`, 'err');
+        return;
+    }
+    document.body.style.backgroundColor = COLORS[code[0]];
+    document.body.style.color = COLORS[code[1]];
+    input.style.color = COLORS[code[1]];
+    promptEl.style.color = COLORS[code[1]];
+};
+
+CMDS.ipconfig = function(args) {
+    const all = args.includes('/all');
+    appendLine('');
+    appendLine('Windows IP Configuration');
+    if (all) {
+        appendLine('');
+        appendLine('        Host Name . . . . . . . . . . . . : ADMINISTRATOR-PC');
+        appendLine('        Primary Dns Suffix  . . . . . . . :');
+        appendLine('        Node Type . . . . . . . . . . . . : Unknown');
+        appendLine('        IP Routing Enabled. . . . . . . . : No');
+        appendLine('        WINS Proxy Enabled. . . . . . . . : No');
+    }
+    appendLine('');
+    appendLine('Ethernet adapter Local Area Connection:');
+    appendLine('');
+    if (all) {
+        appendLine('        Connection-specific DNS Suffix  . :');
+        appendLine('        Description . . . . . . . . . . . : Intel(R) PRO/100 VE Network Connection');
+        appendLine('        Physical Address. . . . . . . . . : 00-0C-F1-A2-B3-C4');
+        appendLine('        Dhcp Enabled. . . . . . . . . . . : Yes');
+        appendLine('        Autoconfiguration Enabled . . . . : Yes');
+    }
+    appendLine('        IP Address. . . . . . . . . . . . : 192.168.1.100');
+    appendLine('        Subnet Mask . . . . . . . . . . . : 255.255.255.0');
+    appendLine('        Default Gateway . . . . . . . . . : 192.168.1.1');
+    if (all) {
+        appendLine('        DHCP Server . . . . . . . . . . . : 192.168.1.1');
+        appendLine('        DNS Servers . . . . . . . . . . . : 8.8.8.8');
+        appendLine('                                            8.8.4.4');
+        appendLine('        Lease Obtained. . . . . . . . . . : Saturday, April 01, 2024 9:00:00 AM');
+        appendLine('        Lease Expires . . . . . . . . . . : Sunday, April 02, 2024 9:00:00 AM');
+    }
+    appendLine('');
+};
+
+CMDS.ping = function(args) {
+    if (args.length === 0) {
+        appendLine('Usage: ping [-t] [-a] [-n count] [-l size] [-f] [-i TTL]', 'err');
+        appendLine('            [-v TOS] [-r count] [-s count] [[-j host-list] |', 'err');
+        appendLine('            [-k host-list]] [-w timeout] target_name', 'err');
+        return;
+    }
+    const host = args.find(a => !a.startsWith('-')) || args[args.length-1];
+    const ip = host === 'localhost' ? '127.0.0.1'
+             : host === 'google.com' ? '142.250.207.46'
+             : host === '127.0.0.1' ? '127.0.0.1'
+             : `192.168.1.${Math.floor(Math.random()*254)+1}`;
+    appendLine('');
+    appendLine(`Pinging ${host} [${ip}] with 32 bytes of data:`);
+    appendLine('');
+    const times = [12, 11, 13, 12].map(() => Math.floor(Math.random()*15)+8);
+    times.forEach(t => appendLine(`Reply from ${ip}: bytes=32 time=${t}ms TTL=128`));
+    appendLine('');
+    appendLine(`Ping statistics for ${ip}:`);
+    appendLine(`    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),`);
+    appendLine(`Approximate round trip times in milli-seconds:`);
+    const min = Math.min(...times), max = Math.max(...times);
+    const avg = Math.round(times.reduce((a,b) => a+b, 0)/times.length);
+    appendLine(`    Minimum = ${min}ms, Maximum = ${max}ms, Average = ${avg}ms`);
+    appendLine('');
+};
+
+CMDS.tasklist = function(args) {
+    appendLine('');
+    appendLine('Image Name                   PID Session Name        Session#    Mem Usage');
+    appendLine('========================= ====== ================ =========== ============');
+    const procs = [
+        ['System Idle Process',          '0', 'Console',    '0',   '28 K'],
+        ['System',                        '4', 'Console',    '0',  '252 K'],
+        ['smss.exe',                    '344', 'Console',    '0',  '424 K'],
+        ['csrss.exe',                   '592', 'Console',    '0',  '3,876 K'],
+        ['winlogon.exe',                '616', 'Console',    '0',  '4,232 K'],
+        ['services.exe',                '660', 'Console',    '0',  '3,148 K'],
+        ['lsass.exe',                   '672', 'Console',    '0',  '1,564 K'],
+        ['svchost.exe',                 '836', 'Console',    '0',  '4,556 K'],
+        ['svchost.exe',                 '912', 'Console',    '0',  '3,188 K'],
+        ['svchost.exe',                 '996', 'Console',    '0', '22,368 K'],
+        ['svchost.exe',                '1084', 'Console',    '0',  '3,220 K'],
+        ['svchost.exe',                '1136', 'Console',    '0',  '4,112 K'],
+        ['spoolsv.exe',                '1280', 'Console',    '0',  '4,484 K'],
+        ['explorer.exe',               '1620', 'Console',    '0', '14,892 K'],
+        ['cmd.exe',                    '2148', 'Console',    '0',  '2,612 K'],
+    ];
+    procs.forEach(([name, pid, sess, sessn, mem]) => {
+        appendLine(`${name.padEnd(25)} ${pid.padStart(6)} ${sess.padEnd(16)} ${sessn.padStart(11)} ${mem.padStart(12)}`);
+    });
+    appendLine('');
+};
+
+CMDS.netstat = function(args) {
+    appendLine('');
+    appendLine('Active Connections');
+    appendLine('');
+    appendLine('  Proto  Local Address          Foreign Address        State');
+    const conns = [
+        ['TCP', '0.0.0.0:135',       '0.0.0.0:0',            'LISTENING'],
+        ['TCP', '0.0.0.0:445',       '0.0.0.0:0',            'LISTENING'],
+        ['TCP', '127.0.0.1:1034',    '127.0.0.1:1035',       'ESTABLISHED'],
+        ['TCP', '192.168.1.100:139', '0.0.0.0:0',            'LISTENING'],
+        ['TCP', '192.168.1.100:1035','192.168.1.1:80',       'ESTABLISHED'],
+        ['UDP', '0.0.0.0:445',       '*:*',                  ''],
+        ['UDP', '0.0.0.0:500',       '*:*',                  ''],
+        ['UDP', '127.0.0.1:1031',    '*:*',                  ''],
+    ];
+    conns.forEach(([proto, local, foreign, state]) => {
+        appendLine(`  ${proto.padEnd(6)} ${local.padEnd(22)} ${foreign.padEnd(22)} ${state}`);
+    });
+    appendLine('');
+};
+
+CMDS.systeminfo = function() {
+    const now = new Date();
+    const boot = new Date(now - 3600000 * 24 * 7);
+    appendLine('');
+    appendLine('Host Name:                 ADMINISTRATOR-PC');
+    appendLine('OS Name:                   Microsoft Windows XP Professional');
+    appendLine('OS Version:                5.1.2600 Service Pack 3 Build 2600');
+    appendLine('OS Manufacturer:           Microsoft Corporation');
+    appendLine('OS Configuration:          Standalone Workstation');
+    appendLine('OS Build Type:             Uniprocessor Free');
+    appendLine('Registered Owner:          Administrator');
+    appendLine('Registered Organization:   N/A');
+    appendLine('Product ID:                55274-640-7616372-23020');
+    appendLine(`Original Install Date:     8/4/2004, 12:00:00 AM`);
+    appendLine(`System Boot Time:          ${boot.toLocaleDateString('en-US')} ${boot.toLocaleTimeString('en-US')}`);
+    appendLine('System Manufacturer:       VMware, Inc.');
+    appendLine('System Model:              VMware Virtual Platform');
+    appendLine('System Type:               X86-based PC');
+    appendLine('Processor(s):              1 Processor(s) Installed.');
+    appendLine('                           [01]: x86 Family 6 Model 37 Stepping 5 GenuineIntel ~2400 Mhz');
+    appendLine('BIOS Version:              INTEL - 6040000');
+    appendLine('Windows Directory:         C:\\WINDOWS');
+    appendLine('System Directory:          C:\\WINDOWS\\system32');
+    appendLine('Boot Device:               \\Device\\HarddiskVolume1');
+    appendLine('System Locale:             en-us;English (United States)');
+    appendLine('Input Locale:              en-us;English (United States)');
+    appendLine(`Current Time Zone:         (UTC+09:00) Seoul`);
+    appendLine('Total Physical Memory:     512 MB');
+    appendLine('Available Physical Memory: 156 MB');
+    appendLine('Virtual Memory: Max Size:  2,048 MB');
+    appendLine('Virtual Memory: Available: 1,734 MB');
+    appendLine('Virtual Memory: In Use:    314 MB');
+    appendLine('Page File Location(s):     C:\\pagefile.sys');
+    appendLine('Domain:                    WORKGROUP');
+    appendLine('Logon Server:              \\\\ADMINISTRATOR-PC');
+    appendLine('Hotfix(s):                 3 Hotfix(s) Installed.');
+    appendLine('                           [01]: Q147222');
+    appendLine('                           [02]: KB896358');
+    appendLine('                           [03]: KB912812');
+    appendLine('Network Card(s):           1 NIC(s) Installed.');
+    appendLine('                           [01]: Intel(R) PRO/100 VE Network Connection');
+    appendLine('                                 Connection Name: Local Area Connection');
+    appendLine('                                 DHCP Enabled:    Yes');
+    appendLine('                                 DHCP Server:     192.168.1.1');
+    appendLine('                                 IP address(es)');
+    appendLine('                                 [01]: 192.168.1.100');
+    appendLine('');
+};
+
+CMDS.chkdsk = function(args) {
+    appendLine('The type of the file system is NTFS.');
+    appendLine('');
+    appendLine('WARNING!  F parameter not specified.');
+    appendLine('Running CHKDSK in read-only mode.');
+    appendLine('');
+    appendLine('CHKDSK is verifying files (stage 1 of 3)...');
+    appendLine('  File verification completed.');
+    appendLine('CHKDSK is verifying indexes (stage 2 of 3)...');
+    appendLine('  Index verification completed.');
+    appendLine('CHKDSK is verifying security descriptors (stage 3 of 3)...');
+    appendLine('  Security descriptor verification completed.');
+    appendLine('');
+    appendLine('    39,070,719 KB total disk space.');
+    appendLine('    15,352,448 KB in 18,392 files.');
+    appendLine('     4,096 KB in 2,042 indexes.');
+    appendLine('         0 KB in bad sectors.');
+    appendLine('       547 KB in use by the system.');
+    appendLine('        65,536 KB occupied by the log file.');
+    appendLine('    23,713,628 KB available on disk.');
+    appendLine('');
+    appendLine('        4,096 bytes in each allocation unit.');
+    appendLine('    9,767,679 total allocation units on disk.');
+    appendLine('    5,928,407 allocation units available on disk.');
+    appendLine('');
+};
+
+CMDS.format = function(args) {
+    if (!args[0]) { appendLine('Required parameter missing', 'err'); return; }
+    appendLine(`The type of the file system is NTFS.`);
+    appendLine(`Enter current volume label for drive ${args[0].toUpperCase()}: `);
+    appendLine(`Format canceled.`);
+};
+
+CMDS.xcopy = function(args) {
+    const filtered = args.filter(a => !a.startsWith('/'));
+    if (filtered.length < 2) { appendLine('The syntax of the command is incorrect.', 'err'); return; }
+    appendLine(`        1 File(s) copied`);
+};
+
+CMDS.sort = function(args) { appendLine('(No input to sort)', 'dim'); };
+CMDS.find = function(args) { appendLine(`File not found - ${args[0] || ''}`, 'err'); };
+
+CMDS.exit = function() {
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'closeWindow' }, '*');
+    } else {
+        window.close();
+    }
+};
+
+CMDS.notepad = function() { launchApp('msnotepad'); };
+CMDS.calc    = function() { launchApp('calculator'); };
+CMDS.mspaint = function() { launchApp('mspaint'); };
+CMDS.explorer= function() { launchApp('icon-my-computer'); };
+CMDS.wmplayer= function() { launchApp('wmplayer'); };
+CMDS.minesweeper = function() { launchApp('minesweeper'); };
+
+CMDS.start = function(args) {
+    if (args.length === 0) { appendLine('START command requires a parameter.', 'err'); return; }
+    const target = args[0].toLowerCase();
+
+    // 1순위: 별칭 테이블 (친숙한 이름 → appId 변환)
+    const appMap = {
+        'notepad': 'msnotepad', 'notepad.exe': 'msnotepad',
+        'calc': 'calculator',   'calc.exe':    'calculator',
+        'mspaint': 'mspaint',   'mspaint.exe': 'mspaint',
+        'wmplayer': 'wmplayer', 'wmplayer.exe': 'wmplayer',
+        'explorer': 'icon-my-computer', 'explorer.exe': 'icon-my-computer',
+        'cmd': 'cmd',           'cmd.exe':     'cmd',
+        'minesweeper': 'minesweeper',
+        'pinball': 'pinball',
+        'vscode': 'vscode',
+    };
+
+    if (appMap[target]) {
+        // 별칭으로 찾은 경우
+        launchApp(appMap[target]);
+    } else {
+        // 2순위: 입력값을 appId로 직접 시도
+        // appRegistry에 등록된 앱이면 그냥 실행됨
+        appendLine(`Starting '${args[0]}'...`, 'dim');
+        launchApp(args[0]);
+    }
+};
+
+function launchApp(appId) {
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'launchApp', appId }, '*');
+    } else {
+        appendLine(`[Cannot launch apps in standalone mode]`, 'dim');
+    }
+}
+
+// ============================================================
+// Command Dispatcher
+// ============================================================
+function dispatch(raw) {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+
+    // Echo the command
+    appendLine(getPromptStr() + trimmed);
+
+    // Expand env vars %VAR%
+    const expanded = trimmed.replace(/%([^%]+)%/g, (_, key) => ENV[key.toUpperCase()] || '');
+
+    // Tokenize (simple)
+    const tokens = tokenize(expanded);
+    if (!tokens.length) return;
+
+    const cmdName = tokens[0].toLowerCase();
+    const args    = tokens.slice(1);
+
+    if (CMDS[cmdName]) {
+        try {
+            CMDS[cmdName](args);
+        } catch(e) {
+            appendLine(`An unexpected error occurred.`, 'err');
+        }
+    } else {
+        // Check if it's a drive change (e.g. "D:")
+        if (/^[a-z]:$/i.test(cmdName)) {
+            const drive = cmdName.toUpperCase();
+            if (VFS[drive]) {
+                currentDrive = drive;
+                currentPath = drive + '\\';
+            } else {
+                appendLine(`The system cannot find the drive specified.`, 'err');
+            }
+        } else {
+            appendLine(`'${tokens[0]}' is not recognized as an internal or external command,`, 'err');
+            appendLine(`operable program or batch file.`, 'err');
+        }
+    }
+    appendLine('');
+    updatePrompt();
+}
+
+function tokenize(str) {
+    const tokens = [];
+    let cur = '', inQuote = false;
+    for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        if (ch === '"') { inQuote = !inQuote; continue; }
+        if (ch === ' ' && !inQuote) {
+            if (cur) { tokens.push(cur); cur = ''; }
+        } else {
+            cur += ch;
+        }
+    }
+    if (cur) tokens.push(cur);
+    return tokens;
+}
+
+// ============================================================
+// Input handling
+// ============================================================
+input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const raw = input.value;
+        historyBuffer.unshift(raw);
+        if (historyBuffer.length > 100) historyBuffer.pop();
+        historyIndex = -1;
+        input.value = '';
+        dispatch(raw);
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (historyIndex < historyBuffer.length - 1) {
+            historyIndex++;
+            input.value = historyBuffer[historyIndex];
+            // Move cursor to end
+            setTimeout(() => input.setSelectionRange(input.value.length, input.value.length), 0);
+        }
+    } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIndex > 0) {
+            historyIndex--;
+            input.value = historyBuffer[historyIndex];
+        } else {
+            historyIndex = -1;
+            input.value = '';
+        }
+    } else if (e.key === 'Tab') {
+        e.preventDefault();
+        handleTabComplete();
+    }
+});
+
+// Always focus input when clicking terminal
+document.getElementById('terminal').addEventListener('click', () => input.focus());
+
+function handleTabComplete() {
+    const val = input.value;
+    const tokens = tokenize(val);
+    if (tokens.length === 0) return;
+
+    // Complete last token as a path
+    const last = tokens[tokens.length - 1] || '';
+    const dirPart = last.lastIndexOf('\\') >= 0
+        ? last.substring(0, last.lastIndexOf('\\') + 1)
+        : '';
+    const filePart = last.substring(dirPart.length).toLowerCase();
+
+    const searchIn = resolvePath(dirPart || currentPath);
+    const node = getVFSNode(searchIn);
+    if (!node || !node.children) return;
+
+    const matches = Object.keys(node.children).filter(k => k.toLowerCase().startsWith(filePart));
+    if (matches.length === 1) {
+        tokens[tokens.length - 1] = dirPart + matches[0];
+        input.value = tokens.join(' ');
+    } else if (matches.length > 1) {
+        appendLine(getPromptStr() + val);
+        appendLine(matches.join('    '));
+        appendLine('');
+    }
+}
+
+// ============================================================
+// Boot message
+// ============================================================
+function boot() {
+    appendLine('Microsoft Windows XP [Version 5.1.2600]');
+    appendLine('(C) Copyright 1985-2001 Microsoft Corp.');
+    appendLine('');
+    updatePrompt();
+    input.focus();
+}
+
+boot();
+</script>
+</body>
+</html>

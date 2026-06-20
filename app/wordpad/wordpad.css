@@ -1,0 +1,271 @@
+.wordpad-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--ButtonFace);
+}
+
+.wordpad-toolbar {
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.wordpad-toolbar button {
+    padding: 3px;
+    background: transparent;
+    border: 1px solid transparent;
+    box-shadow: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wordpad-toolbar button:hover {
+    background-color: rgba(193, 210, 238, 0.5);
+}
+
+.wordpad-toolbar button:active,
+.wordpad-toolbar button.selected {
+    background-color: rgba(152, 181, 226, 0.75);
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+}
+
+.wordpad-color-picker {
+    position: relative;
+    display: inline-block;
+}
+
+.wordpad-color-palette {
+    position: absolute;
+    background-color: var(--ButtonFace);
+    padding: 4px;
+    z-index: 99999;
+    width: 120px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px;
+}
+
+.color-swatch {
+    width: 45px;
+    height: 11px;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.color-label {
+    white-space: nowrap;
+    cursor: pointer;
+    padding-top: 2px;
+}
+
+.wordpad-editor {
+    flex-grow: 1;
+    padding: 10px;
+    padding-top: 2px;
+    background-color: white;
+    overflow: auto;
+    font-family: "Times New Roman", serif;
+    font-size: 10pt;
+    margin: 0px 2px 2px 2px;
+    line-height: 1.4;
+}
+
+.wordpad-editor:focus {
+    outline: none;
+}
+
+.wordpad-ruler {
+    height: 20px;
+    background-color: white;
+    margin: 2px 2px 10px 12px;
+    box-sizing: border-box;
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.ruler-tick {
+    position: absolute;
+    width: 1px;
+    background-color: var(--ButtonText);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.ruler-tick.quarter {
+    height: 2px;
+}
+
+.ruler-tick.half {
+    height: 5px;
+}
+
+.ruler-number {
+    position: absolute;
+    font-size: 10px;
+    color: var(--ButtonText);
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Styled above */
+
+.toolbar-icon-1 {
+    width: 16px;
+    height: 16px;
+    background-image: url("assets/wordpad-toolbar1.png");
+    background-repeat: no-repeat;
+}
+.toolbar-icon-2 {
+    width: 16px;
+    height: 16px;
+    background-image: url("assets/wordpad-toolbar2.png");
+    background-repeat: no-repeat;
+}
+
+.icon-new {
+    background-position: 0 0;
+}
+.icon-open {
+    background-position: -16px 0;
+}
+.icon-save {
+    background-position: -32px 0;
+}
+.icon-print {
+    background-position: -48px 0;
+}
+.icon-print-preview {
+    background-position: -64px 0;
+}
+.icon-find {
+    background-position: -80px 0;
+}
+.icon-cut {
+    background-position: -96px 0;
+}
+.icon-copy {
+    background-position: -112px 0;
+}
+.icon-paste {
+    background-position: -128px 0;
+}
+.icon-undo {
+    background-position: -144px 0;
+}
+.icon-insert-date {
+    background-position: -160px 0;
+}
+
+.icon-bold {
+    background-position: 0 0;
+}
+.icon-italic {
+    background-position: -16px 0;
+}
+.icon-underline {
+    background-position: -32px 0;
+}
+.icon-color {
+    background-position: -48px 0;
+}
+.icon-align-left {
+    background-position: -64px 0;
+}
+.icon-align-center {
+    background-position: -80px 0;
+}
+.icon-align-right {
+    background-position: -96px 0;
+}
+.icon-bullets {
+    background-position: -112px 0;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 22px;
+    background-color: var(--ButtonShadow);
+    margin: 0 4px;
+}
+
+/* XP Custom Dropdown Styles (Font & Font Size) */
+.select-overlay-container {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    margin-right: 4px;
+}
+
+.select-overlay-container select {
+    width: 100%;
+    height: 21px;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-left: 4px;
+    padding-right: 17px; /* Make room for the custom button */
+    border: 1px solid #7F9DB9; /* XP standard input border */
+    border-radius: 0;
+    background-color: #FFFFFF;
+    font-family: Tahoma, sans-serif;
+    font-size: 11px;
+    color: #000;
+}
+
+.select-overlay-container select:focus {
+    outline: none;
+}
+
+/* The custom dropdown arrow button */
+.select-overlay-container .xp-dropdown-btn {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    bottom: 1px;
+    width: 16px;
+    background: radial-gradient(circle at 0 0, #EEEDE5, #AEC8F7 75%);
+    border: 1px solid #fff;
+    border-radius: 2px;
+    box-shadow: 0 1px #A0B5D3, 1px 0 #7C9FD3, inset 1px 1px #B7CAF5, inset -1px -1px #B3C8F5;
+    pointer-events: none; /* Let clicks pass through to the native select */
+}
+
+/* SVG Arrow Icon */
+.select-overlay-container .xp-dropdown-btn::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: block;
+    width: 9px;
+    height: 6px;
+    background: #4D6185;
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg width="9" height="6" version="1.1" viewBox="0 0 9 6" xmlns="http://www.w3.org/2000/svg"><path d="m4.5 6-4.5-4.5 1.5-1.5 3 3 3-3 1.5 1.5z" fill-rule="evenodd"/></svg>');
+    -webkit-mask-size: 9px 6px;
+    mask-image: url('data:image/svg+xml;utf8,<svg width="9" height="6" version="1.1" viewBox="0 0 9 6" xmlns="http://www.w3.org/2000/svg"><path d="m4.5 6-4.5-4.5 1.5-1.5 3 3 3-3 1.5 1.5z" fill-rule="evenodd"/></svg>');
+    mask-size: 9px 6px;
+}
+
+/* Hover State */
+.select-overlay-container select:hover + .xp-dropdown-btn {
+    background: radial-gradient(circle at 0 0, #FDFFFF, #B9DAFB 75%);
+    box-shadow: 0 1px #A0B5D3, 1px 0 #7C9FD3, inset 1px 1px #ABBEE9, inset -1px -1px #8DA8E1;
+}
+
+/* Active (Clicked) State */
+.select-overlay-container select:active + .xp-dropdown-btn {
+    background: radial-gradient(circle at 0 0, #6E8EF1, #D2DEEB 75%);
+    box-shadow: 0 1px #A0B5D3, 1px 0 #7C9FD3, inset 1px 1px #98A1DD, inset -1px -1px #B1C6F3;
+}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screensaver - Starfield</title>
+    <style>
+        /* screensaver.css */
+        #screensaver {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            cursor: none;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // screensavers.js
+        let screensaverInterval = null;
+
+        function createScreensaverContainer() {
+            let ss = document.getElementById('screensaver');
+            if (ss) ss.remove();
+            ss = document.createElement('div');
+            ss.id = 'screensaver';
+            Object.assign(ss.style, { position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: '#000' });
+            document.body.appendChild(ss);
+            return ss;
+        }
+
+        function createCanvas() {
+            const container = document.getElementById('screensaver');
+            const rect = container.getBoundingClientRect();
+            const c = document.createElement('canvas');
+            c.width = rect.width;
+            c.height = rect.height;
+            Object.assign(c.style, { width: '100%', height: '100%' });
+            container.appendChild(c);
+            return c;
+        }
+
+        const screensavers = {
+            starfield: () => {
+                createScreensaverContainer();
+                const ss = createCanvas();
+                const ctx = ss.getContext('2d');
+                const width = ss.width;
+                const height = ss.height;
+                const scale = Math.min(width / 1024, height / 768);
+                const stars = Array.from({ length: 300 }, () => ({ x: Math.random() * width, y: Math.random() * height, z: Math.random() * width }));
+                screensaverInterval = setInterval(() => {
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, width, height);
+                    stars.forEach(s => {
+                        s.z -= 5 * scale;
+                        if (s.z <= 0) Object.assign(s, { x: Math.random() * width, y: Math.random() * height, z: width });
+                        const k = 128 / s.z;
+                        const px = (s.x - width / 2) * k + width / 2;
+                        const py = (s.y - height / 2) * k + height / 2;
+                        const size = Math.max((1 - s.z / width) * 3 * scale, 1);
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(px, py, size, size);
+                    });
+                }, 33);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (screensavers.starfield) {
+                screensavers.starfield();
+            }
+        });
+
+        // ===== 화면보호기 종료 기능 추가 =====
+        function exitAndClose() {
+            // 부모 창이 있으면 종료 메시지 전송
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'exitFullscreenApp' }, '*');
+            }
+        }
+
+        var screensaverFirstEvent = false;
+        var screensaverReady = false;
+        function handleScreensaverExit() {
+            if (!screensaverReady) return; // 준비 안 됐으면 무시
+            if (!screensaverFirstEvent) {
+                screensaverFirstEvent = true;
+                exitAndClose();
+            }
+        }
+
+        window.addEventListener('mousemove', handleScreensaverExit);
+        window.addEventListener('mousedown', handleScreensaverExit);
+        window.addEventListener('keydown', handleScreensaverExit);
+        window.addEventListener('touchstart', handleScreensaverExit);
+
+        window.addEventListener('DOMContentLoaded', function () {
+            setTimeout(() => { screensaverReady = true; }, 700); // 0.7초 후부터 입력 감지
+        });
+    </script>
+</body>
+
+</html>

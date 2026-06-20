@@ -1,0 +1,76 @@
+/* Context Menu Styles */
+/* Extracted and adapted from app/xpdesign/xpdesign.css */
+
+:root {
+  --selection-bg: #316AC5;
+  --selection-fg: #FFFFFF;
+}
+
+#context-menu {
+  position: fixed;
+  z-index: 10000; /* High z-index to appear above everything */
+  display: none;
+  
+  color: #000000;
+  background-color: #FFFFFF;
+  border: 1px solid #ACA899;
+  padding: 2px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  user-select: none;
+  list-style-type: none;
+  flex-direction: column;
+  min-width: 150px;
+  font-family: 'Tahoma', sans-serif;
+  font-size: 11px;
+}
+
+#context-menu.visible {
+  display: flex;
+}
+
+#context-menu li {
+  position: relative;
+  border: 1px solid transparent;
+  padding: 1px 3px 1px 19px;
+  cursor: default;
+}
+
+#context-menu li:hover {
+  background-color: var(--selection-bg);
+  color: var(--selection-fg);
+}
+
+#context-menu li[role=separator] {
+  border-top: 1px solid #ACA899;
+  margin: 3px;
+  height: 0;
+  padding: 0;
+}
+
+#context-menu li[role=separator]:hover {
+  background-color: transparent;
+}
+
+/* Submenu arrow */
+#context-menu li[aria-haspopup=true]::after {
+  content: "";
+  display: block;
+  position: absolute;
+  right: 8px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #000; /* Default arrow color */
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 7"><path d="M0 0 L4 3.5 L0 7 Z" /></svg>');
+  -webkit-mask-size: 4px 7px;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center center;
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 7"><path d="M0 0 L4 3.5 L0 7 Z" /></svg>');
+  mask-size: 4px 7px;
+  mask-repeat: no-repeat;
+  mask-position: center center;
+}
+
+#context-menu li[aria-haspopup=true]:hover::after {
+  background-color: #FFF; /* White arrow on hover */
+}

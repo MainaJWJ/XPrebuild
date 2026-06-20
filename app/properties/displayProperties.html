@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Properties</title>
+    <!-- xpdesign의 스타일과 스크립트를 가져옵니다. -->
+    <link rel="stylesheet" href="./properties.css">
+    <link rel="stylesheet" href="../../scroll.css">
+    <style>
+        /* 기본 레이아웃 구성 */
+        body {
+            background-color: var(--window-bg, #ECE9D8);
+            margin: 0;
+            padding: 11px; /* 실제 XP 등록정보 창 안쪽 여백에 가깝게 설정 */
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            box-sizing: border-box;
+            font-size: 11px;
+        }
+
+        .tabs-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tabs {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* 스크롤바 작동을 위해 필수 */
+        }
+
+        /* 탭 메뉴(최상단) 패딩 및 여백 초기화 (왼쪽 정렬) */
+        menu[role="tablist"] {
+            margin: 2px 0 0 2px;
+            padding: 0;
+        }
+        
+        [role="tabpanel"] {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 13px !important; /* 내부 탭 패딩 규격 일치화 */
+            min-height: 0; /* 컨텐츠가 넘칠 때 스크롤바 작동을 위해 필수 */
+        }
+
+        [role="tabpanel"][hidden] {
+            display: none !important;
+        }
+
+        #tab-xpdesign, #tab-xpmenu {
+            display: block; /* Flex 컨테이너로 동작하여 자식 요소가 flex-shrink되어 내용이 0픽셀로 찌그러지는 현상 방지 */
+        }
+
+        /* Preview Area - XP 기본 모니터 크기와 마진 조정 */
+        .preview-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .monitor-frame {
+            position: relative;
+            width: 172px;
+            height: 154px;
+            background: url('../../image/desktop-preview-monitor.png') no-repeat center center;
+            background-size: contain;
+        }
+
+        .monitor-screen {
+            position: absolute;
+            top: 16px;
+            left: 14px;
+            width: 143px;
+            height: 104px;
+            background-color: #3A6EA5; /* 기본 바탕 화면색 */
+            border: 2px inset #FFF;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset -1px -1px 0 #ACA899, inset 1px 1px 0 #FFF;
+        }
+
+        /* 바탕 화면 설정 그룹 레이아웃: List와 Buttons */
+        .background-settings-row {
+            display: flex;
+            flex-direction: row;
+            gap: 15px; /* 리스트와 버튼 사이 여백 */
+            margin-top: 5px;
+        }
+
+        /* List Box Customizations */
+        .list-box-container {
+            flex: 1; /* 남은 가로 공간 모두 차지 */
+        }
+
+        .list-item {
+            padding: 2px 4px;
+            cursor: default;
+            white-space: nowrap;
+        }
+
+        /* 우측 옵션 패널 (찾아보기, 위치, 색) */
+        .options-panel {
+            display: flex;
+            flex-direction: column;
+            width: 85px; /* 버튼과 드롭다운이 딱 들어맞는 너비 */
+            flex-shrink: 0;
+        }
+
+        .options-panel label {
+            margin-top: 8px;
+            margin-bottom: 2px;
+        }
+
+        .options-panel select {
+            width: 100%;
+        }
+
+        /* 덮어씌운 오리지널 스크롤 버튼이 호버/액티브 상태를 상속받도록 처리 */
+        .select-overlay-container select:hover + .vertical-scrollbar > button {
+            background: radial-gradient(circle at 0 0, #FDFFFF, #B9DAFB 75%);
+            box-shadow: 0 1px #A0B5D3, 1px 0 #7C9FD3, inset 1px 1px #ABBEE9, inset -1px -1px #8DA8E1;
+        }
+
+        .select-overlay-container select:active + .vertical-scrollbar > button {
+            background: radial-gradient(circle at 0 0, #6E8EF1, #D2DEEB 75%);
+            box-shadow: 0 1px #A0B5D3, 1px 0 #7C9FD3, inset 1px 1px #98A1DD, inset -1px -1px #B1C6F3;
+        }
+
+        .color-picker-btn {
+            width: 28px; 
+            height: 18px; 
+            padding: 0;
+            background: none;
+            border: 1px solid #7F9DB9; 
+            cursor: pointer;
+            box-shadow: inset 1px 1px 0 #FFF, -1px -1px 0 #ACA899;
+        }
+        
+        .color-picker-btn::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        
+        .color-picker-btn::-webkit-color-swatch {
+            border: none;
+        }
+        
+        .color-picker-btn::-moz-color-swatch {
+            border: none;
+        }
+        
+        .color-picker-btn:active {
+            box-shadow: inset 1px 2px 1px #808080, inset 0 -1px 1px #fff;
+        }
+
+        /* 하단 Action Button Area */
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+            gap: 6px;
+        }
+
+        .button-group button {
+            width: 75px; /* XP 기본 버튼 크기 규격 */
+            min-width: 75px;
+            height: 23px; /* 높이 규격 일치화 */
+            padding: 0;
+        }
+    </style>
+    <!-- xpdesign의 탭 기능, 리스트 기능 자바스크립트를 연결 -->
+    <script type="module" src="./properties.js"></script>
+    <script type="module" src="./bg-glitch-ui.js"></script>
+    <script src="../../focusController.js"></script>
+</head>
+<body class="use-preferred-font">
+
+    <div class="tabs-container">
+        <!-- Tabs Component (xpdesign 스타일) -->
+        <div class="tabs">
+            <menu role="tablist">
+                <button role="tab" aria-selected="true" aria-controls="tab-background">Desktop</button>
+                <button role="tab" aria-controls="tab-glitch">Glitch</button>
+                <button role="tab" aria-controls="tab-settings">Settings</button>
+                <button role="tab" aria-controls="tab-xpdesign">Design</button>
+                <button role="tab" aria-controls="tab-xpmenu">Menus</button>
+            </menu>
+            
+            <!-- Background Tab -->
+            <div role="tabpanel" id="tab-background" class="padding">
+                <div class="preview-box">
+                    <div class="monitor-frame">
+                        <div class="monitor-screen" id="preview-screen">
+                            <iframe id="screensaver-preview" style="width: 100%; height: 100%; border: none; pointer-events: none; display: none;"></iframe>
+                        </div>
+                    </div>
+                </div>
+                <fieldset class="frame padding flex-grow">
+                    <legend class="frame-title">Screen saver(<u>S</u>)</legend>
+                    
+                    <div class="background-settings-row">
+                        <!-- 좌측: 리스트 박스 -->
+                        <div class="list-box-container">
+                            <div id="screensaver-list" class="list" role="listbox" aria-multiselectable="false" style="height: 110px; overflow: auto; background: var(--input-bg); border: 1px solid #7F9DB9;">
+                                <div role="option" aria-selected="true" tabindex="0" class="list-item" data-app-id="">(None)</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="windows">Windows XP</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="starfield">Starfield</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="pipes">3D Pipes</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="mystify">Mystify</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="maze">Maze</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="flower">Flower</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="smile">Smile</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="fish">Fish</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="flying-toasters">Flying Toasters</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="hard-rain">Hard Rain</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="rainstorm">Rainstorm</div>
+                                <div role="option" tabindex="-1" class="list-item" data-app-id="starry-night">Starry Night</div>
+                            </div>
+                        </div>
+
+                        <!-- 우측: 옵션 조작 패널 -->
+                        <div class="options-panel">
+                            <button id="btn-preview">Preview(<u>P</u>)</button>
+                            
+                            <label>Position(<u>P</u>):</label>
+                            <div class="select-overlay-container" style="position: relative; display: flex; align-items: stretch;">
+                                <select style="width: 100%; height: 21px; appearance: none; -webkit-appearance: none; padding-right: 17px;">
+                                    <option>Center</option>
+                                    <option>Tile</option>
+                                    <option selected>Stretch</option>
+                                </select>
+                                <div class="vertical-scrollbar" aria-hidden="true" style="position: absolute; right: 1px; top: 1px; bottom: 1px; width: 16px; padding: 0; background: none; box-shadow: none; pointer-events: none;">
+                                    <button style="display: none;"></button>
+                                    <button tabindex="-1" style="width: 100%; height: 100%; margin: 0; box-sizing: border-box;"></button>
+                                </div>
+                            </div>
+                            
+                            <label>Color(<u>C</u>):</label>
+                            <input type="color" class="color-picker-btn" value="#3a6ea5">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- GL Glitch Tab (New WebGL Effects) -->
+            <div role="tabpanel" id="tab-glitch" hidden class="padding" style="overflow-y: auto;">
+                <fieldset class="frame padding">
+                    <legend class="frame-title">Advanced WebGL & CRT Overlay Effects</legend>
+                    <div style="margin-top: 5px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid #ACA899; padding-bottom: 8px;">
+                            <input type="checkbox" id="gl-masterEnabled">
+                            <label for="gl-masterEnabled" style="font-weight: bold; color: #003399;">Enable WebGL Background Effects(<u>E</u>)</label>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 100px 1fr 40px; gap: 8px; align-items: center; font-size: 11px;">
+                            <label>Pixel Size:</label>
+                            <input type="range" id="gl-pixelSize" min="1" max="20" step="1" value="2">
+                            <span id="val-gl-pixelSize">2</span>
+                            
+                            <label>Curvature:</label>
+                            <input type="range" id="gl-curvature" min="0" max="20" step="0.1" value="4.0">
+                            <span id="val-gl-curvature">4.0</span>
+                            
+                            <label>RGB Shift:</label>
+                            <input type="range" id="gl-rgbShift" min="0" max="0.05" step="0.001" value="0.015">
+                            <span id="val-gl-rgbShift">0.015</span>
+                            
+                            <label>Digital Noise:</label>
+                            <input type="range" id="gl-digitalNoise" min="0" max="1.0" step="0.01" value="0.15">
+                            <span id="val-gl-digitalNoise">0.15</span>
+                            
+                            <label>Glitch Split:</label>
+                            <input type="range" id="gl-lineDisplacement" min="0" max="0.1" step="0.001" value="0.020">
+                            <span id="val-gl-lineDisplacement">0.020</span>
+
+                            <hr style="grid-column: span 3; width: 100%; border: 0; border-top: 1px solid #ACA899; margin: 5px 0;">
+
+                            <div style="grid-column: span 3; display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                <input type="checkbox" id="chk-enable-filter">
+                                <label for="chk-enable-filter" style="font-weight: bold; color: #003399;">Enable CRT Filter Overlay(<u>U</u>)</label>
+                            </div>
+
+                            <label>Electrical Noise(<u>N</u>):</label>
+                            <input type="range" id="input-roll" min="0" max="10.0" step="0.01" value="1.0">
+                            <span id="val-roll">1.00</span>
+                            
+                            <label>Brightness(<u>R</u>):</label>
+                            <input type="range" id="input-brightness" min="0.8" max="3.0" step="0.01" value="1.0">
+                            <span id="val-brightness">1.00</span>
+                            
+                            <label>Vignette(<u>V</u>):</label>
+                            <input type="range" id="input-vignette" min="0" max="1.6" step="0.02" value="0.4">
+                            <span id="val-vignette">0.40</span>
+                        </div>
+                        
+                        <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 12px; border-top: 1px solid #ACA899; padding-top: 10px;">
+                            <div>
+                                <input type="checkbox" id="chk-grayscale">
+                                <label for="chk-grayscale" style="font-weight: bold; color: #003399;">Grayscale(<u>B</u>)</label>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 10px;">
+                            <button id="btn-gl-reset" style="width: 85px;">Defaults(<u>R</u>)</button>
+                        </div>
+                    </div>
+                </fieldset>
+                <p style="margin-top: 10px; font-size: 10px; color: #555;">* WebGL effects only apply to the background wallpaper. CRT effects apply screen-wide.</p>
+            </div>
+
+            <!-- Settings Tab -->
+            <div role="tabpanel" id="tab-settings" hidden class="padding">
+                <div class="preview-box">
+                    <div class="monitor-frame">
+                        <div class="monitor-screen" style="display: flex; justify-content: center; align-items: center; background-color: #3A6EA5;">
+                            <img src="../../image/resolutionsetting.png" alt="Resolution" style="max-width: 100%; max-height: 100%;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 15px; margin-left: 5px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                        <img src="../../image/monitor.png" alt="" style="width: 16px; height: 16px; margin-right: 5px;" onerror="this.style.display='none'"> 
+                        <span style="font-size: 11px;">Display:</span>
+                    </div>
+                    <div class="select-overlay-container" style="position: relative; display: flex; align-items: stretch; width: 100%;">
+                        <select style="width: 100%; height: 21px; appearance: none; -webkit-appearance: none; padding-right: 17px;">
+                            <option>Plug and Play Monitor on NVIDIA GeForce FX 5200</option>
+                            <option>Default Monitor</option>
+                        </select>
+                        <div class="vertical-scrollbar" aria-hidden="true" style="position: absolute; right: 1px; top: 1px; bottom: 1px; width: 16px; padding: 0; background: none; box-shadow: none; pointer-events: none;">
+                            <button style="display: none;"></button>
+                            <button tabindex="-1" style="width: 100%; height: 100%; margin: 0; box-sizing: border-box;"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px;">
+                    <!-- Screen resolution -->
+                    <fieldset class="frame padding" style="flex: 1; height: 70px; margin: 0;">
+                        <legend class="frame-title">Screen resolution</legend>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 0px; margin-top: 0px;">
+                            <span>Less</span>
+                            <span>More</span>
+                        </div>
+                        <input type="range" min="1" max="5" value="3" style="width: 100%;">
+                        <div style="text-align: center; margin-top: 2px; font-size: 11px;">
+                            1024 by 768 pixels
+                        </div>
+                    </fieldset>
+                    
+                    <!-- Color quality -->
+                    <fieldset class="frame padding" style="flex: 1; height: 70px; margin: 0;">
+                        <legend class="frame-title">Color quality</legend>
+                        <div class="select-overlay-container" style="position: relative; display: flex; align-items: stretch; width: 100%; margin-top: 5px;">
+                            <select style="width: 100%; height: 21px; appearance: none; -webkit-appearance: none; padding-right: 17px;">
+                                <option>Highest (32 bit)</option>
+                                <option>Medium (16 bit)</option>
+                            </select>
+                            <div class="vertical-scrollbar" aria-hidden="true" style="position: absolute; right: 1px; top: 1px; bottom: 1px; width: 16px; padding: 0; background: none; box-shadow: none; pointer-events: none;">
+                                <button style="display: none;"></button>
+                                <button tabindex="-1" style="width: 100%; height: 100%; margin: 0; box-sizing: border-box;"></button>
+                            </div>
+                        </div>
+                        <img src="../../image/rainbow.png" alt="Color Spectrum" style="width: 100%; height: 15px; margin-top: 4px; border: 1px inset #ACA899; box-sizing: border-box;" onerror="this.style.display='none'">
+                    </fieldset>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 5px;">
+                    <a href="#" style="color: blue; text-decoration: underline; font-size: 11px;">Troubleshoot...</a>
+                    <button style="width: 85px;">Advanced</button>
+                </div>
+            </div>
+
+            <!-- XP Design Toolkit Tab -->
+            <div role="tabpanel" id="tab-xpdesign" hidden class="padding" style="overflow-y: auto;">
+                <!-- Input Controls -->
+                <h2>Input Controls</h2>
+                <fieldset class="frame padding">
+                    <legend class="frame-title">Form Elements</legend>
+                    <div class="grid gap" style="grid-template-columns: 1fr 1fr; align-items: center;">
+                        <label for="text-input">Text Input:</label>
+                        <input id="text-input" type="text" placeholder="Enter text here" />
+
+                        <label for="password-input">Password:</label>
+                        <input id="password-input" type="password" placeholder="Password" />
+
+                        <label>Checkbox:</label>
+                        <div>
+                            <input type="checkbox" id="chk1" /> <label for="chk1">Option 1</label>
+                            <input type="checkbox" id="chk2" checked /> <label for="chk2">Option 2 (checked)</label>
+                        </div>
+
+                        <label>Radio Buttons:</label>
+                        <div>
+                            <input type="radio" id="rad1" name="radio" checked /> <label for="rad1">Choice 1</label>
+                            <input type="radio" id="rad2" name="radio" /> <label for="rad2">Choice 2</label>
+                        </div>
+
+                        <label>Buttons:</label>
+                        <div class="flex-row gap">
+                            <button>Normal</button>
+                            <button class="pressed">Pressed</button>
+                            <button disabled>Disabled</button>
+                        </div>
+
+                        <label>Slider:</label>
+                        <div>
+                            <input type="range" min="0" max="100" value="50" />
+                        </div>
+
+                        <label>Vertical Slider:</label>
+                        <div class="vertical-slider-container" style="--slider-length: 100px; width: 100px;">
+                            <input type="range" class="vertical-slider" min="0" max="100" value="50" />
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Progress Bar -->
+                <h2>Progress Indicators</h2>
+                <div class="padding">
+                    <div class="flex-row gap align-center">
+                        <span>Loading:</span>
+                        <div class="progress-bar" style="width: 200px;">
+                            <div class="progress-bar-fill" style="width: 65%;"></div>
+                        </div>
+                        <span>65%</span>
+                    </div>
+                </div>
+
+                <!-- List View -->
+                <h2>List View</h2>
+                <div class="list" role="listbox" aria-multiselectable="true" style="height: 150px; overflow: auto;">
+                    <table class="detailed">
+                        <thead>
+                            <tr>
+                                <th scope="col" role="button" aria-sort="ascending">Name</th>
+                                <th scope="col" role="button" style="text-align: right;">Size</th>
+                                <th scope="col" role="button">Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr role="option">
+                                <td>
+                                    <div class="icon">
+                                        <img src="../../image/folder.png" style="width:16px; height:16px;" />
+                                        <div class="icon-label">Documents</div>
+                                    </div>
+                                </td>
+                                <td style="text-align: right;"></td>
+                                <td>File Folder</td>
+                            </tr>
+                            <tr role="option">
+                                <td>
+                                    <div class="icon">
+                                        <img src="../../image/musicfolder.png" style="width:16px; height:16px;" />
+                                        <div class="icon-label">My Music</div>
+                                    </div>
+                                </td>
+                                <td style="text-align: right;"></td>
+                                <td>File Folder</td>
+                            </tr>
+                            <tr role="option">
+                                <td>
+                                    <div class="icon">
+                                        <img src="../../image/photofolder.png" style="width:16px; height:16px;" />
+                                        <div class="icon-label">My Pictures</div>
+                                    </div>
+                                </td>
+                                <td style="text-align: right;"></td>
+                                <td>File Folder</td>
+                            </tr>
+                            <tr role="option">
+                                <td>
+                                    <div class="icon">
+                                        <img src="../../image/msnotepad.png" style="width:16px; height:16px;" />
+                                        <div class="icon-label">readme.txt</div>
+                                    </div>
+                                </td>
+                                <td style="text-align: right;">2KB</td>
+                                <td>Text Document</td>
+                            </tr>
+                            <tr role="option">
+                                <td>
+                                    <div class="icon">
+                                        <img src="../../image/windowslogo.png" style="width:16px; height:16px;" />
+                                        <div class="icon-label">system.dll</div>
+                                    </div>
+                                </td>
+                                <td style="text-align: right;">1.5MB</td>
+                                <td>Application Extension</td>
+                            </tr>
+                            <tr role="option">
+                                <td>
+                                    <div class="icon">
+                                        <img src="../../image/imagefile1.png" style="width:16px; height:16px;" />
+                                        <div class="icon-label">background.bmp</div>
+                                    </div>
+                                </td>
+                                <td style="text-align: right;">450KB</td>
+                                <td>Bitmap Image</td>
+                            </tr>
+                            <tr role="option">
+                                <td>
+                                    <div class="icon">
+                                        <img src="../../image/bin.png" style="width:16px; height:16px;" />
+                                        <div class="icon-label">Deleted Files</div>
+                                    </div>
+                                </td>
+                                <td style="text-align: right;">0KB</td>
+                                <td>System Folder</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tree View -->
+                <h2>Tree View</h2>
+                <div class="list" style="height: 150px; overflow: auto;">
+                    <ul role="tree">
+                        <li>
+                            <div class="icon">
+                                <img src="../../image/shell.png" style="width:16px; height:16px;" />
+                                <div class="icon-label">Desktop</div>
+                            </div>
+                            <ul>
+                                <li>
+                                    <details open>
+                                        <summary class="icon">
+                                            <img src="../../image/mycomputer.png" style="width:16px; height:16px;" />
+                                            <div class="icon-label">My Computer</div>
+                                        </summary>
+                                        <ul>
+                                            <li>
+                                                <details open>
+                                                    <summary class="icon">
+                                                        <img src="../../image/drive.png" style="width:16px; height:16px;" />
+                                                        <div class="icon-label">Local Disk (C:)</div>
+                                                    </summary>
+                                                    <ul>
+                                                        <li>
+                                                            <div class="icon">
+                                                                <img src="../../image/folder.png" style="width:16px; height:16px;" />
+                                                                <div class="icon-label">Windows</div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="icon">
+                                                                <img src="../../image/folder.png" style="width:16px; height:16px;" />
+                                                                <div class="icon-label">Program Files</div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="icon">
+                                                                <img src="../../image/folder.png" style="width:16px; height:16px;" />
+                                                                <div class="icon-label">Documents and Settings</div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </details>
+                                            </li>
+                                            <li>
+                                                <div class="icon" style="margin-left: 17px;">
+                                                    <img src="../../image/drive.png" style="width:16px; height:16px;" />
+                                                    <div class="icon-label">CD Drive (D:)</div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </details>
+                                </li>
+                                <li>
+                                    <div class="icon">
+                                        <img src="../../image/docfolder.png" style="width:16px; height:16px;" />
+                                        <div class="icon-label">My Documents</div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="icon">
+                                        <img src="../../image/network.png" style="width:16px; height:16px;" />
+                                        <div class="icon-label">My Network Places</div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="icon">
+                                        <img src="../../image/bin.png" style="width:16px; height:16px;" />
+                                        <div class="icon-label">Recycle Bin</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- XP Menus Tab -->
+            <div role="tabpanel" id="tab-xpmenu" hidden class="padding" style="overflow-y: auto;">
+                <!-- Menu 1 (Popup Menu) -->
+                <h2>Menu 1 (Popup Menu)</h2>
+                <ul role="menu" id="menu1" class="xp-popup-menu">
+                    <li tabindex="0">Arrange Icons By</li>
+                    <li tabindex="0">Refresh</li>
+                    <li role="separator"></li>
+                    <li tabindex="0">Paste</li>
+                    <li tabindex="0">Paste Shortcut</li>
+                    <li role="separator"></li>
+                    <li tabindex="0">New</li>
+                    <li role="separator"></li>
+                    <li tabindex="0">Properties</li>
+                </ul>
+
+                <!-- Menu 2 (Menu Bar) -->
+                <h2>Menu 2 (Menu Bar)</h2>
+                <div id="menu2" class="xp-menubar">
+                    <div class="menu-item"><span><u>F</u>ile</span>
+                        <ul class="dropdown-menu">
+                            <li class="disabled">Create Shortcut</li>
+                            <li class="disabled">Delete</li>
+                            <li class="disabled">Rename</li>
+                            <li class="disabled">Properties</li>
+                            <li class="separator"></li>
+                            <li data-action="Close">Close</li>
+                        </ul>
+                    </div>
+                    <div class="menu-item"><span><u>E</u>dit</span>
+                        <ul class="dropdown-menu">
+                            <li class="disabled">Undo</li>
+                            <li class="separator"></li>
+                            <li class="disabled">Cut</li>
+                            <li class="disabled">Copy</li>
+                            <li class="disabled">Paste</li>
+                            <li class="separator"></li>
+                            <li>Select All</li>
+                            <li>Invert Selection</li>
+                        </ul>
+                    </div>
+                    <div class="menu-item"><span><u>V</u>iew</span>
+                        <ul class="dropdown-menu">
+                            <li>Toolbars</li>
+                            <li>Status Bar</li>
+                            <li>Explorer Bar</li>
+                            <li class="separator"></li>
+                            <li>Thumbnails</li>
+                            <li>Tiles</li>
+                            <li>Icons</li>
+                            <li>List</li>
+                            <li>Details</li>
+                        </ul>
+                    </div>
+                    <div class="menu-item"><span><u>F</u>avorites</span>
+                        <ul class="dropdown-menu">
+                            <li>Add to Favorites...</li>
+                            <li>Organize Favorites...</li>
+                        </ul>
+                    </div>
+                    <div class="menu-item"><span><u>T</u>ools</span>
+                        <ul class="dropdown-menu">
+                            <li>Map Network Drive...</li>
+                            <li>Disconnect Network Drive...</li>
+                            <li class="separator"></li>
+                            <li>Folder Options...</li>
+                        </ul>
+                    </div>
+                    <div class="menu-item"><span><u>H</u>elp</span>
+                        <ul class="dropdown-menu">
+                            <li>Help and Support Center</li>
+                            <li class="separator"></li>
+                            <li>About Windows</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Tabs Component -->
+                <h2>Tabs</h2>
+                <div class="tabs">
+                    <menu role="tablist">
+                        <button role="tab" aria-selected="true" aria-controls="tab1">General</button>
+                        <button role="tab" aria-controls="tab2">Settings</button>
+                        <button role="tab" aria-controls="tab3">Advanced</button>
+                    </menu>
+                    <div role="tabpanel" id="tab1" class="padding">
+                        <p>This is the first tab panel with general information.</p>
+                        <p>You can put any content here that belongs to the General category.</p>
+                    </div>
+                    <div role="tabpanel" id="tab2" hidden class="padding">
+                        <p>This is the second tab panel with settings-related content.</p>
+                        <p>Configuration options would go here.</p>
+                    </div>
+                    <div role="tabpanel" id="tab3" hidden class="padding">
+                        <p>This is the third tab panel with advanced options.</p>
+                        <p>Expert-level settings are usually placed here.</p>
+                    </div>
+                </div>
+                <!-- Dropdown Menu -->
+                <h2>Dropdown Menu</h2>
+                <div class="padding">
+                    <div class="select-overlay-container" style="position: relative; display: flex; align-items: stretch; width: 150px;">
+                        <select style="width: 100%; height: 21px; appearance: none; -webkit-appearance: none; padding-right: 17px;">
+                            <option>Option 1</option>
+                            <option selected>Option 2</option>
+                            <option>Option 3</option>
+                        </select>
+                        <div class="vertical-scrollbar" aria-hidden="true" style="position: absolute; right: 1px; top: 1px; bottom: 1px; width: 16px; padding: 0; background: none; box-shadow: none; pointer-events: none;">
+                            <button tabindex="-1" style="width: 100%; height: 100%; margin: 0; box-sizing: border-box;"></button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- OK / Cancel / Apply Buttons -->
+    <div class="button-group">
+        <button>OK</button>
+        <button>Cancel</button>
+        <button disabled>Apply(<u>A</u>)</button>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,349 @@
+/* Windows XP 루나 테마 스크롤바 스타일 */
+/* 이 파일은 Windows XP 운영체제의 루나 테마 스타일과 유사한 스크롤바 UI를 재현하기 위한 CSS 스타일을 포함하고 있습니다. */
+/* WebKit 기반 브라우저와 Firefox 브라우저 모두에서 작동하도록 설계되었습니다. */
+
+/* 커스텀 스크롤바 스타일 (WebKit 브라우저용) */
+::-webkit-scrollbar {
+  background: linear-gradient(to bottom, #F3F1EC, #FEFEFB);
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-corner {
+  background: #ECE9D8; /* --window-bg 색상 */
+}
+
+/* 세로 스크롤바 Thumb */
+::-webkit-scrollbar-thumb:vertical {
+  /* 가로 줄무늬 */
+  background: 
+    repeating-linear-gradient(to right, #EEF4FE, #EEF4FE 1px, #8CB0F8 1px, #8CB0F8 2px),
+    linear-gradient(to bottom, #C8D6FB, #B9CBF3);
+  background-repeat: no-repeat, repeat;
+  background-position: center center, 0 0;
+  background-size: 8px 7px, auto; /* 가로 줄무늬 크기: 8px 너비, 7px 높이 */
+  border-right: 1px solid #7DA0D4;
+  border-bottom: 1px solid #7DA0D4;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px #fff, inset 2px -2px #B4C8F6, inset 0 2px #BDCEF7, inset 0 3px #D1E0FD;
+}
+
+::-webkit-scrollbar-thumb:vertical:hover {
+  background: 
+    repeating-linear-gradient(to right, #EEF4FE, #EEF4FE 1px, #8CB0F8 1px, #8CB0F8 2px),
+    linear-gradient(to bottom, #DAE9FF, #CCE1FF);
+  background-repeat: no-repeat, repeat;
+  background-position: center center, 0 0;
+  background-size: 8px 7px, auto;
+  box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 2px #ACCEFF, inset 0 3px #E0EDFF;
+}
+
+::-webkit-scrollbar-thumb:vertical:active {
+  background: 
+    repeating-linear-gradient(to right, #EEF4FE, #EEF4FE 1px, #8CB0F8 1px, #8CB0F8 2px),
+    linear-gradient(to bottom, #A8BEF6, #92B2F6);
+  background-repeat: no-repeat, repeat;
+  background-position: center center, 0 0;
+  background-size: 8px 7px, auto;
+  box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 2px #839BD4, inset 3px 3px #9FB4EC;
+}
+
+/* 가로 스크롤바 Thumb */
+::-webkit-scrollbar-thumb:horizontal {
+  /* 세로 줄무늬 */
+  background: 
+    repeating-linear-gradient(to bottom, #EEF4FE, #EEF4FE 1px, #8CB0F8 1px, #8CB0F8 2px),
+    linear-gradient(to right, #C8D6FB, #B9CBF3);
+  background-repeat: no-repeat, repeat;
+  /* 아래로 1픽셀 이동 (center에서 1px 아래로) */
+  background-position: center 4px, 0 0;
+  background-size: 7px 8px, auto; /* 세로 줄무늬 크기: 7px 너비, 8px 높이 */
+  border-right: 1px solid #7DA0D4;
+  border-bottom: 1px solid #7DA0D4;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px #fff, inset 2px -2px #B4C8F6, inset 0 2px #BDCEF7, inset 0 3px #D1E0FD;
+}
+
+::-webkit-scrollbar-thumb:horizontal:hover {
+  background: 
+    repeating-linear-gradient(to bottom, #EEF4FE, #EEF4FE 1px, #8CB0F8 1px, #8CB0F8 2px),
+    linear-gradient(to right, #DAE9FF, #CCE1FF);
+  background-repeat: no-repeat, repeat;
+  /* 아래로 1픽셀 이동 (center에서 1px 아래로) */
+  background-position: center 4px, 0 0;
+  background-size: 7px 8px, auto;
+  box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 2px #ACCEFF, inset 3px 0 #E0EDFF;
+}
+
+::-webkit-scrollbar-thumb:horizontal:active {
+  background: 
+    repeating-linear-gradient(to bottom, #EEF4FE, #EEF4FE 1px, #8CB0F8 1px, #8CB0F8 2px),
+    linear-gradient(to right, #A8BEF6, #92B2F6);
+  background-repeat: no-repeat, repeat;
+  /* 아래로 1픽셀 이동 (center에서 1px 아래로) */
+  background-position: center 4px, 0 0;
+  background-size: 7px 8px, auto;
+  box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 2px #839BD4, inset 3px 3px #9FB4EC;
+}
+
+/* 스크롤바 버튼 */
+::-webkit-scrollbar-button {
+  width: 16px;
+  height: 16px;
+  display: none;
+}
+
+::-webkit-scrollbar-button:single-button {
+  display: block;
+  background-repeat: no-repeat;
+}
+
+::-webkit-scrollbar-button:vertical {
+  width: 16px;
+  height: 17px;
+}
+
+::-webkit-scrollbar-button:vertical:hover {
+  background-position: -16px 0;
+}
+
+::-webkit-scrollbar-button:vertical:active {
+  background-position: -32px 0;
+}
+
+::-webkit-scrollbar-button:horizontal {
+  width: 17px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-button:horizontal:hover {
+  background-position: -17px 0;
+}
+
+::-webkit-scrollbar-button:horizontal:active {
+  background-position: -34px 0;
+}
+
+/* 스크롤바 버튼 아이콘 (SVG 이미지) */
+::-webkit-scrollbar-button:vertical:decrement {
+  background-image: url('data:image/svg+xml;utf8,<svg width="48" height="17" version="1.1" viewBox="0 0 48 17" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient id="linearGradient9"><stop stop-color="%237da0d4" offset="0"/><stop stop-color="%23bdcbda" offset="1"/></linearGradient><radialGradient id="radialGradient3" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.023 2.8 -2.7 .022 2.7 .8)" gradientUnits="userSpaceOnUse"><stop stop-color="%23e1eafe" offset="0"/><stop stop-color="%23aec8f7" offset="1"/></radialGradient><linearGradient id="linearGradient5" x2="13" y1="7" y2="7" gradientTransform="translate(1,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%23b8cbf6" stop-opacity=".57" offset="0"/><stop stop-color="%23b0c4f2" stop-opacity=".68" offset="1"/></linearGradient><linearGradient id="linearGradient10" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/><radialGradient id="radialGradient3-6" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.023 2.8 -2.7 .022 18.7 .8)" gradientUnits="userSpaceOnUse"><stop stop-color="%23fdffff" offset="0"/><stop stop-color="%23b9dafb" offset="1"/></radialGradient><linearGradient id="linearGradient5-7" x2="13" y1="7" y2="7" gradientTransform="translate(17,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%23abbee9" offset="0"/><stop stop-color="%238da8e1" offset="1"/></linearGradient><radialGradient id="radialGradient3-8" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.023 2.8 -2.7 .022 34.7 .8)" gradientUnits="userSpaceOnUse"><stop stop-color="%236e8ef1" offset="0"/><stop stop-color="%23d2deeb" offset="1"/></radialGradient><linearGradient id="linearGradient5-3" x2="13" y1="7" y2="7" gradientTransform="translate(33,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%2398a1dd" offset="0"/><stop stop-color="%23b1c6f3" offset="1"/></linearGradient><linearGradient id="linearGradient25" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientTransform="translate(16)" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/><linearGradient id="linearGradient26" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientTransform="translate(32)" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/></defs><path d="m0 2.5v12c3e-7 1.48 1.01 2.5 2.5 2.5h11c1.49 0 2.5-1.02 2.5-2.5v-12c0-1.28-1.22-2.5-2.5-2.5h-11z" color="%23000000" fill="url(%23linearGradient10)" fill-rule="evenodd" stroke-width="1.06" style="-inkscape-stroke:none"/><rect x="1" y="1" width="13" height="14" fill="url(%23radialGradient3)" stroke-linejoin="round" stroke-width="9.9"/><path d="m7.5 5-4.5 4.5 1.5 1.5 3-3 3 3 1.5-1.5z" fill="%234d6185" fill-rule="evenodd"/><path d="m1 1v14h13v-14zm1 1h11v12h-11z" fill="url(%23linearGradient5)"/><g fill-rule="evenodd"><path d="m0 14c0 1.39 0.608 2 2 2h11c1.39 0 2-0.608 2-2v-12c0-1.2-0.802-2-2-2h-11c-1.3 0-2 0.697-2 2zm12.5-13c0.955 0 1.5 0.545 1.5 1.5v11c0 1.1-0.395 1.5-1.5 1.5h-10c-1.13 0-1.5-0.368-1.5-1.5v-11c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/><path d="m16 2.5v12c0 1.48 1.01 2.5 2.5 2.5h11c1.49 0 2.5-1.02 2.5-2.5v-12c0-1.28-1.22-2.5-2.5-2.5h-11z" color="%23000000" fill="url(%23linearGradient25)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m16 14c0 1.39 0.608 2 2 2h11c1.39 0 2-0.608 2-2v-12c0-1.2-0.802-2-2-2h-11c-1.3 0-2 0.697-2 2zm12.5-13c0.955 0 1.5 0.545 1.5 1.5v11c0 1.1-0.395 1.5-1.5 1.5h-10c-1.13 0-1.5-0.368-1.5-1.5v-11c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/><path d="m32 2.5v12c0 1.48 1.01 2.5 2.5 2.5h11c1.49 0 2.5-1.02 2.5-2.5v-12c0-1.28-1.22-2.5-2.5-2.5h-11z" color="%23000000" fill="url(%23linearGradient26)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m32 14c0 1.39 0.608 2 2 2h11c1.39 0 2-0.608 2-2v-12c0-1.2-0.802-2-2-2h-11c-1.3 0-2 0.697-2 2zm12.5-13c0.955 0 1.5 0.545 1.5 1.5v11c0 1.1-0.395 1.5-1.5 1.5h-10c-1.13 0-1.5-0.368-1.5-1.5v-11c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/></g><rect x="17" y="1" width="13" height="14" fill="url(%23radialGradient3-6)" stroke-linejoin="round" stroke-width="9.9"/><path d="m23.5 5-4.5 4.5 1.5 1.5 3-3 3 3 1.5-1.5z" fill="%234d6185" fill-rule="evenodd"/><path d="m17 1v14h13v-14zm1 1h11v12h-11z" fill="url(%23linearGradient5-7)"/><rect x="33" y="1" width="13" height="14" fill="url(%23radialGradient3-8)" stroke-linejoin="round" stroke-width="9.9"/><path d="m39.5 5-4.5 4.5 1.5 1.5 3-3 3 3 1.5-1.5z" fill="%234d6185" fill-rule="evenodd"/><path d="m33 1v14h13v-14zm1 1h11v12h-11z" fill="url(%23linearGradient5-3)"/></svg>');
+}
+
+::-webkit-scrollbar-button:vertical:increment {
+  background-image: url('data:image/svg+xml;utf8,<svg width="48" height="17" version="1.1" viewBox="0 0 48 17" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient id="linearGradient9"><stop stop-color="%237da0d4" offset="0"/><stop stop-color="%23bdcbda" offset="1"/></linearGradient><radialGradient id="radialGradient3" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.023 2.8 -2.7 .022 2.7 .8)" gradientUnits="userSpaceOnUse"><stop stop-color="%23e1eafe" offset="0"/><stop stop-color="%23aec8f7" offset="1"/></radialGradient><linearGradient id="linearGradient5" x2="13" y1="7" y2="7" gradientTransform="translate(1,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%23b8cbf6" stop-opacity=".57" offset="0"/><stop stop-color="%23b0c4f2" stop-opacity=".68" offset="1"/></linearGradient><linearGradient id="linearGradient10" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/><linearGradient id="linearGradient10-0" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientTransform="translate(16)" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/><radialGradient id="radialGradient3-6" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.023 2.8 -2.7 .022 18.7 .8)" gradientUnits="userSpaceOnUse"><stop stop-color="%23fdffff" offset="0"/><stop stop-color="%23b9dafb" offset="1"/></radialGradient><linearGradient id="linearGradient5-7" x2="13" y1="7" y2="7" gradientTransform="translate(17,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%23abbee9" offset="0"/><stop stop-color="%238da8e1" offset="1"/></linearGradient><linearGradient id="linearGradient10-9" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientTransform="translate(32)" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/><radialGradient id="radialGradient3-8" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.023 2.8 -2.7 .022 34.7 .8)" gradientUnits="userSpaceOnUse"><stop stop-color="%236e8ef1" offset="0"/><stop stop-color="%23d2deeb" offset="1"/></radialGradient><linearGradient id="linearGradient5-3" x2="13" y1="7" y2="7" gradientTransform="translate(33,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%2398a1dd" offset="0"/><stop stop-color="%23b1c6f3" offset="1"/></linearGradient></defs><g fill-rule="evenodd"><path d="m0 2.5v12c3e-7 1.48 1.01 2.5 2.5 2.5h11c1.49 0 2.5-1.02 2.5-2.5v-12c0-1.28-1.22-2.5-2.5-2.5h-11z" color="%23000000" fill="url(%23linearGradient10)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m0 14c0 1.39 0.608 2 2 2h11c1.39 0 2-0.608 2-2v-12c0-1.2-0.802-2-2-2h-11c-1.3 0-2 0.697-2 2zm12.5-13c0.955 0 1.5 0.545 1.5 1.5v11c0 1.1-0.395 1.5-1.5 1.5h-10c-1.13 0-1.5-0.368-1.5-1.5v-11c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/><path d="m16 2.5v12c0 1.48 1.01 2.5 2.5 2.5h11c1.49 0 2.5-1.02 2.5-2.5v-12c0-1.28-1.22-2.5-2.5-2.5h-11z" color="%23000000" fill="url(%23linearGradient10-0)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m16 14c0 1.39 0.608 2 2 2h11c1.39 0 2-0.608 2-2v-12c0-1.2-0.802-2-2-2h-11c-1.3 0-2 0.697-2 2zm12.5-13c0.955 0 1.5 0.545 1.5 1.5v11c0 1.1-0.395 1.5-1.5 1.5h-10c-1.13 0-1.5-0.368-1.5-1.5v-11c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/><path d="m32 2.5v12c0 1.48 1.01 2.5 2.5 2.5h11c1.49 0 2.5-1.02 2.5-2.5v-12c0-1.28-1.22-2.5-2.5-2.5h-11z" color="%23000000" fill="url(%23linearGradient10-9)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m32 14c0 1.39 0.608 2 2 2h11c1.39 0 2-0.608 2-2v-12c0-1.2-0.802-2-2-2h-11c-1.3 0-2 0.697-2 2zm12.5-13c0.955 0 1.5 0.545 1.5 1.5v11c0 1.1-0.395 1.5-1.5 1.5h-10c-1.13 0-1.5-0.368-1.5-1.5v-11c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/></g><rect x="1" y="1" width="13" height="14" fill="url(%23radialGradient3)" stroke-linejoin="round" stroke-width="9.9"/><path d="m7.5 12-4.5-4.5 1.5-1.5 3 3 3-3 1.5 1.5z" fill="%234d6185" fill-rule="evenodd"/><path d="m1 1v14h13v-14zm1 1h11v12h-11z" fill="url(%23linearGradient5)"/><rect x="17" y="1" width="13" height="14" fill="url(%23radialGradient3-6)" stroke-linejoin="round" stroke-width="9.9"/><path d="m23.5 12-4.5-4.5 1.5-1.5 3 3 3-3 1.5 1.5z" fill="%234d6185" fill-rule="evenodd"/><path d="m17 1v14h13v-14zm1 1h11v12h-11z" fill="url(%23linearGradient5-7)"/><rect x="33" y="1" width="13" height="14" fill="url(%23radialGradient3-8)" stroke-linejoin="round" stroke-width="9.9"/><path d="m39.5 12-4.5-4.5 1.5-1.5 3 3 3-3 1.5 1.5z" fill="%234d6185" fill-rule="evenodd"/><path d="m33 1v14h13v-14zm1 1h11v12h-11z" fill="url(%23linearGradient5-3)"/></svg>');
+}
+
+::-webkit-scrollbar-button:horizontal:decrement {
+  background-image: url('data:image/svg+xml;utf8,<svg width="51" height="16" version="1.1" viewBox="0 0 51 16" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient id="linearGradient9"><stop stop-color="%237da0d4" offset="0"/><stop stop-color="%23bdcbda" offset="1"/></linearGradient><radialGradient id="radialGradient3" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.0248 2.6 -2.91 .0204 2.83 .814)" gradientUnits="userSpaceOnUse"><stop stop-color="%23e1eafe" offset="0"/><stop stop-color="%23aec8f7" offset="1"/></radialGradient><linearGradient id="linearGradient5" x2="13" y1="7" y2="7" gradientTransform="translate(1,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%23b8cbf6" stop-opacity=".57" offset="0"/><stop stop-color="%23b0c4f2" stop-opacity=".68" offset="1"/></linearGradient><linearGradient id="linearGradient10" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/><radialGradient id="radialGradient3-6" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.0248 2.6 -2.91 .0204 19.8 .814)" gradientUnits="userSpaceOnUse"><stop stop-color="%23fdffff" offset="0"/><stop stop-color="%23b9dafb" offset="1"/></radialGradient><linearGradient id="linearGradient5-7" x2="13" y1="7" y2="7" gradientTransform="translate(18,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%23abbee9" offset="0"/><stop stop-color="%238da8e1" offset="1"/></linearGradient><radialGradient id="radialGradient3-8" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.0248 2.6 -2.91 .0204 36.8 .814)" gradientUnits="userSpaceOnUse"><stop stop-color="%236e8ef1" offset="0"/><stop stop-color="%23d2deeb" offset="1"/></radialGradient><linearGradient id="linearGradient5-3" x2="13" y1="7" y2="7" gradientTransform="translate(35,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%2398a1dd" offset="0"/><stop stop-color="%23b1c6f3" offset="1"/></linearGradient><linearGradient id="linearGradient25" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientTransform="translate(17)" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/><linearGradient id="linearGradient26" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientTransform="translate(34)" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/></defs><g fill-rule="evenodd"><path d="m0 2.5v11c3e-7 1.48 1.01 2.5 2.5 2.5h12c1.49 0 2.5-1.02 2.5-2.5v-11c0-1.28-1.22-2.5-2.5-2.5h-12z" color="%23000000" fill="url(%23linearGradient10)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m0 13c0 1.39 0.608 2 2 2h12c1.39 0 2-0.608 2-2v-11c0-1.2-0.802-2-2-2h-12c-1.3 0-2 0.697-2 2zm13.5-12c0.955 0 1.5 0.545 1.5 1.5v10c0 1.1-0.395 1.5-1.5 1.5h-11c-1.13 0-1.5-0.368-1.5-1.5v-10c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/><path d="m17 2.5v11c0 1.48 1.01 2.5 2.5 2.5h12c1.49 0 2.5-1.02 2.5-2.5v-11c0-1.28-1.22-2.5-2.5-2.5h-12z" color="%23000000" fill="url(%23linearGradient25)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m17 13c0 1.39 0.608 2 2 2h12c1.39 0 2-0.608 2-2v-11c0-1.2-0.802-2-2-2h-12c-1.3 0-2 0.697-2 2zm13.5-12c0.955 0 1.5 0.545 1.5 1.5v10c0 1.1-0.395 1.5-1.5 1.5h-11c-1.13 0-1.5-0.368-1.5-1.5v-10c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/><path d="m34 2.5v11c0 1.48 1.01 2.5 2.5 2.5h12c1.49 0 2.5-1.02 2.5-2.5v-11c0-1.28-1.22-2.5-2.5-2.5h-12z" color="%23000000" fill="url(%23linearGradient26)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m34 13c0 1.39 0.608 2 2 2h12c1.39 0 2-0.608 2-2v-11c0-1.2-0.802-2-2-2h-12c-1.3 0-2 0.697-2 2zm13.5-12c0.955 0 1.5 0.545 1.5 1.5v10c0 1.1-0.395 1.5-1.5 1.5h-11c-1.13 0-1.5-0.368-1.5-1.5v-10c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/></g><rect x="1" y="1" width="14" height="13" fill="url(%23radialGradient3)" stroke-linejoin="round" stroke-width="9.9"/><path d="m4 7.5 4.5-4.5 1.5 1.5-3 3 3 3-1.5 1.5z" fill="%234d6185" fill-rule="evenodd"/><path d="m1 1v13h14v-13zm1 1h12v11h-12z" fill="url(%23linearGradient5)"/><rect x="18" y="1" width="14" height="13" fill="url(%23radialGradient3-6)" stroke-linejoin="round" stroke-width="9.9"/><path d="m18 1v13h14v-13zm1 1h12v11h-12z" fill="url(%23linearGradient5-7)"/><rect x="35" y="1" width="14" height="13" fill="url(%23radialGradient3-8)" stroke-linejoin="round" stroke-width="9.9"/><path d="m35 1v13h14v-13zm1 1h12v11h-12z" fill="url(%23linearGradient5-3)"/><path d="m21 7.5 4.5-4.5 1.5 1.5-3 3 3 3-1.5 1.5z" fill="%234d6185" fill-rule="evenodd"/><path d="m38 7.5 4.5-4.5 1.5 1.5-3 3 3 3-1.5 1.5z" fill="%234d6185" fill-rule="evenodd"/></svg>');
+}
+
+::-webkit-scrollbar-button:horizontal:increment {
+  background-image: url('data:image/svg+xml;utf8,<svg width="51" height="16" version="1.1" viewBox="0 0 51 16" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient id="linearGradient9"><stop stop-color="%237da0d4" offset="0"/><stop stop-color="%23bdcbda" offset="1"/></linearGradient><radialGradient id="radialGradient3" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.0248 2.6 -2.91 .0204 2.83 .814)" gradientUnits="userSpaceOnUse"><stop stop-color="%23e1eafe" offset="0"/><stop stop-color="%23aec8f7" offset="1"/></radialGradient><linearGradient id="linearGradient5" x2="13" y1="7" y2="7" gradientTransform="translate(1,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%23b8cbf6" stop-opacity=".57" offset="0"/><stop stop-color="%23b0c4f2" stop-opacity=".68" offset="1"/></linearGradient><linearGradient id="linearGradient10" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/><radialGradient id="radialGradient3-6" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.0248 2.6 -2.91 .0204 19.8 .814)" gradientUnits="userSpaceOnUse"><stop stop-color="%23fdffff" offset="0"/><stop stop-color="%23b9dafb" offset="1"/></radialGradient><linearGradient id="linearGradient5-7" x2="13" y1="7" y2="7" gradientTransform="translate(18,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%23abbee9" offset="0"/><stop stop-color="%238da8e1" offset="1"/></linearGradient><radialGradient id="radialGradient3-8" cx=".11" cy=".6" r="6.5" gradientTransform="matrix(.0248 2.6 -2.91 .0204 36.8 .814)" gradientUnits="userSpaceOnUse"><stop stop-color="%236e8ef1" offset="0"/><stop stop-color="%23d2deeb" offset="1"/></radialGradient><linearGradient id="linearGradient5-3" x2="13" y1="7" y2="7" gradientTransform="translate(35,1)" gradientUnits="userSpaceOnUse"><stop stop-color="%2398a1dd" offset="0"/><stop stop-color="%23b1c6f3" offset="1"/></linearGradient><linearGradient id="linearGradient11" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientTransform="translate(17)" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/><linearGradient id="linearGradient12" x1="9.36" x2="12.2" y1="16.5" y2="2.06" gradientTransform="translate(34)" gradientUnits="userSpaceOnUse" xlink:href="%23linearGradient9"/></defs><g fill-rule="evenodd"><path d="m0 2.5v11c3e-7 1.48 1.01 2.5 2.5 2.5h12c1.49 0 2.5-1.02 2.5-2.5v-11c0-1.28-1.22-2.5-2.5-2.5h-12z" color="%23000000" fill="url(%23linearGradient10)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m0 13c0 1.39 0.608 2 2 2h12c1.39 0 2-0.608 2-2v-11c0-1.2-0.802-2-2-2h-12c-1.3 0-2 0.697-2 2zm13.5-12c0.955 0 1.5 0.545 1.5 1.5v10c0 1.1-0.395 1.5-1.5 1.5h-11c-1.13 0-1.5-0.368-1.5-1.5v-10c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/><path d="m17 2.5v11c0 1.48 1.01 2.5 2.5 2.5h12c1.49 0 2.5-1.02 2.5-2.5v-11c0-1.28-1.22-2.5-2.5-2.5h-12z" color="%23000000" fill="url(%23linearGradient11)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m17 13c0 1.39 0.608 2 2 2h12c1.39 0 2-0.608 2-2v-11c0-1.2-0.802-2-2-2h-12c-1.3 0-2 0.697-2 2zm13.5-12c0.955 0 1.5 0.545 1.5 1.5v10c0 1.1-0.395 1.5-1.5 1.5h-11c-1.13 0-1.5-0.368-1.5-1.5v-10c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/><path d="m34 2.5v11c0 1.48 1.01 2.5 2.5 2.5h12c1.49 0 2.5-1.02 2.5-2.5v-11c0-1.28-1.22-2.5-2.5-2.5h-12z" color="%23000000" fill="url(%23linearGradient12)" stroke-width="1.06" style="-inkscape-stroke:none"/><path d="m34 13c0 1.39 0.608 2 2 2h12c1.39 0 2-0.608 2-2v-11c0-1.2-0.802-2-2-2h-12c-1.3 0-2 0.697-2 2zm13.5-12c0.955 0 1.5 0.545 1.5 1.5v10c0 1.1-0.395 1.5-1.5 1.5h-11c-1.13 0-1.5-0.368-1.5-1.5v-10c0-0.895 0.605-1.5 1.5-1.5z" color="%23000000" fill="%23fff" style="-inkscape-stroke:none"/></g><rect x="1" y="1" width="14" height="13" fill="url(%23radialGradient3)" stroke-linejoin="round" stroke-width="9.9"/><path d="m12 7.5-4.5 4.5-1.5-1.5 3-3-3-3 1.5-1.5z" fill="%234d6185" fill-rule="evenodd"/><path d="m1 1v13h14v-13zm1 1h12v11h-12z" fill="url(%23linearGradient5)"/><rect x="18" y="1" width="14" height="13" fill="url(%23radialGradient3-6)" stroke-linejoin="round" stroke-width="9.9"/><path d="m18 1v13h14v-13zm1 1h12v11h-12z" fill="url(%23linearGradient5-7)"/><rect x="35" y="1" width="14" height="13" fill="url(%23radialGradient3-8)" stroke-linejoin="round" stroke-width="9.9"/><path d="m35 1v13h14v-13zm1 1h12v11h-12z" fill="url(%23linearGradient5-3)"/><path d="m29 7.5-4.5 4.5-1.5-1.5 3-3-3-3 1.5-1.5z" fill="%234d6185" fill-rule="evenodd"/><path d="m46 7.5-4.5 4.5-1.5-1.5 3-3-3-3 1.5-1.5z" fill="%234d6185" fill-rule="evenodd"/></svg>');
+}
+
+/* 커스텀 스크롤바 스타일 (Firefox 및 기타 브라우저용) */
+.horizontal-scrollbar,
+.vertical-scrollbar {
+  display: flex;
+  background: #EEEDE5;
+}
+
+.horizontal-scrollbar > button,
+.vertical-scrollbar > button {
+  display: flex;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  min-width: 0;
+  padding: 0;
+  background: radial-gradient(circle at 0 0, #EEEDE5, #AEC8F7 75%);
+  border: 1px solid #fff;
+  border-radius: 2px;
+  margin-bottom: 1px;
+  margin-right: 1px;
+  box-shadow: 0 1px #A0B5D3, 1px 0 #7C9FD3, inset 1px 1px #B7CAF5, inset -1px -1px #B3C8F5;
+}
+
+.horizontal-scrollbar > button::after, .horizontal-scrollbar > button:active::after, .horizontal-scrollbar > button:hover::after,
+.vertical-scrollbar > button::after,
+.vertical-scrollbar > button:active::after,
+.vertical-scrollbar > button:hover::after {
+  content: "";
+  display: block;
+  width: 9px;
+  height: 9px;
+  margin: 3px 0 0 3px;
+  background: #4D6185;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  position: initial;
+  box-shadow: none;
+  border: 0;
+}
+
+.horizontal-scrollbar > button:focus,
+.vertical-scrollbar > button:focus {
+  outline: none;
+}
+
+.horizontal-scrollbar > button:not(:disabled):active,
+.vertical-scrollbar > button:not(:disabled):active {
+  padding: 0;
+}
+
+.horizontal-scrollbar > button:not(:disabled, .disabled):hover, .horizontal-scrollbar > button.hover,
+.vertical-scrollbar > button:not(:disabled, .disabled):hover,
+.vertical-scrollbar > button.hover {
+  background: radial-gradient(circle at 0 0, #FDFFFF, #B9DAFB 75%);
+  box-shadow: 0 1px #A0B5D3, 1px 0 #7C9FD3, inset 1px 1px #ABBEE9, inset -1px -1px #8DA8E1;
+}
+
+.horizontal-scrollbar > button:not(:disabled, .disabled):hover::after, .horizontal-scrollbar > button.hover::after,
+.vertical-scrollbar > button:not(:disabled, .disabled):hover::after,
+.vertical-scrollbar > button.hover::after {
+  border: 0;
+}
+
+.horizontal-scrollbar > button:not(:disabled, .disabled):active,
+.vertical-scrollbar > button:not(:disabled, .disabled):active {
+  background: radial-gradient(circle at 0 0, #6E8EF1, #D2DEEB 75%);
+  box-shadow: 0 1px #A0B5D3, 1px 0 #7C9FD3, inset 1px 1px #98A1DD, inset -1px -1px #B1C6F3;
+}
+
+.horizontal-scrollbar > button:not(:disabled, .disabled):active:after,
+.vertical-scrollbar > button:not(:disabled, .disabled):active:after {
+  display: block;
+}
+
+.horizontal-scrollbar > .scrollbar-track,
+.vertical-scrollbar > .scrollbar-track {
+  flex-grow: 1;
+  position: relative;
+}
+
+.horizontal-scrollbar > .scrollbar-track > .scrollbar-thumb,
+.vertical-scrollbar > .scrollbar-track > .scrollbar-thumb {
+  position: absolute;
+  border: 1px solid #fff;
+  border-radius: 2px;
+  box-shadow: 1px 1px #7DA0D4, inset 1px -1px #B4C8F6, inset 0 1px #BDCEF7, inset 0 2px #D1E0FD;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.horizontal-scrollbar > .scrollbar-track > .scrollbar-thumb:hover,
+.vertical-scrollbar > .scrollbar-track > .scrollbar-thumb:hover {
+  box-shadow: 1px 1px #7DA0D4, inset 1px -1px #B4C8F6, inset 0 1px #ACCEFF, inset 0 2px #E0EDFF;
+}
+
+.horizontal-scrollbar > .scrollbar-track > .scrollbar-thumb:active,
+.vertical-scrollbar > .scrollbar-track > .scrollbar-thumb:active {
+  box-shadow: 1px 1px #7DA0D4, inset 1px -1px #B4C8F6, inset 0 1px #839BD4, inset 0 2px #9FB4EC;
+}
+
+/* 가로 스크롤바 */
+.horizontal-scrollbar {
+  padding: 1px 0;
+}
+
+.horizontal-scrollbar > button {
+  height: 15px;
+}
+
+.horizontal-scrollbar > button:first-child::after {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg width="6" height="9" version="1.1" viewBox="0 0 6 9" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-1.5,1.5)"><path d="m1.5 3 4.5-4.5 1.5 1.5-3 3-3-3 1.5-1.5z" fill-rule="evenodd"/></g></svg>');
+  -webkit-mask-size: 6px 9px;
+  mask-image: url('data:image/svg+xml;utf8,<svg width="6" height="9" version="1.1" viewBox="0 0 6 9" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-1.5,1.5)"><path d="m1.5 3 4.5-4.5 1.5 1.5-3 3-3-3 1.5-1.5z" fill-rule="evenodd"/></g></svg>');
+  mask-size: 6px 9px;
+  margin: 2px 0 0 3px;
+}
+
+.horizontal-scrollbar > button:last-child::after {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg width="6" height="9" version="1.1" viewBox="0 0 6 9" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-1.5,1.5)"><path d="m7.5 3-4.5-4.5-1.5 1.5 3 3-3 3 1.5 1.5z" fill-rule="evenodd"/></g></svg>');
+  -webkit-mask-size: 6px 9px;
+  mask-image: url('data:image/svg+xml;utf8,<svg width="6" height="9" version="1.1" viewBox="0 0 6 9" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-1.5,1.5)"><path d="m7.5 3-4.5-4.5-1.5 1.5 3 3-3 3 1.5 1.5z" fill-rule="evenodd"/></g></svg>');
+  mask-size: 6px 9px;
+  margin: 2px 0 0 5px;
+}
+
+.horizontal-scrollbar > .scrollbar-track {
+  background: linear-gradient(to bottom, #F3F1EC, #FEFEFB);
+}
+
+.horizontal-scrollbar > .scrollbar-track > .scrollbar-thumb {
+  height: 15px;
+  background: linear-gradient(to bottom, #C8D6FB, #B9CBF3);
+  top: 0;
+  bottom: 0;
+}
+
+.horizontal-scrollbar > .scrollbar-track > .scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #DAE9FF, #CCE1FF);
+}
+
+.horizontal-scrollbar > .scrollbar-track > .scrollbar-thumb:active {
+  background: linear-gradient(to bottom, #A8BEF6, #92B2F6);
+}
+
+.horizontal-scrollbar > .scrollbar-track > .scrollbar-thumb::after {
+  display: block;
+  content: "";
+  width: 8px;
+  height: 7px;
+  background: repeating-linear-gradient(to right, #EEF4FE, #EEF4FE 1px, #8CB0F8 1px, #8CB0F8 2px);
+}
+
+/* 세로 스크롤바 */
+.vertical-scrollbar {
+  flex-direction: column;
+  width: 17px;
+  padding: 0 1px;
+}
+
+.vertical-scrollbar > button {
+  width: 15px;
+}
+
+.vertical-scrollbar > button:first-child::after {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg width="9" height="6" version="1.1" viewBox="0 0 9 6" xmlns="http://www.w3.org/2000/svg"><path d="m4.5 0-4.5 4.5 1.5 1.5 3-3 3 3 1.5-1.5z" fill-rule="evenodd"/></svg>');
+  -webkit-mask-size: 9px 6px;
+  mask-image: url('data:image/svg+xml;utf8,<svg width="9" height="6" version="1.1" viewBox="0 0 9 6" xmlns="http://www.w3.org/2000/svg"><path d="m4.5 0-4.5 4.5 1.5 1.5 3-3 3 3 1.5-1.5z" fill-rule="evenodd"/></svg>');
+  mask-size: 9px 6px;
+  margin: 4px 0 0 2px;
+}
+
+.vertical-scrollbar > button:last-child::after {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg width="9" height="6" version="1.1" viewBox="0 0 9 6" xmlns="http://www.w3.org/2000/svg"><path d="m4.5 6-4.5-4.5 1.5-1.5 3 3 3-3 1.5 1.5z" fill-rule="evenodd"/></svg>');
+  -webkit-mask-size: 9px 6px;
+  mask-image: url('data:image/svg+xml;utf8,<svg width="9" height="6" version="1.1" viewBox="0 0 9 6" xmlns="http://www.w3.org/2000/svg"><path d="m4.5 6-4.5-4.5 1.5-1.5 3 3 3-3 1.5 1.5z" fill-rule="evenodd"/></svg>');
+  mask-size: 9px 6px;
+  margin: 5px 0 0 2px;
+}
+
+.vertical-scrollbar > .scrollbar-track {
+  background: linear-gradient(to right, #F3F1EC, #FEFEFB);
+}
+
+.vertical-scrollbar > .scrollbar-track > .scrollbar-thumb {
+  width: 15px;
+  background: linear-gradient(to right, #C8D6FB, #B9CBF3);
+  left: 0;
+  right: 0;
+}
+
+.vertical-scrollbar > .scrollbar-track > .scrollbar-thumb:hover {
+  background: linear-gradient(to right, #DAE9FF, #CCE1FF);
+}
+
+.vertical-scrollbar > .scrollbar-track > .scrollbar-thumb:active {
+  background: linear-gradient(to right, #A8BEF6, #92B2F6);
+}
+
+.vertical-scrollbar > .scrollbar-track > .scrollbar-thumb::after {
+  display: block;
+  content: "";
+  width: 7px;
+  height: 8px;
+  background: repeating-linear-gradient(to bottom, #EEF4FE, #EEF4FE 1px, #8CB0F8 1px, #8CB0F8 2px);
+}

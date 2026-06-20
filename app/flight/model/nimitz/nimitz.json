@@ -1,0 +1,79 @@
+{
+  "faction": "NEUTRAL",
+  "hostileFactions": [],
+  "sensors": {
+    "detectionRange": 30000,
+    "lockOnTime": 2.0
+  },
+  "weapons": {
+    "fireCooldown": 8.0
+  },
+  "destruction": {
+    "explosionScale": 35.0,
+    "explosionCount": 8,
+    "health": 2000,
+    "damage": 100
+  },
+  "collisionRadius": 800.0,
+  "model": {
+    "file": "model/nimitz/nimitz.glb",
+    "scale": 560,
+    "initialRotation": {
+      "x": 0,
+      "y": 270,
+      "z": 0
+    },
+    "initialPosition": {
+      "x": 11110,
+      "y": 0,
+      "z": -10000
+    }
+  },
+  "performance": {
+    "speed": 0,
+    "acceleration": 0,
+    "accelerationRate": 1.0,
+    "minSpeed": 0,
+    "gravityEffect": 0.0,
+    "turnDrag": 0.0,
+    "turnSensitivity": 0,
+    "pitchLimits": {
+      "up": 0,
+      "down": 0
+    },
+    "maxRollAngle": 0
+  },
+  "camera": {
+    "lerpSpeed": 0,
+    "minDistance": 0,
+    "maxDistance": 0,
+    "lookAtDistance": 0,
+    "follow": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "rear_view": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "visuals": {
+    "engineHardpoints": []
+  },
+  "hardpoints": {
+    "hardpoint_1": {
+      "type": "none",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "scale": 1
+    },
+    "hardpoint_2": {
+      "type": "none",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "scale": 1
+    }
+  }
+}

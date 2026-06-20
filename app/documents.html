@@ -1,0 +1,908 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Documents</title>
+    <link rel="stylesheet" href="../fonts/fonts.css">
+    <link rel="stylesheet" href="../scroll.css">
+    <script src="../focusController.js"></script>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background: none;
+            overflow: hidden;
+            font-family: Tahoma, 'Noto Sans', sans-serif;
+            font-size: 11px;
+        }
+
+        /* winXP-master의 MyComputer 스타일 */
+        .my-computer-window {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            display: flex;
+            overflow: hidden;
+            flex-direction: column;
+            background: linear-gradient(to right, #edede5 0%, #ede8cd 100%);
+        }
+
+        .com__toolbar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            line-height: 100%;
+            height: 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .com__options {
+            height: 24px;
+            border-bottom: 0px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0px 0 0px 2px;
+            border-left: 0;
+            flex: 1;
+            display: flex;
+        }
+
+        .com__options .menu-item {
+            position: relative;
+            padding: 6px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .com__options .menu-item:hover,
+        .com__options .menu-item.active {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        .com__options .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #888;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            list-style: none;
+            padding: 2px;
+            margin: 0;
+            z-index: 100;
+            color: black;
+        }
+
+        .com__options .menu-item.active .dropdown-menu {
+            display: block;
+        }
+
+        .com__options .dropdown-menu li {
+            padding: 2px 20px 2px 25px;
+            /* Left padding increased for checkmark space */
+            white-space: nowrap;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .com__options .dropdown-menu li:hover {
+            background-color: #316ac5;
+            color: white;
+        }
+
+        /* Disabled item style */
+        .com__options .dropdown-menu li.disabled {
+            color: #888;
+            pointer-events: none;
+        }
+
+        .com__options .dropdown-menu li.disabled:hover {
+            background-color: transparent;
+            color: #888;
+            cursor: default;
+        }
+
+        /* Checkmark style for toggles */
+        .com__options .dropdown-menu li.checked::before {
+            content: '✓';
+            position: absolute;
+            left: 7px;
+            font-weight: bold;
+        }
+
+        .com__options .dropdown-menu li.separator {
+            height: 1px;
+            background-color: #ccc;
+            padding: 0;
+            margin: 4px 0;
+            cursor: default;
+        }
+
+        .com__options .dropdown-menu li.separator:hover {
+            background-color: #ccc;
+            color: inherit;
+        }
+
+        .com__windows-logo {
+            height: 36px;
+            border-left: 1px solid white;
+            border-bottom: 0px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .com__function_bar {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            background-color: #efefef;
+            padding: 1px 3px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .com__function_bar__button {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0);
+            border-radius: 3px;
+            padding: 0 4px;
+            cursor: pointer;
+        }
+
+        .com__function_bar__button:hover {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .com__function_bar__button:hover:active {
+            border: 1px solid rgb(185, 185, 185);
+            background-color: #dedede;
+            box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.7);
+        }
+
+        .com__function_bar__button:hover:active>* {
+            transform: translate(1px, 1px);
+        }
+
+        .com__function_bar__button--disabled {
+            filter: grayscale(1);
+            opacity: 0.7;
+            display: flex;
+            height: 100%;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0);
+            padding: 0 4px;
+            cursor: default;
+        }
+
+        .com__function_bar__icon {
+            height: 22px;
+            width: 22px;
+        }
+
+        .com__function_bar__text {
+            margin-left: 4px;
+        }
+
+        .com__function_bar__separate {
+            height: 90%;
+            width: 1px;
+            background-color: rgba(0, 0, 0, 0.2);
+            margin: 0 2px;
+        }
+
+        .com__address_bar {
+            flex-shrink: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            height: 22px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            padding: 0 2px;
+            box-shadow: inset 0 -2px 1px -1px #b0b0b0;
+        }
+
+        .com__address_bar__title {
+            color: rgba(0, 0, 0, 0.5);
+            padding: 7px;
+            height: 15px;
+        }
+
+        .com__address_bar__content {
+            border: rgba(122, 122, 255, 0.6) 1px solid;
+            height: calc(100% - 1px);
+            display: flex;
+            flex: 1;
+            align-items: center;
+            background-color: white;
+            position: relative;
+            padding: 0 4px;
+        }
+
+        .com__address_bar__content__img {
+            width: 16px;
+            height: 16px;
+            padding-right: 5px;
+        }
+
+        .com__address_bar__right_space {
+            display: flex;
+            align-items: center;
+            padding: 0 16px 0 4px;
+            flex: 0 0 30px;
+        }
+
+        .com__address_bar__right__img {
+            width: 20px;
+            height: 20px;
+            padding-right: 7px;
+        }
+
+        .com__address_bar__right__text {
+            font-size: 11px;
+        }
+
+        .com__content {
+            flex: 1;
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            border-top-width: 0;
+            background-color: #f1f1f1;
+            overflow: auto;
+            font-size: 11px;
+            position: relative;
+        }
+
+        .com__content__inner {
+            display: flex;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .com__content__left {
+            width: 180px;
+            height: calc(100%-10px);
+            background: linear-gradient(to bottom, #748aff 0%, #4057d3 100%);
+            padding: 10px;
+        }
+
+        .com__content__left__card {
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .com__content__left__card__header {
+            display: flex;
+            align-items: center;
+            height: 23px;
+            padding-left: 11px;
+            padding-right: 2px;
+            cursor: pointer;
+            background: linear-gradient(to right, rgb(240, 240, 255) 0, rgb(240, 240, 255) 30%, rgb(168, 188, 255) 100%);
+        }
+
+        .com__content__left__card__header__text {
+            font-weight: 700;
+            color: #0c327d;
+            flex: 1;
+        }
+
+        .com__content__left__card__header__img {
+            width: 18px;
+            height: 18px;
+        }
+
+        .com__content__left__card__content {
+            padding: 5px 10px;
+            background: linear-gradient(to right, rgb(180, 200, 251) 0%, rgb(164, 185, 251) 50%, rgb(180, 200, 251) 100%);
+        }
+
+        .com__content__left__card__row {
+            display: flex;
+            margin-bottom: 2px;
+            align-items: center;
+        }
+
+        .com__content__left__card__img {
+            width: 14px;
+            height: 14px;
+            margin-right: 5px;
+        }
+
+        .com__content__left__card__text {
+            font-size: 10px;
+            line-height: 14px;
+            color: #0c327d;
+        }
+
+        .com__content__left__card__text.link:hover {
+            cursor: pointer;
+            color: #2b72ff;
+            text-decoration: underline;
+        }
+
+        .com__content__right {
+            height: calc(100%-10px);
+            overflow: auto;
+            background-color: #fff;
+            flex: 1;
+            padding: 10px;
+            position: relative;
+        }
+
+        .com__content__right__card {
+            margin-bottom: 10px;
+        }
+
+        .com__content__right__card__header {
+            font-weight: 700;
+            padding: 2px 0 3px 12px;
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .com__content__right__card__header:after {
+            content: '';
+            display: block;
+            background: linear-gradient(to right, #70bfff 0, #fff 100%);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 1px;
+            width: 100%;
+        }
+
+        .com__content__right__card__content {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 5px 15px 0;
+        }
+
+        .com__content__right__card__item {
+            width: 80px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .com__content__right__card__img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 8px;
+            transition: filter 0.01s ease;
+            /* 부드러운 필터 전환 효과 */
+        }
+
+        .com__content__right__card__text {
+            font-family: 'Tahoma', sans-serif;
+            font-size: 11px;
+            color: black;
+            text-align: center;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 2px 4px;
+        }
+
+        /* 폴더 아이콘 선택 시 이미지에 파란색 필터 적용 */
+        .com__content__right__card__item.selected .com__content__right__card__img {
+            filter: sepia(95%) hue-rotate(185deg) saturate(4) brightness(0.6) opacity(0.9);
+        }
+
+        /* 폴더 아이콘 선택 시 텍스트 스타일 */
+        .com__content__right__card__item.selected .com__content__right__card__text {
+            background-color: #000080;
+            /* Windows 98 스타일의 진한 파란색 */
+            color: white;
+            border: 1px dotted white;
+            /* 흰색 점선 테두리 */
+            padding: 1px 3px;
+            border-radius: 0;
+        }
+
+        .status-bar {
+            margin: 0 1px;
+            display: flex;
+            /* 내부 요소들을 가로로 나란히 배치 */
+            gap: 1px;
+            /* 내부 요소 사이의 간격 */
+            height: 22px;
+            /* 상태 표시줄 높이 */
+        }
+
+        .status-bar-field {
+            /* 입체적인 테두리 효과 */
+            box-shadow: inset -1px -1px #dfdfdf, inset 1px 1px grey;
+            flex-grow: 1;
+            /* 남은 공간을 모두 차지 */
+            padding: 4px 3px;
+            /* 내부 여백 */
+            margin: 0;
+            /* 외부 여백 없음 */
+        }
+    </style>
+    <script src="../focusController.js"></script>
+</head>
+
+<body>
+    <div class="my-computer-window">
+        <section class="com__toolbar">
+            <div class="com__options">
+                <div class="menu-item"><span><u>F</u>ile</span>
+                    <ul class="dropdown-menu">
+                        <li class="disabled">Create Shortcut</li>
+                        <li class="disabled">Delete</li>
+                        <li class="disabled">Rename</li>
+                        <li class="disabled">Properties</li>
+                        <li class="separator"></li>
+                        <li data-action="Close">Close</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>E</u>dit</span>
+                    <ul class="dropdown-menu">
+                        <li class="disabled">Undo</li>
+                        <li class="separator"></li>
+                        <li class="disabled">Cut</li>
+                        <li class="disabled">Copy</li>
+                        <li class="disabled">Paste</li>
+                        <li class="separator"></li>
+                        <li>Select All</li>
+                        <li>Invert Selection</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>V</u>iew</span>
+                    <ul class="dropdown-menu">
+                        <li>Toolbars</li>
+                        <li>Status Bar</li>
+                        <li>Explorer Bar</li>
+                        <li class="separator"></li>
+                        <li>Thumbnails</li>
+                        <li>Tiles</li>
+                        <li>Icons</li>
+                        <li>List</li>
+                        <li>Details</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>F</u>avorites</span>
+                    <ul class="dropdown-menu">
+                        <li>Add to Favorites...</li>
+                        <li>Organize Favorites...</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>T</u>ools</span>
+                    <ul class="dropdown-menu">
+                        <li>Map Network Drive...</li>
+                        <li>Disconnect Network Drive...</li>
+                        <li class="separator"></li>
+                        <li>Folder Options...</li>
+                    </ul>
+                </div>
+                <div class="menu-item"><span><u>H</u>elp</span>
+                    <ul class="dropdown-menu">
+                        <li>Help and Support Center</li>
+                        <li class="separator"></li>
+                        <li>About Windows</li>
+                    </ul>
+                </div>
+
+                <div class="com__windows-logo"
+                    style="margin-left: auto; display: flex; align-items: center; justify-content: center; padding: 0 0px; height: 100%; border-left: 1px solid rgba(0, 0, 0, 0.1);">
+                    <img src="../image/windows.png" alt="Windows Logo"
+                        style="height: 100%; object-fit: contain; padding: 0;">
+                </div>
+            </div>
+        </section>
+        <section class="com__function_bar">
+            <div id="back-btn" class="com__function_bar__button--disabled"><img class="com__function_bar__icon"
+                    src="../image/back.png" alt=""> <span class="com__function_bar__text">Back</span></div>
+            <div id="forward-btn" class="com__function_bar__button--disabled"><img class="com__function_bar__icon"
+                    src="../image/front.png" alt=""></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/foldersearch.png"
+                    alt=""></div>
+            <div class="com__function_bar__separate"></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/search.png"
+                    alt=""> <span class="com__function_bar__text">Search</span></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon" src="../image/folder.png"
+                    alt=""> <span class="com__function_bar__text">Folders</span></div>
+            <div class="com__function_bar__separate"></div>
+            <div class="com__function_bar__button"><img class="com__function_bar__icon"
+                    src="../image/start menu programs.png" alt=""></div>
+
+        </section>
+        <section class="com__address_bar" style="margin-bottom: 1px;">
+            <div class="com__address_bar__title">Address</div>
+            <div class="com__address_bar__content">
+                <img src="../image/docfolder.png" alt="icon" class="com__address_bar__content__img">
+                <div class="com__address_bar__content__text">My Documents</div>
+            </div>
+            <div class="com__address_bar__right_space">
+                <img src="../image/continue.png" alt="icon" class="com__address_bar__right__img">
+                <span class="com__address_bar__right__text">Go</span>
+            </div>
+        </section>
+
+        <div class="com__content">
+            <div class="com__content__inner">
+                <div class="com__content__left">
+                    <div class="com__content__left__card">
+                        <div class="com__content__left__card__header">
+                            <div class="com__content__left__card__header__text">File and Folder Tasks</div><img
+                                src="../image/uparrow.png" alt="" class="com__content__left__card__header__img">
+                        </div>
+                        <div class="com__content__left__card__content">
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/folder.png" alt="folder">
+                                <div class="com__content__left__card__text link">Make a new folder</div>
+                            </div>
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/network.png" alt="share">
+                                <div class="com__content__left__card__text link">Publish this folder to the
+                                    Web</div>
+                            </div>
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/email.png" alt="email">
+                                <div class="com__content__left__card__text link">E-mail this file</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="com__content__left__card">
+                        <div class="com__content__left__card__header">
+                            <div class="com__content__left__card__header__text">Other Places</div><img
+                                src="../image/uparrow.png" alt="" class="com__content__left__card__header__img">
+                        </div>
+                        <div class="com__content__left__card__content">
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/mycomputer.png" alt="computer">
+                                <div class="com__content__left__card__text link">My Computer</div>
+                            </div>
+                            <div class="com__content__left__card__row"><img class="com__content__left__card__img"
+                                    src="../image/network.png" alt="network">
+                                <div class="com__content__left__card__text link">My Network Places</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="com__content__right">
+                    <!-- Content will be rendered here by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-bar-field">C:\documents and settings\administrator\My Documents</div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import FolderEnhancer from '../folderEnhancer.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // ==================================================================================
+            // 1. VFS Definitions (Consolidated)
+            // ==================================================================================
+            const vfs = {
+                'Documents': {
+                    type: 'root',
+                    icon: '../image/docfolder.png',
+                    children: {
+                        // --- Text Files ---
+                        'readme.txt': { type: 'file', icon: '../image/wordpad.png' },
+
+                        // --- Screensavers (Apps) ---
+                        'Pipes': { type: 'app', appId: 'pipes', icon: '../image/protect.png' },
+                        'Flower': { type: 'app', appId: 'flower', icon: '../image/protect.png' },
+                        'Maze': { type: 'app', appId: 'maze', icon: '../image/protect.png' },
+                        'Windows': { type: 'app', appId: 'windows', icon: '../image/protect.png' },
+                        'Starfield': { type: 'app', appId: 'starfield', icon: '../image/protect.png' },
+                        'Mystify': { type: 'app', appId: 'mystify', icon: '../image/protect.png' },
+                        'Smile': { type: 'app', appId: 'smile', icon: '../image/protect.png' },
+                        'Fish': { type: 'app', appId: 'fish', icon: '../image/protect.png' },
+                        'Flying Toasters': { type: 'app', appId: 'flying-toasters', icon: '../image/protect.png' },
+                        'Hard Rain': { type: 'app', appId: 'hard-rain', icon: '../image/protect.png' },
+                        'Rainstorm': { type: 'app', appId: 'rainstorm', icon: '../image/protect.png' },
+                        'Starry Night': { type: 'app', appId: 'starry-night', icon: '../image/protect.png' },
+
+                        // --- Videos & Music ---
+                        'Big buck bunny.mp4': { type: 'file', icon: '../image/mediaplayer.png' },
+                        'campfire.mp4': { type: 'file', icon: '../image/mediaplayer.png' },
+                        'blueocean.mp4': { type: 'file', icon: '../image/mediaplayer.png' },
+                        'Turkish March.mp3': { type: 'file', icon: '../image/mediaplayer.png' },
+                        'canon.mp3': { type: 'file', icon: '../image/mediaplayer.png' },
+
+                        // --- PDFs ---
+                        'attention-is-all-you-need-Paper.pdf': { type: 'file', icon: '../image/pdf.png' },
+                        'Bitcoin A Peer-to-Peer Electronic Cash System.pdf': { type: 'file', icon: '../image/pdf.png' },
+                        'language_understanding_paper.pdf': { type: 'file', icon: '../image/pdf.png' },
+
+                        // --- Images ---
+                        '가을.jpg': { type: 'file', icon: '../image/file.png' },
+                        '겨울.jpg': { type: 'file', icon: '../image/file.png' },
+                        '공간 이동.jpg': { type: 'file', icon: '../image/file.png' },
+                        '달과 붉은 사막.jpg': { type: 'file', icon: '../image/file.png' },
+                        '달과 산.jpg': { type: 'file', icon: '../image/file.png' },
+                        '물고기.jpg': { type: 'file', icon: '../image/file.png' },
+                        '바람.jpg': { type: 'file', icon: '../image/file.png' },
+                        '보라 꽃.jpg': { type: 'file', icon: '../image/file.png' },
+                        '빨강 꽃.jpg': { type: 'file', icon: '../image/file.png' },
+                        '석상.jpg': { type: 'file', icon: '../image/file.png' },
+                        '석양.jpg': { type: 'file', icon: '../image/file.png' },
+                        '수련.jpg': { type: 'file', icon: '../image/file.png' },
+                        '열대.jpg': { type: 'file', icon: '../image/file.png' },
+                        '유연.jpg': { type: 'file', icon: '../image/file.png' },
+                        '집.jpg': { type: 'file', icon: '../image/file.png' },
+                        '친구.jpg': { type: 'file', icon: '../image/file.png' },
+                        '크리스탈.jpg': { type: 'file', icon: '../image/file.png' },
+                        '튜울립.jpg': { type: 'file', icon: '../image/file.png' },
+                        '평화.jpg': { type: 'file', icon: '../image/file.png' },
+                        '표면.jpg': { type: 'file', icon: '../image/file.png' },
+                        '푸른 언덕.jpg': { type: 'file', icon: '../image/file.png' }
+                    }
+                }
+            };
+
+            let currentPath = 'Documents';
+            let navigationHistory = ['Documents'];
+            let historyIndex = 0;
+
+            const contentRight = document.querySelector('.com__content__right');
+            const addressBarText = document.querySelector('.com__address_bar__content__text');
+            const addressBarIcon = document.querySelector('.com__address_bar__content__img');
+            const backBtn = document.getElementById('back-btn');
+            const forwardBtn = document.getElementById('forward-btn');
+            const menuItems = document.querySelectorAll('.com__options .menu-item');
+
+            // Initialize FolderEnhancer
+            new FolderEnhancer({
+                container: contentRight,
+                selectableItems: '.com__content__right__card__item',
+                selectionClass: 'selected'
+            }).initialize();
+
+            // ==================================================================================
+            // 2. Render Logic
+            // ==================================================================================
+
+            function render(path) {
+                let currentLevel = null;
+                // Currently simple 1-level structure
+                if (path === 'Documents') {
+                    currentLevel = vfs['Documents'];
+                }
+
+                contentRight.innerHTML = '';
+
+                if (!currentLevel || !currentLevel.children) {
+                    return;
+                }
+
+                const content = document.createElement('div');
+                content.className = 'com__content__right__card__content';
+
+                // Sort items: Apps -> Folders (if any) -> Files
+                const items = Object.entries(currentLevel.children).sort(([, a], [, b]) => {
+                    if (a.type === 'app' && b.type !== 'app') return -1;
+                    if (a.type !== 'app' && b.type === 'app') return 1;
+                    return 0; // Keep original order for same types
+                });
+
+                for (const [name, item] of items) {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'com__content__right__card__item';
+                    itemEl.dataset.name = name;
+                    itemEl.dataset.type = item.type;
+                    if (item.appId) itemEl.dataset.appId = item.appId;
+
+                    const img = document.createElement('img');
+                    img.src = item.icon;
+                    img.alt = item.type;
+                    img.className = 'com__content__right__card__img';
+
+                    const text = document.createElement('div');
+                    text.className = 'com__content__right__card__text';
+                    text.textContent = name;
+
+                    itemEl.appendChild(img);
+                    itemEl.appendChild(text);
+                    content.appendChild(itemEl);
+                }
+                contentRight.appendChild(content);
+
+                updateAddressBar(path, currentLevel.icon);
+                updateNavButtons();
+                setupItemInteraction();
+            }
+
+            function updateAddressBar(path, iconSrc) {
+                let displayPath = path;
+                if (path === 'Documents') {
+                    displayPath = 'C:\\documents and settings\\administrator\\My Documents';
+                }
+                addressBarText.textContent = displayPath;
+                addressBarIcon.src = iconSrc;
+            }
+
+            function updateNavButtons() {
+                backBtn.className = historyIndex > 0 ? 'com__function_bar__button' : 'com__function_bar__button--disabled';
+                forwardBtn.className = historyIndex < navigationHistory.length - 1 ? 'com__function_bar__button' : 'com__function_bar__button--disabled';
+            }
+
+            // ==================================================================================
+            // 3. Execution Logic (Consolidated)
+            // ==================================================================================
+
+            function executeFile(itemName, itemData) {
+                if (window.parent) {
+                    // Case 1: App (Screensaver)
+                    if (itemData.type === 'app' && itemData.appId) {
+                        window.parent.postMessage({ type: 'launchApp', appId: itemData.appId }, '*');
+                        return;
+                    }
+
+                    const lowerName = itemName.toLowerCase();
+
+                    // Case 2: Images
+                    const imageExtensions = ['.jpg', '.jpeg', '.png', '.bmp'];
+                    if (imageExtensions.some(ext => lowerName.endsWith(ext))) {
+                        // Launch ImageViewer with payload
+                        window.parent.postMessage({
+                            type: 'launchApp',
+                            appId: 'imageviewer',
+                            payload: {
+                                type: 'openImageViewer',
+                                filePath: 'My Documents/' + itemName
+                            }
+                        }, '*');
+                        return;
+                    }
+
+                    // Case 3: Videos & Music
+                    // Original video folder had 'aaa' and 'bbb' without extension
+                    const mediaExtensions = ['.mp4', '.avi', '.mp3', '.wav', '.wma'];
+                    if (mediaExtensions.some(ext => lowerName.endsWith(ext))) {
+                        window.parent.postMessage({
+                            type: 'openVideo',
+                            source: itemName
+                        }, '*');
+                        return;
+                    }
+
+                    // Case 4: PDFs
+                    if (lowerName.endsWith('.pdf')) {
+                        window.parent.postMessage({
+                            type: 'launchApp',
+                            appId: 'pdfviewer',
+                            payload: {
+                                type: 'openPdfFile',
+                                filePath: 'My Documents/' + itemName
+                            }
+                        }, '*');
+                        return;
+                    }
+
+
+                    // Case 5: Text Files
+                    if (lowerName.endsWith('.txt')) {
+                        window.parent.postMessage({
+                            type: 'launchApp',
+                            appId: 'msnotepad',
+                            payload: {
+                                type: 'openTextFile',
+                                filePath: 'My Documents/' + itemName,
+                                fileName: itemName
+                            }
+                        }, '*');
+                        return;
+                    }
+
+                    // Fallback for others
+                    alert(`Opening file: ${itemName}`);
+                }
+            }
+
+            // ==================================================================================
+            // 4. Interaction & Events
+            // ==================================================================================
+
+            function setupItemInteraction() {
+                const items = document.querySelectorAll('.com__content__right__card__item');
+                items.forEach(item => {
+                    // Click selection is handled by FolderEnhancer
+
+                    item.addEventListener('dblclick', (e) => {
+                        e.stopPropagation();
+                        const itemName = item.dataset.name;
+                        const type = item.dataset.type;
+                        const appId = item.dataset.appId;
+
+                        if (type === 'folder' || type === 'drive') {
+                            // navigateTo(`${currentPath}/${itemName}`); // No subfolders yet
+                        } else {
+                            executeFile(itemName, { type, appId });
+                        }
+                    });
+                });
+            }
+
+            // --- Navigation Buttons ---
+            backBtn.addEventListener('click', () => {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    currentPath = navigationHistory[historyIndex];
+                    render(currentPath);
+                }
+            });
+
+            forwardBtn.addEventListener('click', () => {
+                if (historyIndex < navigationHistory.length - 1) {
+                    historyIndex++;
+                    currentPath = navigationHistory[historyIndex];
+                    render(currentPath);
+                }
+            });
+
+            // Backspace key for back navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace') {
+                    if (historyIndex > 0) {
+                        historyIndex--;
+                        currentPath = navigationHistory[historyIndex];
+                        render(currentPath);
+                    }
+                }
+            });
+
+            // --- Top Menu Logic ---
+            let isMenuActive = false;
+            menuItems.forEach(menuItem => {
+                menuItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const wasActive = menuItem.classList.contains('active');
+                    menuItems.forEach(item => item.classList.remove('active'));
+                    isMenuActive = false;
+                    if (!wasActive) {
+                        menuItem.classList.add('active');
+                        isMenuActive = true;
+                    }
+                });
+                menuItem.addEventListener('mouseenter', () => {
+                    if (isMenuActive) {
+                        menuItems.forEach(item => item.classList.remove('active'));
+                        menuItem.classList.add('active');
+                    }
+                });
+            });
+            document.addEventListener('click', () => {
+                menuItems.forEach(item => item.classList.remove('active'));
+                isMenuActive = false;
+            });
+
+            document.querySelectorAll('.menu-item li[data-action="Close"]').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (window.parent) {
+                        window.parent.postMessage({ type: 'closeWindow' }, '*');
+                    }
+                });
+            });
+
+            // Initial Render
+            render(currentPath);
+        });
+    </script>
+</body>
+
+</html>

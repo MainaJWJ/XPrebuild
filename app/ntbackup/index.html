@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup or Restore Wizard</title>
+    <link rel="stylesheet" href="../../fonts/fonts.css">
+    <link rel="stylesheet" href="./xpdesign.css">
+    <script src="../../focusController.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 11px;
+            background-color: var(--window-bg);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--window-fg);
+        }
+
+        .wizard-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            background-color: #fff;
+        }
+
+        .left-pane {
+            width: 164px;
+            height: 100%;
+            background-color: #4A608A;
+            flex-shrink: 0;
+        }
+
+        .left-pane img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .right-pane {
+            flex: 1;
+            padding: 30px 25px;
+            display: none;
+            flex-direction: column;
+        }
+
+        .right-pane.active {
+            display: flex;
+        }
+
+        h1 {
+            font-family: 'Tahoma', sans-serif;
+            font-size: 18px;
+            font-weight: normal;
+            margin: 0 0 20px 0;
+            line-height: 1.2;
+        }
+
+        p {
+            margin: 0 0 15px 0;
+            line-height: 1.4;
+        }
+
+        .warning {
+            margin-top: 10px;
+        }
+
+        /* Step 2 Specific */
+        .option-group {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .option-item input[type="radio"] {
+            margin-top: 2px;
+        }
+
+        .option-label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .option-title {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        /* Step 3: Progress Bar (Extracted from properties.css) */
+        .progress-section {
+            margin-top: 20px;
+        }
+
+        .progress-text {
+            margin-bottom: 8px;
+        }
+
+        progress,
+        .progress-bar {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: #fff;
+            border: 1px solid #686868;
+            border-radius: 3px;
+            height: 13px;
+            padding: 2px 3px;
+            box-shadow: inset 1px 1px #BEBEBE, inset 2px 2px #EFEFEF, inset -1px -1px #EFEFEF;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .progress-bar>.progress-bar-value {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 2px;
+            bottom: 2px;
+            left: 3px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6666666667), transparent 50%, rgba(255, 255, 255, 0.6666666667) 100%), repeating-linear-gradient(90deg, #2ED331, #2ED331 6px, transparent 6px, transparent 8px);
+        }
+
+        /* 외부 CSS의 반복 애니메이션 강제 제거 */
+        .progress-bar::after {
+            display: none !important;
+        }
+
+        .footer {
+            height: 45px;
+            background-color: var(--window-bg);
+            border-top: 1px solid #aca899;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 10px;
+            gap: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wizard-container">
+        <div class="left-pane">
+            <img src="ntbackup.png" alt="Wizard Banner">
+        </div>
+
+        <!-- Step 1 -->
+        <div id="step1" class="right-pane active">
+            <h1>Welcome to the Backup or Restore Wizard</h1>
+            <p>This wizard helps you back up or restore your files and settings.</p>
+            <p class="warning"><b>Warning:</b> This feature will back up your C: drive and settings. It does not include D: or E: drives.</p>
+            <p>To continue, click Next.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="step2" class="right-pane">
+            <h1>Backup or Restore</h1>
+            <p>You can either back up or restore files and settings.</p>
+            <p>What do you want to do?</p>
+
+            <div class="option-group">
+                <div class="option-item">
+                    <input type="radio" id="opt-backup" name="action" checked>
+                    <div class="option-label">
+                        <label for="opt-backup" class="option-title">Back up files and settings</label>
+                        <span>Creates a copy of your files so you can restore them later.</span>
+                    </div>
+                </div>
+                <div class="option-item">
+                    <input type="radio" id="opt-restore" name="action">
+                    <div class="option-label">
+                        <label for="opt-restore" class="option-title">Restore files and settings</label>
+                        <span>Restores your files from a previously created backup.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div id="step3" class="right-pane">
+            <h1>Backing Up...</h1>
+            <p>Please wait while the wizard backs up your files, settings and programs. This may take several minutes.</p>
+
+            <div class="progress-section">
+                <div id="progress-status" class="progress-text">Estimating time remaining...</div>
+                <div class="progress-bar" aria-valuenow="0">
+                    <div id="progress-value" class="progress-bar-value" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <button id="btn-back" class="disabled" onclick="goToStep(1)">&lt; Back</button>
+        <button id="btn-next" class="default" onclick="goToStep(2)">Next &gt;</button>
+        <button onclick="window.parent.postMessage({type: 'closeWindow'}, '*')">Cancel</button>
+    </div>
+
+    <script>
+        let progressInterval;
+
+        function goToStep(step) {
+            if (progressInterval) clearInterval(progressInterval);
+
+            document.querySelectorAll('.right-pane').forEach(p => p.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+
+            const backBtn = document.getElementById('btn-back');
+            const nextBtn = document.getElementById('btn-next');
+
+            if (step === 1) {
+                backBtn.classList.add('disabled');
+                nextBtn.onclick = () => goToStep(2);
+                nextBtn.classList.remove('disabled');
+                nextBtn.innerText = 'Next >';
+            } else if (step === 2) {
+                backBtn.classList.remove('disabled');
+                backBtn.onclick = () => goToStep(1);
+                nextBtn.onclick = () => goToStep(3);
+                nextBtn.classList.remove('disabled');
+                nextBtn.innerText = 'Next >';
+            } else if (step === 3) {
+                backBtn.classList.add('disabled');
+                nextBtn.classList.add('disabled');
+                nextBtn.onclick = null;
+                startProgress();
+            }
+        }
+
+        function startProgress() {
+            const barValue = document.getElementById('progress-value');
+            const status = document.getElementById('progress-status');
+            const files = [
+                "C:\\WINDOWS\\system32\\config\\system",
+                "C:\\Documents and Settings\\Administrator\\ntuser.dat",
+                "C:\\WINDOWS\\Fonts\\tahoma.ttf",
+                "C:\\WINDOWS\\Media\\Windows XP Startup.wav",
+                "C:\\Program Files\\Internet Explorer\\iexplore.exe",
+                "C:\\WINDOWS\\system32\\drivers\\etc\\hosts",
+                "Finalizing backup..."
+            ];
+
+            let progress = 0;
+            barValue.style.width = '0%';
+
+            progressInterval = setInterval(() => {
+                if (progress < 100) {
+                    progress += 1.5;
+                    barValue.style.width = Math.min(progress, 98) + '%';
+                    
+                    if (Math.floor(progress) % 15 === 0) {
+                        const fileIdx = Math.floor(progress / 15);
+                        if (files[fileIdx]) {
+                            status.innerText = "Backing up: " + files[fileIdx];
+                        }
+                    }
+                } else {
+                    clearInterval(progressInterval);
+                    barValue.style.width = '100%';
+                    status.innerText = "Backup complete successfully.";
+                    const nextBtn = document.getElementById('btn-next');
+                    nextBtn.classList.remove('disabled');
+                    nextBtn.innerText = 'Finish';
+                    nextBtn.onclick = () => window.parent.postMessage({type: 'closeWindow'}, '*');
+                }
+            }, 100);
+        }
+    </script>
+</body>
+
+</html>

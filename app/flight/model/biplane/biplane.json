@@ -1,0 +1,119 @@
+{
+  "faction": "BLUE",
+  "hostileFactions": [
+    "RED"
+  ],
+  "destruction": {
+    "explosionScale": 6.0,
+    "explosionCount": 1,
+    "health": 100,
+    "damage": 100
+  },
+  "collisionRadius": 30.0,
+  "model": {
+    "file": "model/biplane/biplane.glb",
+    "scale": 10.0,
+    "initialRotation": {
+      "x": 180,
+      "y": 270,
+      "z": 0
+    },
+    "initialPosition": {
+      "x": 4476,
+      "y": 574,
+      "z": -9825
+    },
+    "spawnHeading": 10,
+    "initialGrounded": true
+  },
+  "performance": {
+    "rollResponse": 0.05,
+    "speed": 200,
+    "acceleration": 3,
+    "accelerationRate": 0.1,
+    "minSpeed": 100,
+    "stallSpeed": 70,
+    "gravityEffect": 0.4,
+    "turnDrag": 0.3,
+    "turnSensitivity": 0.01,
+    "pitchRate": 1.5,
+    "rollRate": 2.0,
+    "yawRate": 0.6,
+    "flareAmmo": 30,
+    "flare": {
+      "lifespan": 6.0,
+      "gravity": 120.0,
+      "drag": 1.2,
+      "interval": 0.2,
+      "burstCount": 4,
+      "cooldown": 3.0
+    },
+    "gun": {
+      "fireCooldown": 0.1,
+      "bulletSpeed": 3500,
+      "bulletLife": 2.5,
+      "bulletSpread": 0.03,
+      "damage": 15
+    },
+    "pitchLimits": {
+      "up": 75,
+      "down": -75
+    },
+    "maxRollAngle": 80
+  },
+  "camera": {
+    "lerpSpeed": 0.15,
+    "minDistance": 100,
+    "maxDistance": 400,
+    "lookAtDistance": 1000,
+    "s1": {
+      "x": -240,
+      "y": 100,
+      "z": 0
+    },
+    "s2": {
+      "x": 0,
+      "y": 500,
+      "z": 0,
+      "lookAtMode": "bombing_sight"
+    },
+    "s3": {
+      "x": 8,
+      "y": 11,
+      "z": 0,
+      "lookAtMode": "cockpit"
+    }
+  },
+  "rearviewMirror": {
+    "offset": {
+      "x": -23,
+      "y": 30,
+      "z": 0
+    },
+    "lookTarget": {
+      "x": -100,
+      "y": 20,
+      "z": 0
+    }
+  },
+  "visuals": {
+    "engineHardpoints": [
+
+    ],
+    "gunHardpoints": [
+      {
+        "x": 20,
+        "y": 8,
+        "z": -13
+      },
+      {
+        "x": 20,
+        "y": 8,
+        "z": 13
+      }
+    ]
+  },
+  "hardpoints": {
+
+  }
+}

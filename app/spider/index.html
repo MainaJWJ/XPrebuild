@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<head>
+<title>Spider Solitaire Windows XP</title>
+<!--<meta charset="UTF-8"/>--> 
+<script src="jquery.min.js"></script>
+
+<script type="text/javascript" src="engine/graphics.js"></script><script type="text/javascript" src="engine/sprite.js"></script><script type="text/javascript" src="engine/audio.js"></script><script type="text/javascript" src="engine/button.js"></script><script type="text/javascript" src="engine/prompt.js"></script><script type="text/javascript" src="engine/game.js"></script><script type="text/javascript" src="engine/card.js"></script><script type="text/javascript" src="engine/pool.js"></script><script type="text/javascript" src="engine/cardmanager.js"></script><script type="text/javascript" src="engine/rules.js"></script><script type="text/javascript" src="engine/drawmanager.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui=1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script src="../../focusController.js"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="aaa.js"></script>
+<link rel="stylesheet" href="menu.css">
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+    }
+    #game-container {
+        flex: 1;
+        position: relative;
+        background: #000;
+    }
+    canvas {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+</head>
+<body oncontextmenu="return false">
+    <div id="menu2" class="xp-menubar">
+        <div class="menu-item"><span><u>F</u>ile</span>
+            <ul class="dropdown-menu">
+                <li data-action="new-game">New Game</li>
+                <li data-action="restart">Restart This Game</li>
+                <li class="separator"></li>
+                <li data-action="difficulty">Difficulty...</li>
+                <li class="separator"></li>
+                <li data-action="Close">Exit</li>
+            </ul>
+        </div>
+        <div class="menu-item"><span><u>E</u>dit</span>
+            <ul class="dropdown-menu">
+                <li data-action="undo">Undo Move</li>
+            </ul>
+        </div>
+        <div class="menu-item"><span><u>V</u>iew</span>
+            <ul class="dropdown-menu">
+                <li data-action="sound" class="checked">Sound</li>
+                <li class="separator"></li>
+                <li data-action="hint">Hint</li>
+            </ul>
+        </div>
+        <div class="menu-item"><span><u>H</u>elp</span>
+            <ul class="dropdown-menu">
+                <li class="disabled">Help Topics</li>
+                <li class="separator"></li>
+                <li class="disabled">About Spider Solitaire</li>
+            </ul>
+        </div>
+    </div>
+    <div id="game-container">
+        <canvas id="canvas" style="cursor: default; touch-action: none;"> </canvas>
+    </div>
+<script src="menu.js"></script>
+<script type="text/javascript">
+		var graphics = new Graphics('canvas');
+		var game = new Game();
+		game.setGraphics(graphics);
+		game.load();
+		game.initialize();
+	
+		window.onload = function() {
+			window.scrollTo(0,1);
+
+			(function() {
+				var lastTime = 0;
+				var vendors = ['webkit', 'moz','o','ms'];
+				for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+					window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+					window.cancelAnimationFrame =
+					  window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+				}
+
+				if (!window.requestAnimationFrame)
+					window.requestAnimationFrame = function(callback, element) {
+						var currTime = new Date().getTime();
+						var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+						var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+						  timeToCall);
+						lastTime = currTime + timeToCall;
+						return id;
+					};
+
+				if (!window.cancelAnimationFrame)
+					window.cancelAnimationFrame = function(id) {
+						clearTimeout(id);
+					};
+			}());
+			
+				
+			var ga = {};
+
+			ga.gameTime =  {  // we define just an object since 
+			                  //  there is only one instance.
+			  	lastTime     : Date.now(),
+			  	frameTime    : 0 ,
+			  	typicalFrameTime : 20,
+			  	minFrameTime : 12 , 
+			  	time         : 0
+			};
+
+			// move the clock one tick. return true if new frame, 
+			//      false otherwise.
+			ga.gameTime.tick = function() {
+			    var now = Date.now();
+			    var delta = now - this.lastTime;
+			    if (delta < this.minFrameTime ) return false;     if (delta > 2*this.typicalFrameTime) { // +1 frame if too much time elapsed
+			       	this.frameTime = this.typicalFrameTime;
+			    } else {
+			      	this.frameTime = delta;      
+			    };   
+			    this.time+=this.frameTime;
+			    this.lastTime = now ;
+			    return true;
+			}
+
+			ga.Game = function() {
+			  	this.boundGameRun = this.gameRun.bind(this);
+			};
+
+			ga.Game.prototype.gameRun = function() {
+			  	if (ga.gameTime.tick()) { game.gameLoop(); }
+			  	requestAnimationFrame(this.boundGameRun);
+			};
+
+			var myGame = new ga.Game();
+			myGame.gameRun();
+		}
+		</script>
+</body>
+</html>

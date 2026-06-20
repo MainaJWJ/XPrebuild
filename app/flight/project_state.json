@@ -1,0 +1,753 @@
+{
+    "project_name": "Flight Simulator (Rebuilt)",
+    "description": "A web-based 3D flight simulator featuring realistic spaceship physics and modular architecture within the Windows XP Emulator.",
+    "current_state": {
+        "date": "2026-06-03",
+        "baseline": "Core flight engine with 3D models (Space Shuttle, F-18) and basic HUD UI.",
+        "environment": "Dark grid ground plane (400,000 units) with directional lighting.",
+        "camera_modes": ["Follow Mode", "Rear View Mode"]
+    },
+    "core_modules": [
+        {
+            "file": "index.html",
+            "role": "Main entry point and scene setup"
+        },
+        {
+            "file": "myShipControl.js",
+            "role": "Flight physics and spaceship control logic"
+        },
+        {
+            "file": "uiManager.js",
+            "role": "HUD and UI element management"
+        },
+        {
+            "file": "oceanSystem.js",
+            "role": "Raging sea shader — Perlin noise + sin wave real-time ocean surface"
+        },
+        {
+            "file": "shipEffects.js",
+            "role": "Spaceship model visual effects (micro-vibration)"
+        },
+        {
+            "file": "gunSystem.js",
+            "role": "Auto-firing Cannon (Bullet) weapon system"
+        },
+        {
+            "file": "advancedControl.js",
+            "role": "Realistic 3D aerobatic flight controls utilizing local quaternion rotation"
+        },
+        {
+            "file": "weaponSystem.js",
+            "role": "Weapon lock-on system, flares countermeasures, and 3D flight trajectory prediction"
+        },
+        {
+            "file": "enemySystem.js",
+            "role": "Enemy F-18 AI system, dynamic weapon firing, and defensive maneuvering"
+        }
+    ],
+    "features": [
+        "Three.js r128 based 3D rendering",
+        "Pitch/Yaw/Roll spaceship movement physics",
+        "Dynamic camera switching ('B' key)",
+        "Integrated Windows XP system focus control",
+        "HUD displaying basic flight data",
+        "Engine/speed-responsive micro-vibration effects",
+        "Auto-firing Cannon (Bullet) weapon system from configurable gunHardpoints",
+        "Faction-based dynamic missile lock-on and target tracking system with HUD filtering",
+        "Advanced three-state (Patrol, Attack, Evasive) enemy F-18 flight AI with realistic coordinate-based banking and evasive dogfight maneuvers (barrel rolls, climb loops, and sharp break turns)",
+        "Dual-mode flight controls: Easy (original clamped angles) vs Realistic (360-degree aerobatic pitch and roll, rudder keys Q/E, dynamic agility configuration via JSON, camera up-vector alignment)",
+        "Real-time 3D Missile Trajectory Prediction Line (DLZ/Lead Indicator) dynamically integrating gravity, thrust, lock-on target tracking, and color warning states"
+    ],
+    "history": [
+        {
+            "date": "2026-06-04",
+            "action": "Bypassed Catapult Hook for Helicopter",
+            "description": "Modified landingSystem.js to exclude the helicopter from carrier catapult auto-hooking, disabled Shift/J hook key bindings, and hid the hook status indicators from the HUD. Snapped the spawn position Y coordinate to the deck height (589) and set isGrounded to true on spawn so the helicopter starts parked on the carrier. Also updated spawnSpaceship in myShipControl.js to reset catapultState to IDLE on spawn, ensuring previous F-18 hooked states do not persist."
+        },
+        {
+            "date": "2026-06-04",
+            "action": "Configurable Helicopter Pitch Response Rate",
+            "description": "Refactored EASY mode flight controls in helicopterControl.js to dynamically load cyclic pitch response speed from configuration JSON (pitchResponse), allowing independent tuning of forward/backward pitch agility."
+        },
+        {
+            "date": "2026-06-04",
+            "action": "Configurable Helicopter Tilt Limits and Response Rates",
+            "description": "Refactored EASY mode flight controls in helicopterControl.js to dynamically load cyclic pitch/roll limits and speed of response from configuration JSON (pitchLimits, maxRollAngle, pitchRate, rollRate, and rollResponse), allowing customization of helicopter flight agility."
+        },
+        {
+            "date": "2026-06-04",
+            "action": "Stabilized Enemy AI Steering & Eliminated HUD Reticle Jitter",
+            "description": "Resolved a mathematical singularity (chattering) in enemySystem.js where F-18 fighters and B-52 bombers oscillated left/right rapidly at the same altitude due to Math.atan2 singularity at localTarget.y = 0. Bounded the minimum magnitude of the vertical denominator to 200.0, smoothing out the roll error inputs and stabilizing HUD lead computing reticles."
+        },
+        {
+            "date": "2026-06-04",
+            "action": "Disabled GPWS Terrain Pull-Up Warning for Helicopter",
+            "description": "Bypassed the GPWS terrain warning ('terrain-pull-up' sound) when controlling the helicopter, as low-altitude flight and hover-capability are native features of helicopters."
+        },
+        {
+            "date": "2026-06-04",
+            "action": "Inverted Helicopter Pitch Controls",
+            "description": "Swapped the ArrowUp and ArrowDown keys for the helicopter pitch input to match user preference."
+        },
+        {
+            "date": "2026-06-04",
+            "action": "Helicopter Flight Control and Physics Integration",
+            "description": "Implemented a dedicated helicopter flight control system supporting both EASY (auto-hover, translation-based) and REALISTIC (torque-driven, local up-vector collective thrust) flight dynamics. Created helicopterControl.js to house the physics loops, added UH-60 helicopter configuration JSON (helicopter.json), updated lobby UI and in-game controls guides dynamically based on selection, bypassed jet-plane specific stall warnings for helicopters, and deferred rotor rotation to the model's built-in GLB animation clips."
+        },
+        {
+            "date": "2026-06-04",
+            "action": "RED Bomber U-turn Gimbal Lock Heading Fix",
+            "description": "Fixed an AI flight path bug in enemySystem.js where the RED B-52 bomber would fail to complete its U-turn and fly away infinitely. Replaced the Euler YZX yaw angle extraction (which gets distorted/locked under high banking roll angles) with a robust 3D forward vector projection on the horizontal Y=0 plane to calculate the exact heading, ensuring stable U-turn exit alignment under all conditions."
+        },
+        {
+            "date": "2026-06-04",
+            "action": "Configurable EASY Flight Mode Roll Response",
+            "description": "Refactored the EASY mode flight physics in myShipControl.js to dynamically load the banking (roll) response factor from the aircraft config JSON (performance.rollResponse) with a default fallback of 0.04. Updated configs for F-18 (0.08), Biplane (0.05), and B-52 (0.02) to match their respective agility profiles."
+        },
+        {
+            "date": "2026-06-04",
+            "action": "Scaled Particle Engine Flame Scale Bug Fix",
+            "description": "Resolved a layout shift bug where additive engine flame/core sprites and mach diamonds on the RED B-52 bomber (scaled 24x) spawned at wrong offset coordinates and with 24x oversized dimensions. Rebuilt spawnTrails and spawnMissileTrails in particleSystem.js to scale-normalize the local coordinate offsets, exhaust velocity, and sprite dimensions by dividing them by parentMesh.scale, rendering uniform flames across all aircraft scales."
+        },
+        {
+            "date": "2026-06-04",
+            "action": "Enemy B-52 Bomber AI and Carpet Bombing Implementation",
+            "description": "Created model/b52_2 for the enemy B-52 bomber faction (RED) and role (BOMBER). Implemented spawnEnemyBombers and a dedicated 5-state AI loop (APPROACH, BOMBING, FLY_BY, U_TURN, RETREAT) in enemySystem.js. Bombers now carpet bomb allied fixed targets (NIMITZ carrier, RUNWAY) with custom bomb physics (gravity drop, aligned rotation) and automatically perform wide-banking U-turns to repeat bombing runs."
+        },
+            "date": "2026-06-02",
+            "action": "HUD Horizon Guided by Aircraft Attitude (Option B)",
+            "description": "Switched HUD artificial horizon rotation to follow the aircraft's actual roll angle (spaceship.rollAngle) instead of the camera's roll. This ensures that in stabilized camera modes like bombing sight (s2), the HUD horizon correctly indicates the aircraft's roll attitude relative to the earth, even though the camera viewport remains level."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Horizon Line Rotation Direction Correction",
+            "description": "Corrected the rotation direction of the HUD artificial horizon line. Replaced ctx.rotate(-roll) with ctx.rotate(roll) to align the screen tilt with Canvas clockwise rotation orientation."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Horizon Line Alignment with Camera Roll",
+            "description": "Modified the 2D military Canvas HUD's artificial horizon and pitch ladder to rotate dynamically by the negative camera roll angle. This aligns the HUD horizon line perfectly with the actual 3D sea/horizon line during flight maneuvers (banking/rolls). The central aircraft reference crosshair remains fixed to the cockpit layout."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Consistent Rearview Mirror Rendering",
+            "description": "Resolved a visual bug where the aircraft tail vanished from the rearview mirror in cockpit view (s3) due to spaceship.mesh.visible being false. Implemented temporary visibility state override during mirror rendering so that the rearview mirror always displays the aircraft tail consistently."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Dynamic Rearview Mirror Configuration",
+            "description": "Moved rearview mirror position and look-at target offsets to be loaded dynamically from the spaceship config JSON rather than being hardcoded in index.html. Added the rearviewMirror configuration block to F-18.json with default coordinates as a working example."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Rearview Mirror Overlay & Layout Reset",
+            "description": "Removed right side mirror, scaled left mirror to 1/4 size (130x82) and centered it at top center (12 o'clock position) to serve as a central rearview mirror. Restored Action Cam and warning alerts positions back to the top right side."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Side Mirrors Implementation & Radar Shift",
+            "description": "Implemented left and right side mirrors showing rear view of the aircraft. Configured separate PerspectiveCamera instances, viewport scissor test rendering in main frame loop, and custom curved HTML border shapes representing cockpit mirrors. Moved the Action Cam (PiP) down by 235px to prevent overlaps, shifted warning alerts leftward, and lowered the 2D radar minimap bottom spacing by 40px."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Lobby UI Refinement & Panel Migration",
+            "description": "Moved in-game weather selection control UI and detailed keyboard controls explanation UI into the startup lobby screen overlay to keep the flight HUD cleaner. Created dedicated placeholder containers inside the HTML lobby content overlay and modified weatherSystem.js and uiManager.js to dynamically append the respective panels. Optimized lobby dimensions and text spacing."
+        },
+        {
+            "date": "2026-05-09",
+            "action": "Project State Reset",
+            "description": "Cleared legacy .io space combat combat data and established the baseline for the new flight simulator development phase."
+        },
+        {
+            "date": "2026-05-09",
+            "action": "Environmental Visual Update",
+            "description": "Updated the ground grid and plane colors to lighter gray values (0x888888, 0x444444) to improve visual reference and depth perception during flight."
+        },
+        {
+            "date": "2026-05-09",
+            "action": "Model Swap",
+            "description": "Changed the player's controlled model from Space Shuttle to F-18. Created F18.json configuration and updated myShipControl.js to load the new model."
+        },
+        {
+            "date": "2026-05-09",
+            "action": "Folder & Path Refactoring",
+            "description": "Renamed 'model/F-18' folder to 'model/F-18' for naming consistency. Synchronized all paths in F-18.json and myShipControl.js."
+        },
+        {
+            "date": "2026-05-20",
+            "action": "Realistic Jet Engine Flame & Smoke System Overhaul",
+            "description": "Rebuilt particleSystem.js from scratch to replace old cylinder-based flames with high-fidelity camera-facing canvas-textured sprites. Implemented additive-blended high-temp flame cores (blue-purple for boost, yellow-orange for normal), three-stage shock diamonds (Mach Rings) for afterburner thrust, and volumetric expanding contrail smoke trails that linger realistically in world space."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "Applied Clamped Transparency (Method B) to Ocean Surface",
+            "description": "Implemented Method B for ocean transparency in oceanSystem.js, ensuring a minimum opacity of 85% (mix(0.85, 1.0, max(reflectivity, specular))) to prevent the dark/black spot underneath the aircraft while keeping a smooth, natural transparency gradient."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "Integrated OpenSkyFlight Military HUD into uiManager.js",
+            "description": "Ported HUDRenderer.js from OpenSkyFlight-main (ES module) into vanilla JS and merged it into uiManager.js. Adds a Canvas 2D military HUD overlay featuring: top-center compass band with cardinal points and heading readout, center artificial horizon with pitch ladder, right-side altimeter (MSL) with scrolling scale, left-side speed indicator with smoothed ground speed calculation. Uses Dirty-flag optimization to skip redraws when values haven't changed. Updated index.html to pass delta and camera to updateHUD."
+        },
+        {
+            "date": "2026-05-20",
+            "action": "Exhaust Smoke Physics Refinement",
+            "description": "Refined smoke trails in particleSystem.js. Contrails now inherit 85% of parent aircraft speed on spawn to prevent particle gaps at high speeds, and then decelerate dynamically towards a local wind drift velocity over time."
+        },
+        {
+            "date": "2026-05-20",
+            "action": "JSON Fetch Cache-Busting Implementation",
+            "description": "Added time-based query parameters (?v=timestamp) to all JSON fetch requests in myShipControl.js, weaponSystem.js, and environment.js to prevent browsers from caching configuration files and ensure local modifications take effect immediately upon reloading."
+        },
+        {
+            "date": "2026-05-20",
+            "action": "Raging Sea Ocean Shader Integration",
+            "description": "Created oceanSystem.js by porting the GLSL shaders from the standalone raging-sea React/Vite app into a vanilla Three.js r128 module. The shader combines sin-wave swells with multi-layered Perlin noise (cnoise) to produce a real-time animated ocean surface at 400,000 unit world scale. Replaced the static gray PlaneGeometry+GridHelper ground plane. Sky color updated to match the ocean environment (0x5b9ec9)."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "High-Fidelity Reflective Ocean Integration & Skybox Removal",
+            "description": "Integrated the advanced double-mapped reflective ocean surface from Three.js-Ocean-Scene-main. Procedural reflections and fog are configured to blend seamlessly with the solid sky background color (0x5b9ec9), while the complex 3D skybox, stars, and twilight modules were omitted/removed per user request. Modified the ocean material to be fully opaque (transparent: false and alpha = 1.0) so that the water details remain clearly visible from high altitude without blending into the background. Removed all fog calculations from the ocean shader to make the water details and reflections completely clear and sharp up to the rendering distance limit. Blended the reflection with a deep ocean blue base color, clamped Fresnel reflectivity to 0.5 to make the horizon contrast sharp, darkened the sky/fog reflection color, and scaled the wave size (NORMAL_MAP_SCALE = 0.0005, NORMAL_MAP_STRENGTH = 3.0) to make the individual wave tiles 5x larger than before (total 200x original scale) for clear visibility at altitude y = 5000. Brightened the water base color to a cobalt blue and implemented Half-Lambert shading on the normal map slopes to show water waves and volume details clearly across the entire map. Enabled anisotropic filtering on normal maps to keep ripples sharp at high altitudes and steep angles."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "Ocean Wave Distance Visibility Enhancement",
+            "description": "Disabled GPU mipmapping (set minFilter to THREE.LinearFilter and generateMipmaps to false) on ocean normal maps in oceanSystem.js to prevent wave details from averaging/flattening at far distances, keeping the wave texture patterns sharp and visible all the way to the horizon."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "Clear Daylight Weather Adjustment",
+            "description": "Adjusted index.html sky background color to a vibrant sky blue (0x3a9fe9), and set ambient light to a bluish tint (0xdbebff, 0.8) and directional light to a strong warm sunlight (0xfffaed, 1.3). Updated oceanSystem.js to reflect the bright clear day sky in water surface reflections and base color."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "Restored Ocean Transparency",
+            "description": "Restored the ocean material's transparent property to true, and updated the fragment shader's alpha output calculation using reflectivity, specular, and depth coefficients (t) instead of forcing opaque 1.0, restoring the original look and blending behavior of the ocean."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "Unused Ocean Code Clean-up",
+            "description": "Cleaned up unused configurations and shaders from oceanSystem.js (removed FOG_DISTANCE_VAL, global, parallax chunks, SPECULAR_SIZE, and sampleFog) to keep the codebase clean and lightweight."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "Ocean Mesh Subdivision to Fix Jitter",
+            "description": "Subdivided the ocean surface mesh from a single giant quad to a 128x128 grid (PlaneGeometry) to resolve floating-point perspective interpolation precision errors (jittering/artifacts) when viewing the horizon in the center of the screen."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "Ocean Horizon Artifact and Shimmering Fix",
+            "description": "Re-enabled GPU mipmapping (LinearMipmapLinearFilter) and anisotropic filtering on ocean normal maps to resolve extreme shimmering (aliasing) at grazing angles. Scaled down OCEAN_HALF_SIZE to 700,000 so that no part of the camera-following ocean mesh is clipped by the camera's far plane (1,000,000), eliminating horizon tearing and clipping glitches."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "East Sea Indigo/Cobalt Ocean Adjustment",
+            "description": "Adjusted the ocean's baseColor to a deep, cool, and rich cobalt indigo/navy (vec3(0.04, 0.24, 0.58)) to simulate the deep water of the East Sea of Korea (Donghae), refined diffuse shading, and set a high opacity alpha multiplier (0.95) to retain a solid, deep-water look."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "Blazing Summer Noon Brightness Tuning",
+            "description": "Brightened the overall atmosphere to simulate a bright summer noon by updating the sky background color to 0x7ec2f6, boosting ambient light to 1.2, and boosting sunlight to 1.8. Adjusted oceanSystem.js to use a brighter cobalt baseColor (vec3(0.08, 0.34, 0.72)), boosted diffuse shading minimums (0.85), strengthened water specular glints (1.5x), and lightened water surface reflections to vec3(0.35, 0.68, 0.95)."
+        },
+        {
+            "date": "2026-05-24",
+            "action": "Consolidated Ocean Normal Maps and Cleaned Up Unused Directory",
+            "description": "Copied waterNormal1.png and waterNormal2.png from Three.js-Ocean-Scene-main/images/ to a new local app/flight/images/ folder. Updated oceanSystem.js to load the textures relatively, and safely deleted the rest of the unused Three.js-Ocean-Scene-main folder to optimize workspace cleanliness and size."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Missile and Bomb Explosion Effects Integration",
+            "description": "Extended ParticleManager in particleSystem.js to implement a modern 4-layer particle explosion effect (spritesheet fireballs, high-speed debris with gravity/drag, rapid flash, and rising gray smoke mist) using Three.js r128 API features, bypassing obsolete SPE.js library compatibility crashes. Integrated collision and lifespan checks in WeaponManager (weaponSystem.js) to trigger the explosion effects upon lifespan expiration or ocean surface contact (locking y=0)."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Explosion Demo Folder Cleanup & Texture Consolidation",
+            "description": "Moved sprite-explosion2.png and smokeparticle.png from explosion-demo/img/ to the local app/flight/images/ folder. Updated all texture load paths in particleSystem.js relatively and completely deleted the unused explosion-demo folder to optimize workspace footprint."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Spaceship Idle Bobbing and Micro-Vibration Implementation",
+            "description": "Created shipEffects.js defining ShipEffectsManager to apply low-frequency atmospheric bobbing (translation and rotation) and high-frequency, throttle/speed-responsive micro-vibrations to the spaceship's 3D model relative to its physics group. Updated index.html to load the script and call ShipEffectsManager.update in the main animation loop."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Removed Idle Bobbing from Ship Effects",
+            "description": "Removed the slow idle bobbing effect entirely from shipEffects.js to prevent visual joint alignment errors between the wings of the airplane model (which bobs locally) and its mounted hardpoint weapons (which are directly attached to spaceship.mesh)."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Configurable Cannon (Bullet) System Implementation",
+            "description": "Created gunSystem.js implementing GunManager. It loads hardpoint locations and count dynamically from the model's json configuration file (added gunHardpoints in F-18.json and battlecruiser.json). Soundless additive-blended orange/yellow laser cylinders are spawned when holding the 'A' key, and collide with the ocean surface (y <= 0) to trigger ParticleManager explosion effects."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Faction-Based Dynamic Homing and Locking System",
+            "description": "Implemented faction and hostileFactions parameters in JSON configuration files for F-18, battlecruiser, and nimitz models. Transferred faction info to meshes in environment.js, and updated weaponSystem.js and uiManager.js to scan, lock, and display HUD markers only for hostile targets."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Dynamic Weapon Explosion Scale and Target Collision Radii",
+            "description": "Extracted hardcoded values for missile explosion scale (6.0) and collision detection bounds (150). Both parameters are now dynamically loaded from JSON files for weapons (aim120d, airbomb) and targets (F-18, battlecruiser, nimitz) and applied inside environment.js and weaponSystem.js."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Fix Premature Water Detonation on Sea Targets",
+            "description": "Resolved a bug where missiles approaching floating targets at shallow angles would cross y <= 0 (sea level) and explode on water before reaching the target center. Added a check in weaponSystem.js to bypass water collision when a missile is within 1.5 times the target's collision radius."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Integrated Missile Fire Sound and Lock-On Alarms",
+            "description": "Added dynamic sound effects into weaponSystem.js by invoking soundManager. Integrated looping TWS radar tone (rwr-tws) during lock-on acquisition, looping LOCKED tone (rwr-lock) upon solid target lock, and one-shot missile launch audio (missile-fire)."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Adjusted RWR Alarm Pitches to Deep Tones",
+            "description": "Added playback rate support to SoundManager (soundManager.js) and configured rwr-tws and rwr-lock alarms to play at 40% playback speed (0.4), converting high-pitched beeps into a much heavier, deep warning sound."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Enemy Combat AI & Player Health Implementation",
+            "description": "Implemented enemySystem.js to allow hostile NPCs (like the Battlecruiser) to detect the player, lock on, and fire tracking missiles (AIM-120D) at the player. Integrated player health system (100 HP) into myShipControl.js, added 'MISSILE INBOUND' warning and Armor HP bar to the Canvas HUD in uiManager.js, and implemented directional RWR alarm sounds (rwr-tws, rwr-lock) during enemy lock-on."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Dynamic Enemy Fighter Jets AI",
+            "description": "Removed the static Battlecruiser and replaced it with 5 dynamic enemy F-18 fighter jets in a V-formation. Upgraded EnemySystem (enemySystem.js) with flight AI: the enemy jets now continuously fly, smoothly turn to chase the player, emit engine particles, and fire missiles when in range."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Advanced Enemy Dogfight & Evasive AI",
+            "description": "Upgraded enemy F-18 fighter jets with a three-state flight AI (Patrol, Attack, Evasive). Jets now patrol autonomously using waypoint-based systems, break formation to flank the player during attacks, and perform barrel rolls, loops, and sharp breaks when locked on or chased by missiles. Integrated full local coordinate calculations to bank (roll) realistically into turns."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Dynamic Health and Damage Integration from Model JSONs",
+            "description": "Moved player/NPC health (destruction.health) and weapon damage (destruction.damage) to JSON configuration files for F-18, battlecruiser, nimitz, aim120d, and airbomb. Updated myShipControl.js, enemySystem.js, and weaponSystem.js to parse and apply these values, enabling a multi-hit combat/damage battle system."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Model Separation for Enemy F-18 (F18_2)",
+            "description": "Created a dedicated model directory model/F18_2/ containing F18_2.glb and F18_2.json. This separates the enemy jet settings from the player's F-18 settings, resolving the faction conflict bug (BLUE vs RED) cleanly and dynamically through JSON configuration."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Reduced Enemy Count to 1",
+            "description": "Reduced the spawned enemy F-18 fighter jets from 5 to 1 to allow for focused 1v1 dogfighting scenarios."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Cannon and Bomb Collision Damage Integration",
+            "description": "Implemented proximity collision check and damage application for cannons (bullets) and unguided aviation bombs in gunSystem.js and weaponSystem.js. Cannons deal 5 damage per hit, and bombs deal damage based on model configurations."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Implemented M61 Cannon Bullet Spread",
+            "description": "Added bullet spread (탄퍼짐) to GunManager in gunSystem.js. Calculates random perpendicular offsets based on a 1-degree spread cone relative to the jet's rotation, aligning the bullet mesh with the new trajectory."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "HUD Off-Screen Target Indicators",
+            "description": "Added dynamic HUD edge pointers (off-screen indicators) in uiManager.js for hostile targets within 60km. Pointers display rotated carets at screen boundaries pointing towards targets, accompanied by target names and distances that dynamically align to stay readable."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Keyboard Controls UI Guide Update",
+            "description": "Updated the HUD keyboard controls guide panel inside uiManager.js. Added the missing M61 Vulcan Cannon key ('A') and refined the descriptions to be more professional (e.g., Space -> '애프터버너', B -> '에어브레이크', 1-5 -> '무장 발사', R -> '무장 재장전', T -> '정지/재개', D -> '시점 전환'). Also updated the key-highlight loop to handle case-insensitivity dynamically."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "HUD M61 Gun Lead Computing Reticle (LCOS) Implementation",
+            "description": "Implemented a dynamic Gun Lead Computing Reticle (LCOS) on the HUD to assist players in hitting moving targets with the M61 Vulcan Cannon. Modifies enemySystem.js to expose the enemy jet's velocity vector as enemy.mesh.velocity. Modifies uiManager.js to compute the projectile's time-of-flight based on target distance and real-time bullet speed, project the predicted future target coordinates to 2D screen coordinates, and draw a prediction line along with a specialized HUD reticle labeled 'GUN LEAD'."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "HUD Bomb CCIP (Constantly Computed Impact Point) Implementation",
+            "description": "Implemented a real-time CCIP bombing sight on the HUD. Modifies index.html to expose window.cameraMode globally. Modifies uiManager.js to compute gravity-based ballistic trajectories for unguided aviation bombs (taking into account aircraft speed and a -400 u/s^2 gravitational acceleration) and project the predicted sea-level impact coordinates (y=0) to 2D screen coordinates. Renders a dotted Bomb Fall Line starting from the screen center to the impact point, accompanied by a dynamic reticle showing the Time of Flight (TOF) of the bomb."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Bombing Sight (s3) Camera Stabilization",
+            "description": "Stabilized the camera position and look-at target tracking when in bombing sight mode (s3) inside myShipControl.js. Instead of letting the camera position follow the local pitch and roll rotations of the jet, the camera is positioned strictly above the jet using its horizontal forward vector and vertical height. The camera now looks straight down at the aircraft mesh position, locking the jet's representation to a consistent screen coordinate during banking and pitching maneuvers."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Globalized HUD Bomb CCIP Reticle Display",
+            "description": "Removed the camera mode constraint inside the _drawCCIP function in uiManager.js. The CCIP Bombing Reticle and Bomb Fall Line are now processed and rendered dynamically in all camera modes (s1, s2, and s3) whenever the calculated impact point falls within the camera's active viewport."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Immersive 3D Flat CCIP Bomb Reticle",
+            "description": "Replaced the 2D canvas bomb fall line and circle with a flat 3D crosshair reticle on the sea surface. Declares _ccipMarker3D and instantiates it in initUIManager, aligning it to the projected landing coordinates of the bomb at y=10.0 (to avoid Z-fighting with waves). Only dynamic TOF text remains rendered on the 2D canvas overlay."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Disable Engine Water Vapor Contrail Generation",
+            "description": "Completely removed the smoke/contrail particle generation blocks and dead update code from particleSystem.js to disable engine vapor and contrail trails behind player aircraft, enemy jets, and missiles."
+        },
+        {
+            "date": "2026-05-25",
+            "action": "Remove Unused Model Trail Configurations",
+            "description": "Removed unused trailColor and trailSize configuration properties from F-18.json, F18_2.json, battlecruiser.json, aim120d.json, airbomb.json, and nimitz.json to fully clean up water vapor/trail remnants."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Player MJU-7A Flare Countermeasure System",
+            "description": "Implemented player-only flare decoy system. Fired with V key (burst of 6), leaving smoke trails. RWR and coordinates UI display flare count. Enemy missiles track and detonate on flares within 4000 unit range."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Enemy Jet MJU-7A Flare AI Integration",
+            "description": "Implemented enemy jet flare decoy AI triggered upon player missile threat detection. Supports faction-based tracking logic: player missiles track enemy (RED) flares and detonate on proximity, while enemy missiles track player (BLUE) flares."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Flare Duration and Decoy Probability Tuning",
+            "description": "Increased flare lifetime to 6.0s (1.5x original). Implemented 70% lock-on decoy transfer probability per missile encounter to provide realistic countermeasure effectiveness."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Aerobatic Realistic Flight Control Implementation",
+            "description": "Created advancedControl.js implementing full 3D local-quaternion flight physics (supporting loops, rolls, and rudders via Q/E keys) with speed-dependent control effectiveness. Configured pitchRate, rollRate, and yawRate parameters in F-18.json, F18_2.json, and battlecruiser.json. Added a key listener for 'C' to toggle between Easy and Realistic modes, resolving snapping issues by extracting YZX Euler angles during transitions. Updated uiManager.js to show the active control mode and display keyboard guides."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Enemy Jet Realistic Missile Launch Ejection Implementation",
+            "description": "Modified enemySystem.js so that F-18 enemy jets launch missiles straight ahead matching their current 3D orientation (quaternion) and speed, rather than instantly aiming at the player at launch. During the 0.5-second ignition delay, the missile drops vertically due to gravity while coasting forward, before igniting and homing towards the player."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Dynamic Enemy Missile Performance Configuration Integration",
+            "description": "Updated fireMissileAtPlayer in enemySystem.js to read lifespan and ignitionDelay dynamically from the missile configuration JSON (aim120d.json) rather than using hardcoded values, making enemy missile parameters fully consistent with player missiles."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Complete Homing Weapon Configuration De-Hardcoding",
+            "description": "Modified both weaponSystem.js and enemySystem.js to load homing missile variables (agility, acceleration, maxSpeed, and explosionScale) dynamically from the weapon's configuration JSON (aim120d.json, airbomb.json) instead of using hardcoded numbers in scripts. Updated target config JSON files to include these parameters."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Player Aircraft Dynamic Collision Radius Integration",
+            "description": "Modified myShipControl.js to load spaceship.collisionRadius dynamically from the selected aircraft config JSON (F-18.json, battlecruiser.json) rather than hardcoding it to 80.0, enabling accurate collision detection for different vessel sizes."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Enemy AI Sensor & Weapon Config De-Hardcoding",
+            "description": "Modified enemySystem.js and environment.js to bind JSON configs to lockable target meshes. Replaced hardcoded radar range (30000), lock-on time (2.0s), and fire cooldown (8.0s) in EnemySystem.update with values loaded dynamically from target configs (F18_2.json, nimitz.json)."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Flare Countermeasure Flight & Spawn Spec Integration",
+            "description": "Added flare flight specs (lifespan, gravity, drag, interval, burstCount, cooldown) to F-18, F18_2, and battlecruiser JSON performance blocks. Updated Flare constructor, WeaponManager, and EnemySystem to load and apply these specs dynamically."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Missile Gravity & Inertial Flight Spec Integration",
+            "description": "Added gravity parameter to aim120d and airbomb JSON performance blocks. Updated weaponSystem.js and enemySystem.js to load gravity drop rate dynamically during ignition delay, and configured non-targeted missiles to accelerate and cap speed based on dynamic weapon specifications."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Right-Side Warning HTML Box UI Implementation",
+            "description": "Added dynamic HTML-based warning boxes on the right side of the screen. Implemented a yellow box for missile detection when enemy missiles are in-flight and a red box for radar locks/warnings when isPlayerLocked or isPlayerBeingLocked is true. Removed duplicate canvas-drawn warnings and added custom CSS keyframe blinking animations for a cleaner cockpit HUD."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Simulation-Wide Pause System and Audio Suspend Implementation",
+            "description": "Implemented full simulation pause when pressing 't'. It halts all sub-system frame updates (waves, particles, flight physics, animations, weapons, enemy AI) and pauses all active sound effects using SoundManager. Also added a blurred 'PAUSED' HTML overlay, locked keyboard inputs during pause, and capped frame delta to prevent teleportation issues on resume."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Remove Scaling from Warning Box Animations",
+            "description": "Refined the red warning box animation in style.css by removing transform scale styling, keeping only opacity and glowing outline pulses to prevent layout shifts."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Remove Battlecruiser Assets and Ship Selection HUD Panel",
+            "description": "Deleted the app/flight/model/battlecruiser folder containing Battlecruiser assets. Removed AVAILABLE_SHIPS list and ship selection buttons (shipBox) from createShipSelectPanel in uiManager.js to move aircraft selection to a future lobby menu. Cleaned up Battlecruiser references in codebase comments."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Interactive Startup Lobby Screen Overlay Implementation",
+            "description": "Added a glassmorphic start screen (lobby) to the flight simulator showing mission briefing and keyboard guides. Simulation updates are frozen on startup, and looping audios are deferred until the player clicks 'START MISSION', resolving Web Audio autoplay restrictions."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Faction-Colored HUD Target Marker Implementation",
+            "description": "Removed the early hostile-only target filtering in uiManager.js to display all friendly, enemy, and neutral targets within 60km. Added a dynamic faction-to-color mapping function and bound the colors consistently to off-screen pointers, on-screen target brackets, label texts, and gun lead indicators (red for enemy RED/hostiles, green for player BLUE/allies, and yellow for NEUTRAL targets)."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "First-Person Cockpit View and Analog Dashboard Integration",
+            "description": "Removed the Rear View camera mode and re-mapped camera modes to s1 (Follow), s2 (Bombing), and s3 (Cockpit). Implemented first-person cockpit view (s3) by hiding the player aircraft mesh, bypassing camera lerp lag, and aligning camera up vectors directly. Integrated 3 high-fidelity analog dashboard gauges (airspeed, attitude, altimeter) using assets from flightSimPanels-master, rendered via vanilla HTML5 Canvas 2D contexts only in s3 mode."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Flare Distance-Based Dynamic Scaling and Visibility Enhancement",
+            "description": "Exposed the main camera object globally on window.mainCamera. Increased base flare and glow sprite sizes, and implemented a custom dynamic distance-based scaling formula in weaponSystem.js to ensure flare particles shrink much slower as distance increases, significantly improving visibility from far away."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Flight Landing & Ground Taxiing Mechanics Implementation",
+            "description": "Implemented aircraft landing and ground taxiing mechanics. Added isGrounded state, touchdown vertical descent and pitch/roll limits safety check, automatic horizontal level snapping, sea-level clamping (using dynamic bounding-box-derived wheelOffset), nosewheel steering via Arrow keys / Q-E keys, rolling friction and wheel brakes ('b' or 'B' keys), lift-off takeoff speed check (>450 u/s + ArrowDown), and HUD indicators (GEAR DN, AIRBORNE/LANDED/TAXIING). Also hid the CCIP bomb marker UI when grounded."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Runway Static Model & Config Integration",
+            "description": "Created runway.json configuration file for the runway model (runway.glb), placing it at the world origin (y = 10 to avoid Z-fighting). Modified environment.js to load the runway alongside the Nimitz aircraft carrier and output its bounding box dimensions to the browser console on load to facilitate scaling adjustments."
+        },
+        {
+            "date": "2026-05-26",
+            "action": "Takeoff Aerodynamic Rotation Multiplier Implementation",
+            "description": "Replaced the binary takeoff speed gate (450 u/s) with a realistic aerodynamic rotation model. Pitch control capability starts at 400 u/s and scales up in 20% discrete intervals (every 20 u/s) up to 100% at >=480 u/s. The player can now pull the nose up to a maximum ground pitch angle (12 degrees) while taxiing, and lift-off is naturally triggered once the speed reaches 500 u/s and the nose rotation pitch angle exceeds 5 degrees."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Missile Trajectory Prediction Line (DLZ) Integration",
+            "description": "Implemented a real-time 3D flight prediction line for the player's mounted missiles (AIM-120D) in weaponSystem.js. The path is simulated dynamically inside a single frame using 60 Euler integration steps (dt = 0.1s) reflecting gravity, thrust acceleration, and locked target homing (agility). The line dynamically transitions from green (no lock/locking) to solid red (locked) and is hidden when all missiles have been fired."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "HUD Missile Lock-On Cone (15-Degree) Ring Implementation",
+            "description": "Implemented a visual 15-degree Lock Cone guide circle on the Canvas HUD in uiManager.js. The circle is dynamically projected from the aircraft's nose forward axis into screen space, drawn with a dashed circular line and crosshair ticks, and labeled 'LOCK CONE 15°'. It changes color from green to red when a target is fully locked, and automatically hides when missiles are empty."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Extensible Weapon Classification & Camera Mode-Based Filtering",
+            "description": "Added 'category' properties to aim120d.json and airbomb.json. Implemented getWeaponCategory in weaponSystem.js to classify weapons (with a fallback to performance parameters). Modified the 3D prediction line, HUD CCIP bomb fall line, and lock cone circle to dynamically filter and render based on the current camera mode (rendering only bomb assets in bombing sight 's2' and only missile assets in follow/cockpit views 's1'/'s3')."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Initial Ground Runway Spawning Configuration",
+            "description": "Modified spawnSpaceship in myShipControl.js to support initialGrounded and spawnHeading configurations dynamically. The speed is set to 0 (standstill) and the altitude snap-aligns to the computed wheelOffset above the runway. Updated F-18.json to place the aircraft on the runway (x=-25000, z=-4000, Y heading 90 degrees) in a grounded state (initialGrounded=true), so the game starts parked at the runway."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Dynamic Enemy Fighter Spawn Coordinates Integration",
+            "description": "Modified spawnEnemyJets in enemySystem.js to dynamically load the enemy F-18 (F18_2) spawn position from F18_2.json configuration (model.initialPosition) if available, falling back to a player-relative forward offset."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Enemy Fighter Spawn Variable Scope Bug Fix",
+            "description": "Resolved a ReferenceError where playerPos was block-scoped within the else block of spawnEnemyJets but used for target rotation outside it in enemySystem.js."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Obsolete AimPoint Guide Cleanup",
+            "description": "Removed unused variable aimPoint, empty updateAimPoint function, and its global window assignment from uiManager.js and myShipControl.js to clean up dead code from the deleted green aiming guide."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Continuous Missile Trajectory Prediction Line Display",
+            "description": "Modified updatePredictionLine in weaponSystem.js to keep the 3D trajectory prediction line visible under all conditions: added a fallback weapon configuration when out of ammo, fell back to the first available weapon regardless of camera mode, and bypassed gravity drop/ejection speed when grounded to prevent the line from clipping into the sea/runway. Updated index.html to continue updating the prediction line during lobby screen and pause state."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Prediction Line Frustum Culling Fix",
+            "description": "Set this.predictionLine.frustumCulled = false in weaponSystem.js. This prevents the Three.js rendering engine from incorrectly culling (hiding) the 3D trajectory line when the player looks up at a target, which previously caused the line's outdated bounding sphere to fall outside the camera's view frustum."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Strict Camera Mode Weapon Trajectory Rendering",
+            "description": "Cleaned up weapon trajectory rendering to strictly adhere to camera modes."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Missile Warning Sound Toggle UI & Controls Guide Layout Update",
+            "description": "Added a '경고음 켜기' checkbox to the bottom UI in uiManager.js, allowing the player to toggle missile lock-on warning sounds (rwr-tws, rwr-lock) during gameplay. Updated weaponSystem.js and enemySystem.js to respect this toggle. Also split the keyboard controls guide into two stacked rows for better readability."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Aircraft Carrier Landing System & Orange Visual Highlight",
+            "description": "Implemented aircraft carrier landing via a new file landingSystem.js loaded in index.html. Uses Three.js Raycasting from the aircraft downwards to detect the flight deck of NIMITZ. Dynamically adjusts spaceship.wheelOffset to offset the hardcoded 50.0 sea-level in myShipControl.js, allowing the aircraft to land safely at the deck's altitude and taxi on it. Also handles rolling off the deck by resetting grounded state, and paints the carrier meshes in dark orange (0xff4400) with a red-orange emissive glow (0xff2200) for visual verification."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Carrier Catapult, Arresting Wire, and ILS Guide Implementation",
+            "description": "Implemented carrier catapult launch system, arresting wire fast stopping, 3D glideslope guide rings (6 gates at 3.5-degree slope), and 2D Canvas HUD ILS localizer/glideslope deviation crosshair indicators entirely in landingSystem.js. Catapult triggers via Shift/J key when stationary on deck and launches with steam particle effects on Spacebar. Arresting wire applies 15.0 deceleration upon landing on NIMITZ."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Catapult Launch Duration & Automatic Hook-On-Spawn Implementation",
+"description": "Extended carrier catapult launch acceleration time to 3.0s (from 1.2s). Configured the aircraft to spawn automatically hooked (catapultState = 'HOOKED') on simulation startup at the aircraft carrier catapult coordinates. Implemented a persistent HUD Hook Status indicator (HOOK: ENGAGED / LAUNCHING / READY) at the bottom-left of the cockpit military HUD and updated the lobby and in-game controls guides to describe the Shift/J hook binding and Space launch controls."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Holographic HUD-Plane 2D Projected Landing Corridor (HITS) Implementation",
+            "description": "Removed 3D world line meshes and replaced them with a 2D projected HUD-plane wireframe grid tunnel (Highway in the Sky) computed in real-time. The 3D coordinates of the 9000-unit, 3.5-degree slope tunnel are projected onto the pilot's HUD Canvas using camera matrices, ensuring the tunnel only overlays on the pilot's screen like a real HUD display. Segment blocks light up from green to cyan-blue as the aircraft flies through them."
+        },
+        {
+            "date": "2026-05-27",
+            "action": "Removal of 2D HUD ILS Deviation Needles & Overlay Text",
+            "description": "Completely removed all elements of the 2D HUD Instrument Landing System (ILS), including the localizer (LOC) and glideslope (G/S) dashed crosshair needles, the center circle guide, and the ILS active/distance text readouts. The 2D projected wireframe grid tunnel remains active as the primary landing guidance system."
+        },
+        {
+            "date": "2026-05-28",
+            "action": "Landing Path Visibility Root Cause Fix (Rolled back matrix hack)",
+            "description": "Corrected the root cause of the HUD path not showing in Lobby by swapping script load order in index.html (landingSystem.js now loads after uiManager.js to preserve the updateHUD wrapper) and removed the !spaceship.frozen block."
+        },
+        {
+            "date": "2026-05-28",
+            "action": "Action/Kill Cam Picture-in-Picture Implementation",
+            "description": "Added a new PiP (Picture-in-Picture) camera system in index.html using WebGL setScissor/setViewport. It renders a second camera perspective over the main scene in the top-right corner. It is triggered for 4 seconds when: 1) the player's gun hits a target, 2) the player's missile hits a target, 3) an enemy missile hits the player. A dynamic DOM overlay 'TARGET CAM' was also added for visual styling."
+        },
+        {
+            "date": "2026-05-28",
+            "action": "2D Radar (Minimap) Implementation",
+            "description": "Implemented a 2D radar in the bottom-right corner of the HUD (uiManager.js). Features a green circular background with grid lines and a 60KM range. Calculates local positions of lockable targets using the spaceship's inverse world matrix to achieve a dynamic Heading-Up display. Enemies are drawn as small oriented triangles based on their faction."
+        },
+        {
+            "date": "2026-05-28",
+            "action": "Radar Horizontal Plane Tracking & Forward Direction Bug Fix",
+            "description": "Modified _drawRadar in uiManager.js to project coordinates horizontally using dot products against the spaceship's flat horizontal forward/right vectors. This isolates radar tracking from the aircraft's pitch and roll angles. Also corrected coordinate mapping (rx = distRight, ry = -distForward) so that targets directly in front of the aircraft are properly rendered at the 12 o'clock (forward) position instead of 3 o'clock."
+        },
+        {
+            "date": "2026-05-28",
+            "action": "Radar Rotation Inversion Bug Fix",
+            "description": "Corrected the horizontal right vector equation in uiManager.js to (-forward.z, 0, forward.x). This resolves the left-right coordinate inversion, ensuring target blips rotate in the correct direction (counter-clockwise on radar during a player's clockwise right turn)."
+        },
+        {
+            "date": "2026-05-28",
+            "action": "Ocean Opacity Overhaul (fft-ocean-master Design Principles Applied)",
+            "description": "Redesigned oceanSystem.js using the visual design principles from fft-ocean-master (jbouny). Key changes: (1) transparent: false — ocean surface is now fully opaque (alpha = 1.0 always), preventing the Nimitz carrier's hull from showing through the water. (2) side: FrontSide — only the top face of the surface mesh is rendered, eliminating the hull-visible-from-below artifact. (3) depthWrite: true — properly writes to the depth buffer. (4) Adopted fft-ocean's Fresnel formula: pow(1 - NdotV, 2.0) for more physically accurate water reflections. (5) Implemented HDR-style tone-mapping (hdr function: 1.0 - exp(-color * exposure), exposure=0.35). (6) Added gradient skybox sampling (sampleSkybox returns a lerp from horizon to zenith sky color) instead of a flat sky color. (7) Deep ocean base color (vec3(0.04, 0.18, 0.38)) — darker and more opaque-feeling. (8) Specular sharpness increased to 200 for tighter sun glints. The overall result is a rich, visually vibrant, and fully opaque ocean surface resembling the fft-ocean demo."
+        },
+        {
+            "date": "2026-05-28",
+            "action": "Weather/Climate System Implementation (fft-ocean-master Style)",
+            "description": "Created weatherSystem.js implementing 5 weather presets inspired by fft-ocean-master (Day, Sunset, Cloudy, Night, Storm). Features: (1) Smooth Lerp transition with ease-in-out cubic over configurable duration (default 5s). (2) Per-preset control of scene background color, ambient light color/intensity, directional light color/intensity/position, and ocean shader uniforms. (3) Canvas-generated rain particle system (THREE.Points, 2500 droplets) with per-weather intensity (0.0 to 1.0), camera-following, gravity simulation, and top-respawn loop. (4) Top-center weather selection button panel (F1~F5 labels) with active preset highlight and smooth hover effects. (5) HUD top-right weather status text (WX: ☀ DAY, etc.) with '···' indicator during transition. (6) F1~F5 keyboard shortcuts registered in index.html for instant weather switching. Extended oceanSystem.js to expose dynamic uniforms: _OceanColor, _SkyTop, _SkyHorizon, _WaveSpeed, _Exposure, plus setWeatherUniforms() public API. Updated index.html to load weatherSystem.js, call WeatherSystem.init() after OceanSystem.init(), and update WeatherSystem in the main animation loop."
+        },
+        {
+            "date": "2026-05-28",
+            "action": "Rain Visuals Enhancement (Snow-to-Rain Fix & Velocity Compensation)",
+            "description": "Resolved a visual bug where falling rain looked like snow. (1) Distortion Fix: created a square 64x64 canvas for PointsMaterial texture and drew a vertical ellipse (width 1.6, height 56) to prevent Three.js Points billboard stretch distortion. (2) High-Speed Streaks: increased falling speed from 150-230 to 450-650 units/s. (3) Camera Velocity Compensation: tracked lastCameraPos and subtracted camera displacement from rain coordinates in weatherSystem.js, preventing rain particles from flying along with the jet cockpit. (4) Dynamic Colors: bound points color to rainColor preset dynamically."
+        },
+        {
+            "date": "2026-05-30",
+            "action": "Storm Weather Lightning Effect Implementation",
+            "description": "Implemented a dynamic, high-fidelity lightning strike effect for the STORM weather preset in weatherSystem.js. Features: (1) Dynamic loading of the local lightening/lightningSystem.js module on initialization. (2) Set a constant 1.0-second interval timer for spawning lightning strikes falling from a high altitude (Y=50000 or custom) to random coordinates across the active map region (80km area around the player). (3) A screen flash overlay element ('#lightning-flash-overlay') created dynamically on initialization. (4) An exponential decay screen-flash glow effect triggered only when the horizontal distance between the player's aircraft and the strike is less than 5000 units. (5) Customized the lightning parameters to create a highly detailed, branching upside-down tree effect: increased main and alt fractal depths to 8 and 6, increased roughness values to 0.75-0.95 (making segments bend and zigzag significantly), boosted the branch count to 5-10, shortened relative branch lengths (0.15-0.35), and reduced X/Z scale factors to 0.15 to ensure branches fall vertically rather than spreading horizontally."
+        },
+        {
+            "date": "2026-05-30",
+            "action": "Lightning System Self-Contained Integration",
+            "description": "Cleanly merged the contents of lightningSystem.js directly into weatherSystem.js to create a self-contained module, avoiding dynamic script tag loading. Fixed Korean comments encoding to prevent character corruption, and prepared for deleting the legacy redundant lightening/ folder."
+        },
+        {
+            "date": "2026-05-30",
+            "action": "Particle System Self-Contained Integration",
+            "description": "Cleanly merged the contents of threeJenParticle.js directly into particleSystem.js to create a self-contained module, reducing the number of external script files loaded. Removed the script tag for threeJenParticle.js from index.html and deleted the redundant file."
+        },
+        {
+            "date": "2026-05-31",
+            "action": "Sea Crash Detection & Runway Taxiing Fall-Off Physics",
+            "description": "Implemented sea surface collision/crash detection and updated runway taxiing fall-off physics: (1) Added checks in myShipControl.js to detect when an airborne aircraft's altitude drops below sea level (Y <= 50.0 + wheelOffset), triggering 100 damage and spawning explosion/crash UI. (2) Replaced the height-based threshold in landingSystem.js with a raycast-based check (activeGroundY === null) so that when taxiing off the edge of either the NIMITZ carrier or the RUNWAY, the aircraft immediately reverts to airborne (isGrounded = false). This allows stall and gravity physics to pull the aircraft down into the sea and crash naturally at low speeds."
+        },
+        {
+            "date": "2026-05-31",
+            "action": "Takeoff Landing Re-trigger Glitch Fix",
+            "description": "Fixed a bug where taking off from the runway or aircraft carrier would immediately trigger a landing (or a hard-landing crash) on the next frame due to the aircraft still being close to the deck height. (1) Corrected the verticalDescentSpeed vector calculation in landingSystem.js to use the aircraft's forward direction (+X vector) instead of the up direction (+Y vector). (2) Moved the verticalDescentSpeed calculation outside the landing check and added it to the outer if statement, ensuring automatic landing (and the fallback crash landing logic) is only triggered when the aircraft is actually descending (verticalDescentSpeed > 0), allowing the aircraft to climb and fly away smoothly upon takeoff."
+        },
+        {
+            "date": "2026-05-31",
+            "action": "Simplified Landing and Taxiing Deceleration Physics",
+            "description": "Simplified landing and taxiing deceleration coefficients across the carrier and runway: (1) Removed the redundant runwayBrakingActive touchdown deceleration code blocks in landingSystem.js. (2) Configured carrier arresting wire touchdown deceleration to a simplified coefficient of 6.0 in landingSystem.js. (3) Unified general taxiing/landing slide friction to a coefficient of 0.1 and active wheel braking to 1.0 inside myShipControl.js, avoiding unnecessary parameter variations."
+        },
+        {
+            "date": "2026-05-31",
+            "action": "Modified Bombing Sight LookAt Target to Forward Vector",
+            "description": "Modified the bombing sight (s2) camera lookAt configuration in myShipControl.js to point to a position 1000 units in front of the aircraft (using the forward vector +X) instead of directly at the aircraft's center coordinates, ensuring the center of the screen aligns with the aircraft's flight path."
+        },
+        {
+            "date": "2026-05-31",
+            "action": "Stabilized Bombing Sight Camera Horizon",
+            "description": "Stabilized the bombing sight (s2) camera view in myShipControl.js by forcing camera.up to the static world up vector (0, 1, 0) and basing the lookAt target coordinates on the horizontal forward vector (flatForward) instead of the full 3D rolling quaternion, preventing the horizon from tilting during banking turns."
+        },
+        {
+            "date": "2026-05-31",
+            "action": "Implemented Dynamic Gray Exhaust Smoke on Boost",
+            "description": "Updated particleSystem.js to dynamically set the color of engine contrail/exhaust smoke to gray (0x555555) when the aircraft is boosting (afterburner active) and white (0xffffff) during normal flight, enhancing realism under throttle."
+        },
+        {
+            "date": "2026-06-01",
+            "action": "Centralized Collision System Refactoring",
+            "description": "Modularized and centralized scattered collision checks into a reusable CollisionSystem module. Refactored landingSystem.js, weaponSystem.js, and gunSystem.js to delegate downward raycasts, forward/lateral mesh collisions, and proximity-based sphere checks to CollisionSystem, improving maintainability and extensibility with 100% functional parity."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Decoupled and Customized Missile Flame and Smoke Trails",
+            "description": "Created spawnMissileTrails in particleSystem.js, providing custom high-density smoke (con-trail) and bright core flame particle effects for missiles, while leaving jet engine flames untouched. Updated weaponSystem.js and enemySystem.js to call spawnMissileTrails for both player and enemy missiles, supporting custom colors (such as red flame for enemy missiles)."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Adapted Missile Flames to Match Jet Engine Boost State",
+            "description": "Modified spawnMissileTrails and the update loop in particleSystem.js to render missile exhaust flames using the jet afterburner's high-intensity blue-purple gradient (or red gradient for enemy missiles) and added three-stage Mach diamonds behind the nozzle, while maintaining the thick persistent missile smoke trail."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Enabled Catapult Hook Disengage and Engage in Lobby State",
+            "description": "Modified the keydown event listener in landingSystem.js to allow toggling the catapult hook (Shift/J keys) during the initial mission briefing/lobby phase. It bypasses real-time ground raycast checks by checking window.isLobbyActive, snaps the aircraft to the correct catapult coordinate and orientation, and updates the HUD status representation, ensuring a reliable unhook/re-hook experience before clicking 'START MISSION'."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Weapon Launch Consolidation Shortcut ('S' key)",
+            "description": "Implemented an integrated weapon launch shortcut bound to the 'S' key. In forward flight views (s1/s3), pressing 'S' launches air-to-air missiles sequentially (hardpoint_2 -> hardpoint_4). In the bombing sight view (s2), pressing 'S' drops unguided aviation bombs sequentially (hardpoint_1 -> hardpoint_5). Updated the lobby controls guide UI in uiManager.js to reflect the new sequential fire control."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Removed Individual Weapon Firing Hotkeys",
+            "description": "Completely removed individual weapon firing hotkeys (1-5 keys) and updated the lobby controls guide UI in uiManager.js to omit the '1-5: 개별 발사' description, keeping only the consolidated sequential firing shortcut ('S' key)."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Biplane Playable Aircraft Integration",
+            "description": "Integrated the new biplane model as a playable aircraft. Created the biplane.json configuration file specifying custom performance values, camera offsets, and hardpoint mounts. Added an interactive aircraft selection UI to the lobby screen in index.html, allowing the player to swap between F-18 and Biplane before launching the simulation, complete with interactive buttons, live mission briefing text updates, and loading state locks. Modified changeShip in myShipControl.js to safely call the decorated window.spawnSpaceship."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Dynamic Emulator Focus Controller Script Loading",
+            "description": "Resolved the strict MIME type strictness blocking error. Replaced the static script tag referencing '../../focusController.js' with a dynamic loader script block in index.html. It checks if the app is currently running inside an iframe (window.parent !== window) and dynamically spawns the script tag, gracefully catching and bypassing 404/MIME errors when the app is executed in standalone preview servers."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Rearview Mirror Positioning Adjustment",
+            "description": "Moved the rearview mirror overlay and its WebGL camera render viewport position in index.html to be located at top 60px and left 10% of the screen width, adapting to the user layout preferences."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Rearview Mirror Location Refinement (Top 140px, Left 80px)",
+            "description": "Adjusted the rearview mirror positioning in index.html to top 140px and left 80px, modifying both the HTML CSS layout overlay and the corresponding WebGL viewport scissor calculation parameters."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Rearview Mirror Location Refinement (Top 60px, Left 40px)",
+            "description": "Adjusted the rearview mirror positioning in index.html to top 60px and left 40px, adapting CSS absolute styles and matching WebGL viewport boundary offsets."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Rearview Mirror Location Refinement (Top 60px, Left 100px)",
+            "description": "Adjusted the rearview mirror positioning in index.html to top 60px and left 100px, modifying both CSS absolute properties and WebGL viewport boundary offsets."
+        },
+        {
+            "date": "2026-06-02",
+            "action": "Rearview Mirror Location Refinement (Top 100px, Left 60px)",
+            "description": "Adjusted the rearview mirror positioning in index.html to top 100px and left 60px, modifying both CSS absolute properties and WebGL viewport boundary offsets."
+        },
+        {
+            "date": "2026-06-03",
+            "action": "B-52 Stratofortress Playable Aircraft Integration",
+            "description": "Added the B-52 Stratofortress heavy strategic bomber as a playable aircraft. Created model/b52/b52.json config with custom sluggish performance characteristics, adjusted camera and rearview mirror coordinates, and 24.0x model scaling. Set up wing-mounted engine nozzle contrail emitters, dual gun hardpoints on the nose, and weapon rack coordinates for airbombs and aim120d missiles. Integrated the B-52 selection button to index.html aircraft selection UI."
+        },
+        {
+            "date": "2026-06-16",
+            "action": "Integrated 3D Volumetric Mushroom Cloud VFX for Airbomb Explosions",
+            "description": "Ported and integrated the advanced 3D Mushroom Cloud VFX system into the main simulator. Consolidated volumetric raymarching, instanced billow particles, ground dust, shockwaves, and timeline physics into a single location-independent file (mushroomCloudVFX.js). Modified index.html to load and update the manager, and updated weaponSystem.js to trigger the new 30-second mushroom cloud sequence specifically for airbomb explosions while preserving default missile explosions. Resolved a Three.js version compatibility issue where clearUpdateRanges() was not supported in r128 by falling back to standard updateRange object properties."
+        },
+        {
+            "date": "2026-06-16",
+            "action": "Equipped Helicopter with Airbomb for Testing",
+            "description": "Added an airbomb to hardpoint_1 of the helicopter configuration (helicopter.json), mounted on the center underside of the fuselage, to allow testing the 20x scaled volumetric mushroom cloud VFX in s2 camera mode."
+        },
+        {
+            "date": "2026-06-16",
+            "action": "Fixed Absolute Path 404 in Mushroom Cloud Index",
+            "description": "Changed script src from absolute /src/main.js to relative ./src/main.js inside mushroom cloud/index.html to ensure it loads properly when served from subdirectories."
+        }
+    ]
+}
+    

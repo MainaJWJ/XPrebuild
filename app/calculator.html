@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        main {
+            width: max-content;
+            background-color: rgb(235 233 216);
+            padding: 5px;
+            font-family: sans-serif;
+        }
+        main #screen {
+            display: block;
+            width: 100%;
+            margin: 0 auto 5px;
+            height: 30px;
+            font-size: 16px;
+            padding: 2px 5px;
+        }
+        button.other {
+            border: 1px solid rgb(10, 10, 190);
+            box-shadow: 0 0 2px 0px rgb(92 193 255);
+            border-radius: 3px;
+            background-image: linear-gradient(rgb(240 240 240) 0 50%, rgb(226, 226, 226));
+            color: blue;
+            cursor: pointer;
+        }
+        button.other:hover {
+            box-shadow: 0 0 0 2px rgba(245, 192, 93, 0.6980392157) inset, 0 0 2px 0px rgb(92 193 255);
+        }
+        button.other:active {
+            background-image: linear-gradient(rgb(226 226 226), rgb(240 240 240) 50%);
+            box-shadow: inset 1px 2px 1px #D1CCC1, inset 0 -1px 1px #fff;
+        }
+        button#empty {
+            border: 2px inset #ddd;
+            box-shadow: none;
+            background-color: rgb(235 233 216) !important;
+        }
+        button.red { 
+            color: red; 
+        }
+        main .col-wrapper { 
+            display: flex; 
+        }
+        .col-1 button {
+            display: block;
+            width: 40px;
+            height: 30px;
+            margin: 5px;
+        }
+        .col-2 { 
+            margin-left: 3px; 
+        }
+        .col-2 div { 
+            display: flex; 
+        }
+        .col-2 div:first-child,
+        .col-2 div:first-child button {
+            width: 100%;
+            height: 30px;
+            margin: 2px 0;
+            column-gap: 2px;
+        }
+        .col-2 div:first-child button { 
+            padding: 0 5px; 
+        }
+        .col-2 div button {
+            width: 40px;
+            height: 30px;
+            margin: 3px;
+        }
+    </style>
+    <script src="../focusController.js"></script>
+</head>
+<body>
+    <main>
+        <input type="text" id="screen" value="0" readonly/>
+        <div class="col-wrapper">
+            <div class="col-1">
+                <button class="red" id="empty"></button>
+                <button class="red other" onclick="memoryClear()">MC</button>
+                <button class="red other" onclick="memoryRecall()">MR</button>
+                <button class="red other" onclick="memorySave()">MS</button>
+                <button class="red other" onclick="memoryAdd()">M+</button>
+            </div>
+            <div class="col-2">
+                <div>
+                    <button class="red other" onclick="backspace()">Backspace</button>
+                    <button class="red other" onclick="clearEntry()">CE</button>
+                    <button class="red other" onclick="clearAll()">C</button>
+                </div>
+                <div>
+                    <button class="other" onclick="append('7')">7</button>
+                    <button class="other" onclick="append('8')">8</button>
+                    <button class="other" onclick="append('9')">9</button>
+                    <button class="other red" onclick="append('/')">/</button>
+                    <button class="other" onclick="squareRoot()">sqt</button>
+                </div>
+                <div>
+                    <button class="other" onclick="append('4')">4</button>
+                    <button class="other" onclick="append('5')">5</button>
+                    <button class="other" onclick="append('6')">6</button>
+                    <button class="other red" onclick="append('*')">*</button>
+                    <button class="other" onclick="percentage()">%</button>
+                </div>
+                <div>
+                    <button class="other" onclick="append('1')">1</button>
+                    <button class="other" onclick="append('2')">2</button>
+                    <button class="other" onclick="append('3')">3</button>
+                    <button class="other red" onclick="append('-')">-</button>
+                    <button class="other" onclick="inverse()">1/x</button>
+                </div>
+                <div>
+                    <button class="other" onclick="append('0')">0</button>
+                    <button class="other" onclick="toggleSign()">+/-</button>
+                    <button class="other" onclick="append('.')">.</button>
+                    <button class="other red" onclick="append('+')">+</button>
+                    <button class="other red" onclick="calculate()">=</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        const screen = document.getElementById("screen");
+        let memory = 0;
+
+        const append = (char) => {
+            if (screen.value === "0" || screen.value === "Error") screen.value = "";
+            screen.value += char;
+        };
+
+        const clearAll = () => screen.value = "0";
+        const clearEntry = () => screen.value = "0";
+        const backspace = () => screen.value = screen.value.slice(0, -1) || "0";
+
+        const calculate = () => {
+            try {
+                const result = safeEval(screen.value);
+                displayResult(result);
+            } catch {
+                screen.value = "Error";
+            }
+        };
+
+        const toggleSign = () => {
+            if (screen.value === "0" || screen.value === "Error") return;
+            screen.value = screen.value.startsWith("-") ? screen.value.slice(1) : `-${screen.value}`;
+        };
+
+        const squareRoot = () => {
+            try {
+                const result = Math.sqrt(safeEval(screen.value));
+                displayResult(result);
+            } catch {
+                screen.value = "Error";
+            }
+        };
+
+        const percentage = () => {
+            try {
+                const result = safeEval(screen.value) / 100;
+                displayResult(result);
+            } catch {
+                screen.value = "Error";
+            }
+        };
+
+        const inverse = () => {
+            try {
+                const result = 1 / safeEval(screen.value);
+                displayResult(result);
+            } catch {
+                screen.value = "Error";
+            }
+        };
+
+        const memoryClear = () => memory = 0;
+        const memoryRecall = () => screen.value = memory;
+        const memorySave = () => memory = parseFloat(screen.value) || 0;
+        const memoryAdd = () => memory += parseFloat(screen.value) || 0;
+        
+        // 안전한 수학 표현식 계산 함수
+        const safeEval = (expression) => {
+            // 입력값에서 허용되지 않는 문자 제거
+            expression = expression.replace(/\s/g, ''); // 공백 제거
+            if (!/^[0-9+\-*/().]+$/.test(expression)) {
+                throw new Error('Invalid characters in expression');
+            }
+            
+            // 연산자와 숫자만 포함된 수학 표현식인지 검증
+            if (expression === '' || /^[-+*/.]+$/.test(expression)) {
+                throw new Error('Invalid expression');
+            }
+            
+            // Function 생성자를 사용하여 안전한 평가
+            // 전역 스코프를 차단하기 위해 새로운 함수 생성
+            try {
+                const result = new Function('return (' + expression + ')')();
+                if (typeof result !== 'number' || isNaN(result) || !isFinite(result)) {
+                    throw new Error('Invalid result');
+                }
+                return result;
+            } catch (e) {
+                throw e;
+            }
+        };
+        
+        // 계산 결과 표시 함수 (에러 처리 개선)
+        const displayResult = (result) => {
+            if (typeof result === 'number' && isFinite(result)) {
+                // 결과가 너무 길면 지수 표기법 사용
+                if (Math.abs(result) > 999999999 || (Math.abs(result) < 0.000001 && result !== 0)) {
+                    screen.value = result.toExponential(6);
+                } else {
+                    // 소수점 처리: 필요 없는 자릿수는 표시하지 않음
+                    if (Number.isInteger(result)) {
+                        screen.value = result.toString();
+                    } else {
+                        // 소수점 이하 10자리까지만 표시하고, 필요 없는 0은 제거
+                        screen.value = parseFloat(result.toFixed(10)).toString();
+                    }
+                }
+            } else {
+                screen.value = "Error";
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monaco Editor</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+        }
+        #container {
+            width: 100%;
+            height: 100vh;
+            border: none;
+        }
+    </style>
+    <script src="../../focusController.js"></script>
+</head>
+<body>
+    <div id="container"></div>
+
+    <!-- Monaco Editor 로딩을 위한 AMD 로더 -->
+    <script src="./loader.js"></script>
+    <script id="html-content" type="text/plain">
+
+<!DOCTYPE html>
+<!-- Windows XP 데스크톱 구현 파일 -->
+<!-- 이 파일은 Windows XP 운영체제의 데스크톱 환경을 웹에서 재현한 HTML 파일입니다. -->
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows XP Rebuild</title>
+    <link rel="stylesheet" href="./windowManager.css">
+    <link rel="stylesheet" href="./desktop-icons.css">
+    <link rel="stylesheet" href="./contextMenu.css">
+    <link rel="icon" href="./image/windowslogo.png">
+
+    <!-- ====================================================================== -->
+    <!-- CSS 스타일 정의 -->
+    <!-- ====================================================================== -->
+    <link rel="stylesheet" href="./desktop.css">
+</head>
+
+<body id="desktop-body">
+    <!-- ====================================================================== -->
+    <!-- HTML 구조 정의 -->
+    <!-- ====================================================================== -->
+    <div id="desktop-wrapper">
+        <!-- 데스크톱 영역 -->
+        <div id="desktop-area">
+            <!-- 아이콘들이 동적으로 추가될 컨테이너 -->
+            <div id="desktop-icons"></div>
+            <div id="desktop-icons-col2"></div>
+            <div id="desktop-icons-col3"></div>
+            <div id="desktop-icons-col4"></div>
+        </div>
+
+        <!-- 작업표시줄 컨테이너 -->
+        <div id="taskbar-container">
+            <iframe id="taskbar-frame" src="taskbar.html"></iframe>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+
+
+    <!-- ====================================================================== -->
+    <!-- JavaScript 로직 -->
+    <!-- ====================================================================== -->
+    
+    <!-- Clippy 동적 초기화 및 통합 관리자 -->
+    <script src="./clippyManager.js">
+        
+    </script>
+</body>
+</html>
+    </script>
+    <script>
+        // Monaco Editor 로드를 위한 설정
+        require.config({ 
+            paths: { 
+                vs: '.' 
+            } 
+        });
+
+        // Monaco Editor 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // AMD 방식으로 Monaco Editor 로드
+            require(['vs/editor/editor.main'], function() {
+                if (typeof monaco !== 'undefined') {
+                    // HTML 콘텐츠 가져오기
+                    var htmlContent = document.getElementById('html-content').textContent.trim();
+                    
+                    monaco.editor.create(document.getElementById('container'), {
+                        value: htmlContent,
+                        language: 'html',
+                        theme: 'vs-dark',
+                        automaticLayout: true,
+                        insertSpaces: true,
+                        tabSize: 4
+                    });
+                } else {
+                    console.error('Monaco Editor API를 로드하지 못했습니다.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../scroll.css">
+    <title>Microsoft Excel</title>
+    <link rel="icon" href="../../image/xls.png" type="image/png">
+    <link rel='stylesheet' href='./pluginsCss.min.css' />
+    <link rel='stylesheet' href='./plugins.min.css' />
+    <link rel='stylesheet' href='./luckysheet.min.css' />
+    <link rel='stylesheet' href='./iconfont.min.css' />
+    <script src="./plugin.min.js"></script>
+    <script src="./luckysheet.umd.min.js"></script>
+
+    <style>
+        #luckysheet {
+            margin: 0px;
+            padding: 0px;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0px;
+            top: 0px;
+        }
+
+        #luckysheet_info_detail {
+            display: none !important;
+        }
+    </style>
+    <script src="../../focusController.js"></script>
+</head>
+
+<body>
+    <div id="luckysheet">
+    </div>
+    <script>
+        $(function () {
+            var options = {
+                container: 'luckysheet'
+            }
+            luckysheet.create(options)
+        })
+    </script>
+</body>
+
+</html>

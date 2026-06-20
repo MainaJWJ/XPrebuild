@@ -1,0 +1,146 @@
+{
+  "faction": "BLUE",
+  "hostileFactions": [
+    "RED"
+  ],
+  "destruction": {
+    "explosionScale": 8.0,
+    "explosionCount": 1,
+    "health": 100,
+    "damage": 100
+  },
+  "collisionRadius": 45.0,
+  "model": {
+    "file": "model/F-18/F-18.glb",
+    "scale": 1,
+    "initialRotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "initialPosition": {
+      "x": 4476,
+      "y": 574,
+      "z": -9825
+    },
+    "spawnHeading": 10,
+    "initialGrounded": true
+  },
+  "performance": {
+    "rollResponse": 0.08,
+    "speed": 700,
+    "acceleration": 4,
+    "accelerationRate": 0.08,
+    "minSpeed": 400,
+    "stallSpeed": 250,
+    "gravityEffect": 0.4,
+    "turnDrag": 0.4,
+    "turnSensitivity": 0.01,
+    "pitchRate": 1.2,
+    "rollRate": 2.5,
+    "yawRate": 0.5,
+    "flareAmmo": 60,
+    "flare": {
+      "lifespan": 9.0,
+      "gravity": 120.0,
+      "drag": 1.2,
+      "interval": 0.15,
+      "burstCount": 6,
+      "cooldown": 3.0
+    },
+    "gun": {
+      "fireCooldown": 0.002,
+      "bulletSpeed": 4500,
+      "bulletLife": 3,
+      "bulletSpread": 0.022,
+      "damage": 21
+    },
+    "pitchLimits": {
+      "up": 75,
+      "down": -75
+    },
+    "maxRollAngle": 70
+  },
+  "camera": {
+    "lerpSpeed": 0.15,
+    "minDistance": 100,
+    "maxDistance": 400,
+    "lookAtDistance": 1000,
+    "s1": {
+      "x": -240,
+      "y": 100,
+      "z": 0
+    },
+    "s2": {
+      "x": 0,
+      "y": 500,
+      "z": 0,
+      "lookAtMode": "bombing_sight"
+    },
+    "s3": {
+      "x": 65,
+      "y": 23,
+      "z": 0,
+      "lookAtMode": "cockpit"
+    }
+  },
+  "rearviewMirror": {
+    "offset": {
+      "x": -23,
+      "y": 30,
+      "z": 0
+    },
+    "lookTarget": {
+      "x": -100,
+      "y": 20,
+      "z": 0
+    }
+  },
+  "visuals": {
+    "engineHardpoints": [
+      {
+        "x": -72,
+        "y": 5,
+        "z": -6
+      },
+      {
+        "x": -72,
+        "y": 5,
+        "z": 6
+      }
+    ],
+    "gunHardpoints": [
+      {
+        "x": 0,
+        "y": -15,
+        "z": 15
+      }
+    ]
+  },
+  "hardpoints": {
+    "hardpoint_2": {
+      "type": "aim120d",
+      "position": { "x": 0, "y": 3, "z": -30 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "scale":0.5
+    },
+    "hardpoint_4": {
+      "type": "aim120d",
+      "position": { "x": 0, "y": 3, "z": 30 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "scale": 0.5
+    },
+    "hardpoint_1": {
+      "type": "airbomb",
+      "position": { "x": -5, "y": 0, "z": -60 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "scale": 0.2
+    },
+    "hardpoint_5": {
+      "type": "airbomb",
+      "position": { "x": -5, "y": 0, "z": 60 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "scale": 0.2
+    }
+  }
+}

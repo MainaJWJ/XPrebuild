@@ -1,0 +1,438 @@
+/* Windows XP 창 스타일 */
+/* 이 파일은 Windows XP 운영체제의 창(Window) UI를 재현하기 위한 모든 CSS 스타일을 포함하고 있습니다. */
+/* 전체 구조: .xp-window > .title-bar + .window-body */
+
+/* 기본 창 스타일 */
+/* 비활성 상태의 Windows XP 창 외관을 정의합니다. */
+.xp-window {
+  /* Windows XP 창 배경 그라데이션 */
+  /* 파란색 계열의 그라데이션으로 비활성 창의 배경을 표현합니다. */
+  background: linear-gradient(to bottom right, #758CDD, #7587DD 100%);
+  
+  /* 창 테두리 설정 */
+  /* Windows XP 창의 3D 효과를 위한 테두리 색상을 지정합니다. */
+  border-left: 1px solid #5B68CD;
+  border-bottom: 1px solid #4F53BC;
+  border-right: 1px solid #4F53BC;
+  
+  /* 창 상단 모서리 둥글게 처리 */
+  /* Windows XP 특유의 둥근 상단 모서리를 구현합니다. */
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  
+  /* 위치 및 패딩 설정 */
+  /* 창의 위치와 내부 여백을 조정합니다. */
+  position: relative;
+  padding: 3px;
+  
+  /* 창 내부 그림자 효과 */
+  /* Windows XP 창의 입체적인 효과를 위한 내부 그림자(inset shadow)를 적용합니다. */
+  box-shadow: inset -1px -1px 0 #6D74CD, inset -2px -2px 0 #7587DD, inset 1px 0 0 #7480DC, inset 2px 0 0 #758CDD;
+  
+  /* 부드러운 창 전환 애니메이션 (최대화/복원/최소화 통일) */
+  /* 모든 속성이 동일한 0.25초, 동일한 이징 커브로 전환됩니다. */
+  transition: top 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              left 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              width 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              height 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              padding 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              border-radius 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              border 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 활성 창 스타일 */
+/* 현재 선택된(활성화된) 창의 스타일을 정의합니다. */
+.xp-window.active {
+  /* 활성 창 배경 그라데이션 */
+  /* 더 진한 파란색 계열로 활성 창을 표현하여 비활성 창과 구분합니다. */
+  background: linear-gradient(to bottom right, #166AEE, #002CBC 100%);
+  
+  /* 활성 창 테두리 색상 변경 */
+  /* 활성 창에 어울리는 더 진한 테두리 색상으로 변경합니다. */
+  border-left-color: #0734DA;
+  border-bottom-color: #00138C;
+  border-right-color: #00138C;
+  
+  /* 활성 창 내부 그림자 효과 */
+  /* 활성 창의 입체감을 강조하는 내부 그림자 효과를 적용합니다. */
+  box-shadow: inset -1px -1px 0 #001DA0, inset -2px -2px 0 #003DDC, inset 1px 0 0 #166AEE, inset 2px 0 0 #0855DD;
+}
+
+/* 제목 표시줄 스타일 */
+/* 창 상단의 제목 표시줄 영역 스타일을 정의합니다. */
+.title-bar {
+  /* 제목 표시줄 배경 그라데이션 */
+  /* Windows XP 제목 표시줄의 복합 그라데이션 효과를 구현합니다. */
+  background: linear-gradient(90deg, #7783DA, transparent 5px),
+    linear-gradient(270deg, rgba(37, 39, 105, 0.5), transparent 5px),
+    linear-gradient(180deg, #98B2E8 0%, #9DB9EB 5%, #7996DE 10%, #7D9BE3 84%, #80A5E7 90%, #7A93DF 97%, #7A93DF 100%);
+  
+  /* 텍스트 색상 및 정렬 */
+  /* 제목 표시줄 텍스트의 색상과 정렬 방식을 설정합니다. */
+  color: #D8E4F8;
+  display: flex;
+  flex-direction: row;
+  font-weight: bold;
+  
+  /* 제목 표시줄 모서리 둥글게 처리 */
+  /* 창과 일관성 있게 상단 모서리를 둥글게 처리합니다. */
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  
+  /* 제목 표시줄 테두리 설정 */
+  /* 제목 표시줄의 3D 효과를 위한 테두리를 추가합니다. */
+  border-top: 1px solid #688DE0;
+  border-left: 1px solid #5B68CD;
+  border-right: 1px solid #00138C;
+  
+  /* 제목 표시줄 여백 및 패딩 설정 */
+  /* 제목 표시줄의 위치를 조정하고 내부 여백을 설정합니다. */
+  margin: -3px -4px 0 -4px;
+  padding: 0 5px;
+  
+  /* 요소 정렬 */
+  /* 제목 텍스트와 버튼을 수직 중앙 정렬합니다. */
+  align-items: center;
+}
+
+/* 활성 제목 표시줄 스타일 */
+/* 활성 창의 제목 표시줄에 적용되는 특별한 스타일입니다. */
+.xp-window.active > .title-bar {
+  /* 활성 제목 표시줄 배경 그라데이션 */
+  /* 활성 창에 어울리는 더 진한 파란색 그라데이션을 적용합니다. */
+  background: linear-gradient(90deg, #003DDC, transparent 5px),
+    linear-gradient(270deg, rgba(0, 14, 125, 0.5), transparent 5px),
+    linear-gradient(180deg, #3D95FF 0%, #3D95FF 5%, #0054E3 10%, #0372FF 84%, #026AFE 90%, #0144D0 97%, #0144D0 100%);
+  
+  /* 활성 제목 표시줄 텍스트 색상 및 그림자 */
+  /* 흰색 텍스트와 테두리 색상을 변경하여 가독성을 높입니다. */
+  color: #FFFFFF;
+  border-top-color: #0058EB;
+  border-left-color: #001ABC;
+  
+  /* 활성 제목 표시줄 텍스트 그림자 */
+  /* 텍스트에 그림자를 추가하여 더 뚜렷하게 보이도록 합니다. */
+  text-shadow: 1px 1px 0 #0A1883;
+}
+
+/* 제목 표시줄 텍스트 */
+/* 창의 제목을 표시하는 텍스트 영역 스타일입니다. */
+.title-bar-text {
+  text-align: left;
+  font-family: 'Trebuchet MS', 'Tahoma', sans-serif; /* XP 창 제목 표시줄 폰트 */
+  font-weight: bold;
+  font-size: 13px; /* XP 기준: 10pt = 13px (@96dpi) */
+  padding: 2px 5px 4px;
+  flex-grow: 1;
+  cursor: default;
+}
+
+/* 제목 표시줄 아이콘 */
+/* 창의 제목 표시줄에 표시되는 프로그램 아이콘 스타일입니다. */
+.title-bar-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 0px;
+  vertical-align: middle;
+}
+
+/* 제목 표시줄 버튼 컨테이너 */
+/* 닫기, 최소화, 최대화 버튼을 담는 컨테이너입니다. */
+.title-bar-buttons {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  padding: 4px 0px 3px 0px; /*위 오른쪽 아래 왼쪽*/
+  align-items: center;
+}
+
+/* 제목 표시줄 버튼 스타일 */
+/* 제목 표시줄의 각 버튼(닫기, 최소화, 최대화)에 공통으로 적용되는 스타일입니다. */
+.title-bar-buttons button {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  min-width: 0;
+  padding: 0;
+  background-repeat: no-repeat;
+  background-position: center center;
+  box-shadow: none;
+  margin-left: 2px;
+  box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1), inset -2px -2px 2px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none; /* 테두리 제거 */
+  background-color: transparent; /* 배경색 투명하게 설정 */
+}
+
+/* 버튼 호버 효과 */
+/* 마우스가 버튼 위에 있을 때 적용되는 효과입니다. */
+.title-bar-buttons button:hover {
+  filter: brightness(1.2);
+}
+
+/* 버튼 클릭 효과 */
+/* 버튼을 누르고 있을 때 적용되는 효과입니다. */
+.title-bar-buttons button:active {
+  filter: brightness(0.8);
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+/* 버튼 기본 배경 */
+/* 일반 버튼(최소화, 최대화)의 배경 스타일입니다. */
+.title-bar-buttons button,
+.title-bar-buttons button:active {
+  background: linear-gradient(135deg, #BFD1FC 0%, transparent 20%),
+    linear-gradient(90deg, #5E8BF7 0%, transparent 40%),
+    linear-gradient(180deg, #5E8BF7 0%, transparent 30%),
+    linear-gradient(to bottom right, #467EF5, #0760F3);
+}
+
+/* 닫기 버튼 배경 */
+/* 닫기 버튼에 특별히 적용되는 빨간색 배경 스타일입니다. */
+.title-bar-buttons button[data-close] {
+  background: linear-gradient(135deg, #EFA390 0%, transparent 20%),
+    linear-gradient(90deg, #E98168 0%, transparent 40%),
+    linear-gradient(180deg, #E98168 0%, transparent 30%),
+    linear-gradient(to bottom right, #E66A4D, #E03802);
+}
+
+/* 버튼 아이콘 스타일 */
+/* 버튼 내부의 아이콘을 위한 기본 스타일입니다. */
+.title-bar-buttons button::after {
+  display: none;
+  position: initial;
+}
+
+/* 버튼 아이콘 표시 */
+/* 각 버튼에 해당하는 아이콘을 표시하기 위한 스타일입니다. */
+.title-bar-buttons button[data-close]::after,
+.title-bar-buttons button[data-minimize]::after,
+.title-bar-buttons button[data-maximize]::after {
+  display: block;
+  content: '';
+  width: 100%;
+  height: 100%;
+  border: 0;
+  outline: none;
+  margin: auto;
+  border-radius: 0;
+}
+
+/* 닫기 버튼 아이콘 */
+/* 닫기 버튼에 사용되는 PNG 아이콘을 적용합니다. */
+.title-bar-buttons button[data-close]::after {
+  background: url('./image/close.png') no-repeat center center;
+  background-size: cover;
+}
+
+/* 최소화 버튼 아이콘 */
+/* 최소화 버튼에 사용되는 PNG 아이콘을 적용합니다. */
+.title-bar-buttons button[data-minimize]::after {
+  background: url('./image/minimize.png') no-repeat center center;
+  background-size: cover;
+}
+
+/* 최대화 버튼 아이콘 */
+/* 최대화 버튼에 사용되는 PNG 아이콘을 적용합니다. */
+.title-bar-buttons button[data-maximize]::after {
+  background: url('./image/maximize.png') no-repeat center center;
+  background-size: cover;
+}
+
+/* 복원 버튼 아이콘 */
+/* 최대화 상태에서의 복원 버튼에 사용되는 PNG 아이콘을 적용합니다. */
+.maximized .title-bar-buttons button[data-maximize]::after {
+  background: url('./image/restore.png') no-repeat center center;
+  background-size: cover;
+}
+
+/* 창 본문 */
+/* 창 내부의 실제 콘텐츠가 표시되는 영역입니다. */
+.window-body {
+  background: #ece9d8;
+  color: #000;
+  flex-grow: 1;
+  padding: 0;
+  margin: 0;
+  min-height: 0;
+}
+
+/* iframe 스타일 */
+/* 창 본문 내부에 삽입되는 iframe 요소의 스타일입니다. */
+.window-body iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* 최대화 상태 */
+/* 창이 최대화되었을 때의 스타일입니다. */
+.xp-window.maximized {
+  top: 0px !important;
+  left: 0px !important;
+  width: 100% !important;
+  height: calc(100% - 40px) !important;
+  transform: none;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* 드래그/리사이즈 중에는 전환 애니메이션 비활성화 */
+/* 마우스를 즉각 따라오도록 하여 인풋랙을 방지합니다. */
+.xp-window.dragging,
+.xp-window.resizing {
+  transition: none !important;
+}
+
+/* 최소화 애니메이션 진행 중 상태 */
+/* steps(5)로 실제 Windows XP의 뚝뚝 끊기는 프레임 느낌을 재현합니다. */
+/* 최대화/복원의 부드러운 전환과 별도로, 최소화만 XP 스타일로 동작합니다. */
+.xp-window.minimizing {
+  pointer-events: none;
+  transition: opacity 0.15s steps(5, end),
+              transform 0.15s steps(5, end) !important;
+}
+
+/* 최소화 완료 상태 */
+/* 애니메이션 후 완전히 숨겨진 상태. opacity: 0은 안전장치입니다. */
+.xp-window.minimized {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 크기 조절 핸들 */
+/* 창의 크기를 조절할 수 있는 핸들 요소들의 기본 스타일입니다. */
+.resize-handle {
+  position: absolute;
+  z-index: 10;
+}
+
+/* 북서 (좌상단) 핸들 */
+/* 창의 좌상단에 위치하는 대각선 크기 조절 핸들입니다. */
+.resize-nw {
+  top: -3px;
+  left: -3px;
+  width: 10px;
+  height: 10px;
+  cursor: nw-resize;
+}
+
+/* 북동 (우상단) 핸들 */
+/* 창의 우상단에 위치하는 대각선 크기 조절 핸들입니다. */
+.resize-ne {
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  cursor: ne-resize;
+}
+
+/* 남서 (좌하단) 핸들 */
+/* 창의 좌하단에 위치하는 대각선 크기 조절 핸들입니다. */
+.resize-sw {
+  bottom: -3px;
+  left: -3px;
+  width: 10px;
+  height: 10px;
+  cursor: sw-resize;
+}
+
+/* 남동 (우하단) 핸들 */
+/* 창의 우하단에 위치하는 대각선 크기 조절 핸들입니다. */
+.resize-se {
+  bottom: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  cursor: se-resize;
+}
+
+/* 북 (상단) 핸들 */
+/* 창의 상단 중앙에 위치하는 수직 크기 조절 핸들입니다. */
+.resize-n {
+  top: -3px;
+  left: 10px;
+  right: 10px;
+  height: 6px;
+  cursor: n-resize;
+}
+
+/* 남 (하단) 핸들 */
+/* 창의 하단 중앙에 위치하는 수직 크기 조절 핸들입니다. */
+.resize-s {
+  bottom: -3px;
+  left: 10px;
+  right: 10px;
+  height: 6px;
+  cursor: s-resize;
+}
+
+/* 서 (좌측) 핸들 */
+/* 창의 좌측 중앙에 위치하는 수평 크기 조절 핸들입니다. */
+.resize-w {
+  top: 10px;
+  bottom: 10px;
+  left: -3px;
+  width: 6px;
+  cursor: w-resize;
+}
+
+/* 동 (우측) 핸들 */
+/* 창의 우측 중앙에 위치하는 수평 크기 조절 핸들입니다. */
+.resize-e {
+  top: 10px;
+  bottom: 10px;
+  right: -3px;
+  width: 6px;
+  cursor: e-resize;
+}
+
+/* --- 크기 조절 핸들 동적 스타일 --- */
+/* 사용자가 창 크기를 조절하는 동안(.resizing 클래스가 활성화된 동안) 핸들의 크기를 확대하여 더 쉽게 잡을 수 있도록 합니다. */
+
+/* 코너 핸들 (대각선) 크기 확대 */
+/* 기존 10x10px에서 200x200px로 확대하고, 위치를 재조정합니다. */
+.xp-window.resizing .resize-nw {
+    width: 400px; height: 400px;
+    top: -200px; left: -200px;
+}
+.xp-window.resizing .resize-ne {
+    width: 400px; height: 400px;
+    top: -200px; right: -200px;
+}
+.xp-window.resizing .resize-sw {
+    width: 400px; height: 400px;
+    bottom: -200px; left: -200px;
+}
+.xp-window.resizing .resize-se {
+    width: 400px; height: 400px;
+    bottom: -200px; right: -200px;
+}
+
+/* 상하 핸들 (수직) 크기 확대 */
+/* 기존 높이 6px에서 120px로 확대하고, 위치를 재조정합니다. */
+.xp-window.resizing .resize-n {
+    height: 240px;
+    top: -120px;
+}
+.xp-window.resizing .resize-s {
+    height: 240px;
+    bottom: -120px;
+}
+
+/* 좌우 핸들 (수평) 크기 확대 */
+/* 기존 너비 6px에서 120px로 확대하고, 위치를 재조정합니다. */
+.xp-window.resizing .resize-w {
+    width: 240px;
+    left: -120px;
+}
+.xp-window.resizing .resize-e {
+    width: 240px;
+    right: -120px;
+}

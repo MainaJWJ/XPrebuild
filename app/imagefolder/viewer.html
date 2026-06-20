@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Viewer UI</title>
+    <!-- 원본 CSS 파일 연결 (Tailwind 유틸리티 포함) -->
+    <link rel="stylesheet" href="assets/index-BC-Eo0I0.css">
+    <link rel="stylesheet" href="../../scroll.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        /* 뷰어 루트 컨테이너 */
+        .viewer-container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="cursor-default">
+    <!-- 원본 구조를 그대로 가져옴 (사이드바/메뉴 제외) -->
+    <div class="viewer-container w-full h-full bg-pictures-blue overflow-x-hidden">
+        
+        <!-- 메인 이미지 표시 영역 (상단 75%) -->
+        <div class="flex flex-col justify-center items-center w-full h-9/12 gap-1">
+            <!-- 큰 이미지 박스 -->
+            <div class="w-3/4 h-5/6 mt-1 border border-black overflow-hidden">
+                <div id="main-image" class="w-full h-full bg-contain bg-center bg-no-repeat" 
+                     style="background-image: url('https://picsum.photos/800/600'); transform: rotate(0deg);"></div>
+            </div>
+            
+            <!-- 버튼 컨트롤 바 -->
+            <div class="flex py-2">
+                <div class="flex gap-0.5">
+                    <button class="flex items-center w-7 h-7 cursor-pointer rounded-sm hover:border border border-pictures-blue hover:border-gray-300 hover:shadow-header-tools p-1">
+                        <img src="assets/previous-icon.svg" alt="Photo précédente">
+                    </button>
+                    <button class="flex items-center w-7 h-7 cursor-pointer rounded-sm hover:border border border-pictures-blue hover:border-gray-300 hover:shadow-header-tools p-1">
+                        <img src="assets/next-icon.svg" alt="Photo suivante">
+                    </button>
+                </div>
+                <hr class="w-px mx-2 h-full bg-moon-mist">
+                <div class="flex">
+                    <button class="flex items-center w-7 h-7 cursor-pointer rounded-sm hover:border border border-pictures-blue hover:border-gray-300 hover:shadow-header-tools p-1">
+                        <img src="assets/left.svg" alt="Tourner à gauche">
+                    </button>
+                    <button class="flex items-center w-7 h-7 cursor-pointer rounded-sm hover:border border border-pictures-blue hover:border-gray-300 hover:shadow-header-tools p-1">
+                        <img src="assets/right.svg" alt="Tourner à droite">
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 썸네일 스트립 (고정 높이 적용) -->
+        <div class="w-full bg-white" style="height: 120px;">
+            <div id="thumb-strip" class="flex w-full h-full bg-no-repeat bg-32 bg-bottom-right-picture-menu bg-window-picture px-2 pt-1.5 pb-2 gap-4 overflow-x-auto">
+                
+                <!-- 썸네일 항목들 (실제 이미지 데이터로 채워짐) -->
+                <div class="flex flex-col items-center flex-shrink-0" style="width: 140px;">
+                    <div class="bg-no-repeat bg-contain bg-center cursor-pointer border border-gray-300" 
+                         style="background-image: url('../imageviewer/image/가을.jpg'); width: 140px; height: 80px;"></div>
+                    <p class="text-center inline-block font-trebuchet-pixel text-xxs cursor-pointer mt-1 truncate w-full">가을.jpg</p>
+                </div>
+                <div class="flex flex-col items-center flex-shrink-0" style="width: 140px;">
+                    <div class="bg-no-repeat bg-contain bg-center cursor-pointer border border-gray-300" 
+                         style="background-image: url('../imageviewer/image/겨울.jpg'); width: 140px; height: 80px;"></div>
+                    <p class="text-center inline-block font-trebuchet-pixel text-xxs cursor-pointer mt-1 truncate w-full">겨울.jpg</p>
+                </div>
+                <div class="flex flex-col items-center flex-shrink-0" style="width: 140px;">
+                    <div class="bg-no-repeat bg-contain bg-center cursor-pointer border border-gray-300" 
+                         style="background-image: url('../imageviewer/image/공간 이동.jpg'); width: 140px; height: 80px;"></div>
+                    <p class="text-center inline-block font-trebuchet-pixel text-xxs cursor-pointer mt-1 truncate w-full">공간 이동.jpg</p>
+                </div>
+                <div class="flex flex-col items-center flex-shrink-0" style="width: 140px;">
+                    <div class="bg-no-repeat bg-contain bg-center cursor-pointer border border-gray-300" 
+                         style="background-image: url('../imageviewer/image/달과 붉은 사막.jpg'); width: 140px; height: 80px;"></div>
+                    <p class="text-center inline-block font-trebuchet-pixel text-xxs cursor-pointer mt-1 truncate w-full">달과 붉은 사막.jpg</p>
+                </div>
+                <div class="flex flex-col items-center flex-shrink-0" style="width: 140px;">
+                    <div class="bg-no-repeat bg-contain bg-center cursor-pointer border border-gray-300" 
+                         style="background-image: url('../imageviewer/image/달과 산.jpg'); width: 140px; height: 80px;"></div>
+                    <p class="text-center inline-block font-trebuchet-pixel text-xxs cursor-pointer mt-1 truncate w-full">달과 산.jpg</p>
+                </div>
+                <div class="flex flex-col items-center flex-shrink-0" style="width: 140px;">
+                    <div class="bg-no-repeat bg-contain bg-center cursor-pointer border border-gray-300" 
+                         style="background-image: url('../imageviewer/image/석양.jpg'); width: 140px; height: 80px;"></div>
+                    <p class="text-center inline-block font-trebuchet-pixel text-xxs cursor-pointer mt-1 truncate w-full">석양.jpg</p>
+                </div>
+                <div class="flex flex-col items-center flex-shrink-0" style="width: 140px;">
+                    <div class="bg-no-repeat bg-contain bg-center cursor-pointer border border-gray-300" 
+                         style="background-image: url('../imageviewer/image/수련.jpg'); width: 140px; height: 80px;"></div>
+                    <p class="text-center inline-block font-trebuchet-pixel text-xxs cursor-pointer mt-1 truncate w-full">수련.jpg</p>
+                </div>
+                <div class="flex flex-col items-center flex-shrink-0" style="width: 140px;">
+                    <div class="bg-no-repeat bg-contain bg-center cursor-pointer border border-gray-300" 
+                         style="background-image: url('../imageviewer/image/푸른 언덕.jpg'); width: 140px; height: 80px;"></div>
+                    <p class="text-center inline-block font-trebuchet-pixel text-xxs cursor-pointer mt-1 truncate w-full">푸른 언덕.jpg</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainImage = document.getElementById('main-image');
+            const thumbnails = document.querySelectorAll('.viewer-container .bg-white .flex-shrink-0');
+            const btnPrev = document.querySelector('button img[alt="Photo précédente"]').parentElement;
+            const btnNext = document.querySelector('button img[alt="Photo suivante"]').parentElement;
+            const btnRotateL = document.querySelector('button img[alt="Tourner à gauche"]').parentElement;
+            const btnRotateR = document.querySelector('button img[alt="Tourner à droite"]').parentElement;
+
+            // 이미지 데이터 추출 (현재 HTML에 있는 것들)
+            const images = Array.from(thumbnails).map((thumb, index) => {
+                const imgDiv = thumb.querySelector('div');
+                const nameP = thumb.querySelector('p');
+                const url = imgDiv.style.backgroundImage.replace(/url\(["']?|["']?\)/g, '');
+                return { index, url, name: nameP.textContent, thumbElement: thumb };
+            });
+
+            let currentIndex = 1; // 기본 선택된 이미지 (index2)
+            let currentRotation = 0;
+
+            function updateViewer(index) {
+                currentIndex = index;
+                const imgData = images[currentIndex];
+                
+                // 메인 이미지 변경
+                mainImage.style.backgroundImage = `url('${imgData.url}')`;
+                
+                // 회전 초기화
+                currentRotation = 0;
+                applyRotation();
+
+                // 썸네일 스타일 업데이트
+                images.forEach((img, idx) => {
+                    const imgDiv = img.thumbElement.querySelector('div');
+                    const nameP = img.thumbElement.querySelector('p');
+                    
+                    if (idx === currentIndex) {
+                        imgDiv.className = 'bg-no-repeat bg-contain bg-center cursor-pointer border-3 border-focus-blue';
+                        nameP.className = 'text-center inline-block font-trebuchet-pixel text-xxs cursor-pointer mt-1 bg-focus-blue px-1 my-px text-white truncate w-full';
+                    } else {
+                        imgDiv.className = 'bg-no-repeat bg-contain bg-center cursor-pointer border border-gray-300';
+                        nameP.className = 'text-center inline-block font-trebuchet-pixel text-xxs cursor-pointer mt-1 truncate w-full';
+                    }
+                });
+            }
+
+            function applyRotation() {
+                mainImage.style.transform = `rotate(${currentRotation}deg)`;
+            }
+
+            // --- 이벤트 바인딩 ---
+            
+            // 썸네일 클릭 및 더블클릭
+            images.forEach(img => {
+                // 단일 클릭: 내부 뷰어 업데이트
+                img.thumbElement.onclick = () => updateViewer(img.index);
+
+                // 더블클릭: 최상위 부모(데스크톱)에게 메시지 전송 (기존 이미지 뷰어 실행)
+                img.thumbElement.ondblclick = () => {
+                    console.log(`Thumbnail dblclicked: ${img.name}`);
+                    if (window.top) {
+                        window.top.postMessage({
+                            type: 'launchApp',
+                            appId: 'imageviewer',
+                            payload: {
+                                type: 'openImageViewer',
+                                filePath: 'My Documents/' + img.name
+                            }
+                        }, '*');
+                    }
+                };
+            });
+
+            // 이전/다음 버튼
+            btnPrev.onclick = () => {
+                const newIndex = (currentIndex - 1 + images.length) % images.length;
+                updateViewer(newIndex);
+            };
+            btnNext.onclick = () => {
+                const newIndex = (currentIndex + 1) % images.length;
+                updateViewer(newIndex);
+            };
+
+            // 회전 버튼
+            btnRotateL.onclick = () => {
+                currentRotation -= 90;
+                applyRotation();
+            };
+            btnRotateR.onclick = () => {
+                currentRotation += 90;
+                applyRotation();
+            };
+
+            // 초기 상태 설정
+            updateViewer(currentIndex);
+
+            // --- 외부 메시지 수신 (데스크톱 연동) ---
+            window.addEventListener('message', (event) => {
+                const data = event.data;
+                if (data.type === 'openImageViewer' && data.filePath) {
+                    console.log('Viewer received open command:', data.filePath);
+                    
+                    // 파일 경로에서 이름만 추출 (예: "My Documents/가을.jpg" -> "가을.jpg")
+                    const fileName = data.filePath.split('/').pop();
+                    
+                    // 이름이 일치하는 이미지 찾기
+                    const foundIndex = images.findIndex(img => img.name === fileName);
+                    
+                    if (foundIndex !== -1) {
+                        updateViewer(foundIndex);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<!-- Windows XP 작업표시줄 HTML 파일 -->
+<!-- 이 파일은 Windows XP 작업표시줄 UI를 재현하며, iframe으로 로드되어 메인 페이지와 상호작용합니다. -->
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taskbar</title>
+    <link rel="stylesheet" href="fonts/fonts.css">
+    <style>
+        /* 기본 body 스타일 - 투명 배경으로 설정하여 작업표시줄 아래 내용이 보이도록 함 */
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        
+        /* 스크롤바를 숨기기 위해 오버플로우를 hidden으로 설정 */
+        html, body {
+            overflow: hidden;
+        }
+        
+        /* Windows XP 작업표시줄 스타일 */
+        /* 작업표시줄은 화면 하단에 고정된 형태로, 왼쪽(시작버튼, 창 탭), 오른쪽(알림 아이콘, 시계)으로 구성됨 */
+
+        /* 작업표시줄 전체 컨테이너 스타일 */
+        /* 작업표시줄의 기본 크기와 배경, 위치를 정의함 */
+        .taskbar {
+            /* 높이 설정 - Windows XP 작업표시줄 표준 높이 */
+            height: 30px;
+            
+            /* Windows XP 작업표시줄 그라데이션 배경 */
+            /* 파란색 계열의 복합 그라데이션으로 Windows XP 특유의 입체감 표현 */
+            background: linear-gradient(
+                to bottom,
+                #1f2f86 0,
+                #3165c4 3%,
+                #3682e5 6%,
+                #4490e6 10%,
+                #3883e5 12%,
+                #2b71e0 15%,
+                #2663da 18%,
+                #235bd6 20%,
+                #2258d5 23%,
+                #2157d6 38%,
+                #245ddb 54%,
+                #2562df 86%,
+                #245fdc 89%,
+                #2158d4 92%,
+                #1d4ec0 95%,
+                #1941a5 98%
+            );
+            
+            /* 위치 설정 - 화면 하단에 고정 */
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            
+            /* 플렉스 박스로 레이아웃 설정 - 왼쪽과 오른쪽 영역을 유연하게 배치 */
+            display: flex;
+        }
+
+        /* 작업표시줄 왼쪽 항목들 컨테이너 */
+        /* 시작 버튼과 퀵 런치 버튼들, 열린 창들의 탭이 위치하는 영역 */
+        .taskbar-items-left {
+            height: 100%;
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 작업표시줄 오른쪽 항목들 컨테이너 */
+        /* 시스템 알림 아이콘들과 시계가 위치하는 영역 */
+        .taskbar-items-right {
+            background-color: #0b77e9;
+            flex-shrink: 0;
+            /* 알림 영역의 그라데이션 배경 - 작업표시줄과 구분되는 시각적 효과 */
+            background: linear-gradient(
+                to bottom,
+                #0c59b9 1%,
+                #139ee9 6%,
+                #18b5f2 10%,
+                #139beb 14%,
+                #1290e8 19%,
+                #0d8dea 63%,
+                #0d9ff1 81%,
+                #0f9eed 88%,
+                #119be9 91%,
+                #1392e2 94%,
+                #137ed7 97%,
+                #095bc9 100%
+            );
+            border-left: 1px solid #1042af;
+            box-shadow: inset 1px 0 1px #18bbff;
+            padding: 0 10px;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Windows XP 시작 버튼 스타일 */
+        /* 작업표시줄의 가장 좌측에 위치하는 시작 버튼 */
+        .start-button {
+            /* 버튼 크기 설정 - 작업표시줄 높이에 맞춤 */
+            height: 100%;
+            width: 104px;
+            margin-right: 5px;
+            position: relative;
+            
+            /* 시작 버튼 배경 이미지 설정 - Windows XP 특유의 시작 버튼 이미지 */
+            background-image: url('./image/start.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100% 100%;
+            
+            /* 버튼 기본 스타일 제거 - 이미지로만 표현하기 위해 기본 스타일 제거 */
+            border: none;
+            box-shadow: none;
+            background-color: transparent;
+            
+            /* 커서 모양 설정 - 클릭 가능함을 나타냄 */
+            cursor: pointer;
+        }
+
+        /* 시작 버튼 호버 효과 */
+        /* 마우스가 버튼 위에 있을 때 밝아지는 효과 */
+        .start-button:hover {
+            filter: brightness(105%);
+        }
+
+        /* 시작 버튼 클릭 효과 */
+        /* 버튼을 누르고 있을 때 어두워지는 효과 */
+        .start-button:active {
+            filter: brightness(85%);
+        }
+
+        /* 퀵 런치 영역 컨테이너 */
+        /* 시작 버튼 옆에 위치하는 빠른 실행 버튼들이 위치하는 영역 */
+        .quick-launch {
+            display: flex;
+            align-items: center;
+            padding-left: 0px;
+            /* border-right: 1px solid #4a73ad; */
+            margin-right: 5px;
+            height: 100%;
+        }
+
+        /* 퀵 런치 버튼 스타일 */
+        .quick-launch-btn {
+            width: 22px;
+            height: 22px;
+            margin: 0 1px;
+            background-color: transparent; /* 기본 상태는 투명 배경 */
+            border: none; /* 테두리 제거 */
+            border-radius: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-shadow: none; /* 기본 상태는 그림자 없음 */
+        }
+
+        /* 퀵 런치 버튼 호버 효과 */
+        .quick-launch-btn:hover {
+            background-color: #3c81f3; /* 비활성 탭 색상과 동일 */
+            border: none; /* 테두리 유지하지 않음 */
+            /* Windows XP의 입체적인 그림자 효과 적용 */
+            box-shadow: inset -1px 0px rgba(0, 0, 0, 0.3),
+                inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+        }
+
+        /* 퀵 런치 버튼 클릭 효과 */
+        .quick-launch-btn:active {
+            background-color: #1e52b7; /* 활성 탭 색상과 동일 */
+            border: none; /* 테두리 유지하지 않음 */
+            /* 활성 탭의 그림자 효과 적용 */
+            box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.2),
+                inset 1px 0 1px rgba(0, 0, 0, 0.7);
+        }
+
+        /* 작업표시줄 창 목록 영역 */
+        /* 열린 창들의 탭이 표시되는 영역 */
+        .taskbar-windows {
+            flex-grow: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 작업표시줄 탭 스타일 */
+        /* 열린 창을 나타내는 탭의 기본 스타일 */
+        .taskbar-tab {
+            flex: 1;
+            max-width: 150px;
+            color: #fff;
+            border-radius: 2px;
+            margin-top: 2px;
+            padding: 0 8px;
+            height: 22px;
+            font-family: 'Tahoma', sans-serif; /* XP 작업표시줄 탭 폰트 */
+            font-size: 11px;
+            /* 비활성 탭의 파란색 배경 */
+            background-color: #3c81f3;
+            /* Windows XP의 입체적인 그림자 효과 */
+            box-shadow: inset -1px 0px rgba(0, 0, 0, 0.3),
+                inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+            position: relative;
+            display: flex;
+            align-items: center;
+            /* 클릭 가능함을 나타내는 커서 */
+            cursor: pointer;
+            margin-right: 2px;
+            overflow: hidden;
+            user-select:none;
+        }
+
+        /* 활성 탭 스타일 */
+        /* 현재 선택된(활성화된) 창의 탭 스타일 */
+        .taskbar-tab.active {
+            /* 활성 탭의 더 진한 파란색 배경 */
+            background-color: #1e52b7;
+            /* 활성 탭의 그림자 효과 변경 */
+            box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.2),
+                inset 1px 0 1px rgba(0, 0, 0, 0.7);
+        }
+
+        /* 비활성 탭 호버 스타일 */
+        /* 마우스가 비활성 탭 위에 있을 때의 효과 */
+        .taskbar-tab:not(.active):hover {
+            background-color: #53a3ff;
+            box-shadow: inset -1px 0px rgba(0, 0, 0, 0.3),
+                inset 1px 1px 1px rgba(255, 255, 255, 0.2);
+        }
+
+        /* 활성 탭 호버 스타일 */
+        /* 마우스가 활성 탭 위에 있을 때의 효과 */
+        .taskbar-tab.active:hover {
+            background-color: #3576f3;
+        }
+
+        /* 탭 클릭 효과 */
+        /* 비활성 탭을 누르고 있을 때의 효과 */
+        .taskbar-tab:not(.active):hover:active {
+            background-color: #1e52b7;
+            box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
+                inset 1px 0 1px rgba(0, 0, 0, 0.7);
+        }
+
+        /* 활성 탭을 누르고 있을 때의 효과 */
+        .taskbar-tab.active:hover:active {
+            background-color: #1e52b7;
+        }
+
+        /* 탭 아이콘 스타일 */
+        /* 창 탭 내부에 표시되는 프로그램 아이콘 스타일 */
+        .taskbar-tab-icon {
+            height: 15px;
+            width: 15px;
+            margin-right: 8px;
+        }
+
+        /* 탭 텍스트 스타일 */
+        /* 창 제목을 표시하는 텍스트 스타일 */
+        .taskbar-tab span {
+            position: absolute;
+            left: 27px;
+            right: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 알림 영역 아이콘 스타일 */
+        /* 시스템 알림 영역의 아이콘들(볼륨, 프린터 등)의 공통 스타일 */
+        .notification-icon {
+            height: 15px;
+            width: 15px;
+            margin: 0 2px;
+        }
+
+        /* 시계 스타일 */
+        /* 작업표시줄 우측에 표시되는 시계의 스타일 */
+        #taskbar-clock {
+            margin: 0 5px;
+            color: #fff;
+            font-family: 'Tahoma', sans-serif; /* XP 시계 폰트 */
+            font-size: 11px;
+            font-weight: normal; /* XP 원본: Regular (lighter 제거) */
+            text-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Windows XP 작업표시줄 구조 -->
+    <!-- 전체 작업표시줄 컨테이너 -->
+    <div class="taskbar">
+        <!-- 왼쪽 영역: 시작 버튼과 창 탭들 -->
+        <div class="taskbar-items-left">
+            <!-- Windows XP 시작 버튼 -->
+            <button class="start-button" id="startButton" aria-label="Start"></button>
+            <!-- 퀵 런치 영역: 자주 사용하는 프로그램 바로가기 -->
+            <div class="quick-launch" id="quickLaunch">
+                <button class="quick-launch-btn" id="ql-computer" title="My Computer">
+                    <img src="./image/mycomputer.png" alt="My Computer" style="width: 16px; height: 16px;">
+                </button>
+                <button class="quick-launch-btn" id="ql-internet" title="Internet Explorer">
+                    <img src="./image/explore.png" alt="IE" style="width: 16px; height: 16px;">
+                </button>
+                <button class="quick-launch-btn" id="ql-vscode" title="vscode">
+                    <img src="./image/vscode.png" alt="vscode" style="width: 16px; height: 16px;">
+                </button>
+            </div>
+            <!-- 열린 창들의 탭이 동적으로 추가되는 영역 -->
+            <div class="taskbar-windows" id="taskbarWindows"></div>
+        </div>
+        <!-- 오른쪽 영역: 시스템 알림 아이콘들과 시계 -->
+        <div class="taskbar-items-right">
+            <!-- 시스템 알림 아이콘들 -->
+            <img src="./image/volume.png" alt="볼륨" title="볼륨" class="notification-icon">
+            <img src="./image/printer.png" alt="프린터" title="프린터" class="notification-icon">
+            <img src="./image/panel.png" alt="상태" title="상태" class="notification-icon">
+            <!-- 실시간 시계 표시 영역 -->
+            <span id="taskbarClock" style="color: #fff; font-family: Tahoma, Geneva, Verdana, sans-serif; font-size: 11px; font-weight: lighter; cursor: default; user-select: none;"></span>
+        </div>
+    </div>
+    
+    <!-- 작업표시줄 기능을 처리하는 JavaScript -->
+    <script>
+        // 시계 더블 클릭 시 날짜 및 시간 설정 앱 실행
+        document.getElementById('taskbarClock').addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'launchApp',
+                    appId: 'timedate'
+                }, '*');
+            }
+        });
+        // 작업표시줄 메시지 타입 상수 정의
+        const TASKBAR_MESSAGE_TYPES = {
+            ADD_TAB: 'addTaskbarTab',
+            REMOVE_TAB: 'removeTaskbarTab',
+            ACTIVATE_TAB: 'activateTaskbarTab',
+            DEACTIVATE_TAB: 'deactivateTaskbarTab',
+            DEACTIVATE_ALL_TABS: 'deactivateAllTaskbarTabs',
+            LAUNCH_APP: 'launchApp',
+            TASKBAR_TAB_CLICK: 'taskbarTabClick'
+        };
+
+        // DOM이 완전히 로드된 후 실행
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM 요소들 참조
+            const startButton = document.getElementById('startButton');        // 시작 버튼
+            const taskbarWindows = document.getElementById('taskbarWindows');  // 창 탭 컨테이너
+            const taskbarClock = document.getElementById('taskbarClock');      // 시계 표시 요소
+            
+            // 시작 버튼 클릭 이벤트 핸들러
+            startButton.addEventListener('click', (e) => {
+                // 이벤트 전파 방지
+                e.stopPropagation();
+                // 부모 창(메인 페이지)에 시작 메뉴 열기 요청 메시지 전송
+                if (window.parent) {
+                    window.parent.postMessage({
+                        type: 'openStartMenu'
+                    }, '*');
+                }
+            });
+            
+            // 퀵 런치 버튼 클릭 이벤트 핸들러
+            const qlInternet = document.getElementById('ql-internet');
+            const qlEmail = document.getElementById('ql-email');
+            const qlComputer = document.getElementById('ql-computer');
+            const qlVscode = document.getElementById('ql-vscode');
+            
+            // Internet Explorer 퀵 런치 버튼 클릭 이벤트
+            if (qlInternet) {
+                qlInternet.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // 부모 창(메인 페이지)에 Internet Explorer 열기 요청 메시지 전송
+                    if (window.parent) {
+                        window.parent.postMessage({
+                            type: 'launchApp',
+                            appId: 'internet-explorer'
+                        }, '*');
+                    }
+                });
+            }
+            
+            // E-mail 퀵 런치 버튼 클릭 이벤트
+            if (qlEmail) {
+                qlEmail.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // 부모 창(메인 페이지)에 E-mail 열기 요청 메시지 전송
+                    if (window.parent) {
+                        window.parent.postMessage({
+                            type: 'launchApp',
+                            appId: 'email'
+                        }, '*');
+                    }
+                });
+            }
+            
+            // My Computer 퀵 런치 버튼 클릭 이벤트
+            if (qlComputer) {
+                qlComputer.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // 부모 창(메인 페이지)에 My Computer 열기 요청 메시지 전송
+                    if (window.parent) {
+                        window.parent.postMessage({
+                            type: 'launchApp',
+                            appId: 'icon-my-computer'
+                        }, '*');
+                    }
+                });
+            }
+            
+            // VSCode 퀵 런치 버튼 클릭 이벤트
+            if (qlVscode) {
+                qlVscode.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // 부모 창(메인 페이지)에 VSCode 열기 요청 메시지 전송
+                    if (window.parent) {
+                        window.parent.postMessage({
+                            type: 'launchApp',
+                            appId: 'vscode'
+                        }, '*');
+                    }
+                });
+            }
+            
+            // 시계 업데이트 함수 - 현재 시간을 표시
+            function updateClock() {
+                const now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                // AM/PM 표시 형식 사용
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                // 12시간제로 변환
+                hours = hours % 12 || 12;
+                // 분이 한 자리일 경우 앞에 0 추가
+                minutes = String(minutes).padStart(2, '0');
+                // 시계 요소에 시간 표시
+                taskbarClock.textContent = `${hours}:${minutes} ${ampm}`;
+            }
+            
+            // 작업표시줄 탭 추가 함수 - 새 창이 열릴 때 호출됨
+            function addTaskbarTab(windowId, title, iconUrl) {
+                // 새로운 탭 요소 생성
+                const tab = document.createElement('div');
+                tab.className = 'taskbar-tab';
+                // 데이터 속성으로 창 ID 저장
+                tab.dataset.windowId = windowId;
+                
+                // 아이콘 추가 - 지정된 아이콘이 있으면 사용, 없으면 기본 아이콘 사용
+                if (iconUrl) {
+                    tab.innerHTML = `<img src="${iconUrl}" class="taskbar-tab-icon" alt=""><span>${title}</span>`;
+                } else {
+                    // 기본 아이콘 사용
+                    tab.innerHTML = `<img src="./image/file.png" class="taskbar-tab-icon" alt=""><span>${title}</span>`;
+                }
+                
+                // 탭 클릭 이벤트 핸들러 - 해당 창을 활성화하도록 요청
+                tab.addEventListener('click', () => {
+                    // 부모 창에 탭 클릭 이벤트 전달
+                    if (window.parent) {
+                        window.parent.postMessage({
+                            type: 'taskbarTabClick',
+                            windowId: windowId
+                        }, '*');
+                    }
+                });
+                
+                // 탭을 작업표시줄에 추가
+                taskbarWindows.appendChild(tab);
+            }
+            
+            // 작업표시줄 탭 제거 함수 - 창이 닫힐 때 호출됨
+            function removeTaskbarTab(windowId) {
+                // 해당 창 ID를 가진 탭 요소를 찾아서 제거
+                const tab = document.querySelector(`.taskbar-tab[data-window-id="${windowId}"]`);
+                if (tab) {
+                    tab.remove();
+                }
+            }
+            
+            // 작업표시줄 탭 활성화 함수 - 특정 창을 활성화 상태로 표시
+            function activateTaskbarTab(windowId) {
+                // 모든 탭의 활성 상태를 해제
+                document.querySelectorAll('.taskbar-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // 지정된 창 ID의 탭을 활성 상태로 설정
+                const tab = document.querySelector(`.taskbar-tab[data-window-id="${windowId}"]`);
+                if (tab) {
+                    tab.classList.add('active');
+                }
+            }
+            
+            // 작업표시줄 탭 비활성화 함수 - 특정 창을 비활성 상태로 표시
+            function deactivateTaskbarTab(windowId) {
+                // 지정된 창 ID의 탭을 비활성 상태로 설정
+                const tab = document.querySelector(`.taskbar-tab[data-window-id="${windowId}"]`);
+                if (tab) {
+                    tab.classList.remove('active');
+                }
+            }
+            
+            // 모든 작업표시줄 탭 비활성화 함수 - 모든 창을 비활성 상태로 표시
+            function deactivateAllTaskbarTabs() {
+                // 모든 탭의 활성 상태를 해제
+                document.querySelectorAll('.taskbar-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+            }
+            
+            // 부모 창에서 메시지를 수신하는 이벤트 핸들러
+            // 다른 창(메인 페이지 등)에서 작업표시줄에 명령을 보내는 데 사용됨
+            window.addEventListener('message', (event) => {
+                // 수신된 메시지 데이터
+                const data = event.data;
+                
+                // 메시지 타입에 따라 적절한 함수 호출
+                switch (data.type) {
+                    case TASKBAR_MESSAGE_TYPES.ADD_TAB:
+                        // 새 탭 추가 요청
+                        addTaskbarTab(data.windowId, data.title, data.iconUrl);
+                        break;
+                    case TASKBAR_MESSAGE_TYPES.REMOVE_TAB:
+                        // 탭 제거 요청
+                        removeTaskbarTab(data.windowId);
+                        break;
+                    case TASKBAR_MESSAGE_TYPES.ACTIVATE_TAB:
+                        // 탭 활성화 요청
+                        activateTaskbarTab(data.windowId);
+                        break;
+                    case TASKBAR_MESSAGE_TYPES.DEACTIVATE_TAB:
+                        // 탭 비활성화 요청
+                        deactivateTaskbarTab(data.windowId);
+                        break;
+                    case TASKBAR_MESSAGE_TYPES.DEACTIVATE_ALL_TABS:
+                        // 모든 탭 비활성화 요청
+                        deactivateAllTaskbarTabs();
+                        break;
+                }
+            });
+            
+            // 초기화 - 페이지 로드 시 한 번 실행
+            updateClock();
+            // 이후 1분마다 시계 업데이트
+            setInterval(updateClock, 60000);
+        });
+    </script>
+</body>
+</html>

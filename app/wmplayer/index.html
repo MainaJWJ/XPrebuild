@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ko" style="--icon-mask: url('./xplogo_small.png');">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Windows Media Player</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+
+    <!-- 다이얼로그박스 스크롤 오류 처리를 위한 스타일 -->
+    <style id="wm-dialog-fix-style">
+        app.dialogbox appcontents {
+            overflow-y: auto;
+        }
+
+        /* iframe 내장 시 발생하는 기본 스크롤바 및 여백 제거 */
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+    <!-- 사용자 환경 XP 공통 기반 CSS -->
+    <link class="theme" rel="stylesheet" href="./modules.css">
+    <!-- Windows Media Player 디자인 핵심 WMP8 CSS -->
+    <link id="wmpCSS_instance_wmp-29679" rel="stylesheet" type="text/css" href="./wmp8.css">
+    <!-- 시각화 모듈 추가 -->
+    <script src="./visualizer.js"></script>
+</head>
+
+<body>
+
+    <!-- WMP 애플리케이션 최상위 컨테이너. 창의 좌표와 레이어 결정 -->
+    <app id="wmp-29679" class="wmp" data-window-id="wmp-29679" sized="true"
+        style="border: none !important; background: transparent !important; box-shadow: none !important;">
+
+        <!-- WMP 컨텐츠 실제 영역 -->
+        <appcontents>
+            <div class="iframe-focus-overlay"
+                style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 10; display: none;">
+            </div>
+            <appcontentholder>
+
+
+
+                <!-- 메인 플레이어 디자인 구조 요소 -->
+                <wmpmainframe class="">
+                    <wmpcolorifier>
+                        <div id="miniwindowcontrols">
+                            <div id="mini-minimize">0</div>
+                            <div id="mini-close">r</div>
+                        </div>
+                        <div class="wmpshapeholder" id="topleft">
+                            <div class="wmpshape"></div>
+                        </div>
+                        <div class="shapeshader" id="topleft">
+                            <div class="wmpshape"></div>
+                        </div>
+
+                        <!-- 상단 우측 재생목록 선택 영역 -->
+                        <div class="wmpshapeholder" id="topright">
+                            <div class="wmpshape"></div>
+                            <select class="hasicons" id="playlistselector" title="Current Playlist">
+                                <option id="wmp-currentplaylist-option">Current Playlist</option>
+                            </select>
+                            <div id="windowcontrols">
+                                <div id="minimize">0</div>
+                                <div id="maximize">1</div>
+                                <div id="close">r</div>
+                            </div>
+                        </div>
+                        <div class="shapeshader" id="topright">
+                            <div class="wmpshape"></div>
+                        </div>
+
+                        <div id="topmetal">
+                            <div class="metaledge left"></div>
+                            <fnbutton id="toggleUIFrame" title="Show/Hide Menu Bar and Frame"></fnbutton>
+                            <div class="metaledge right"></div>
+                            <fnbutton id="shuffle" title="Shuffle"></fnbutton>
+                            <fnbutton id="equalizer" title="Equalizer"></fnbutton>
+                            <fnbutton id="playlist" class="active" title="Show/Hide Playlist"></fnbutton>
+                        </div>
+
+                        <div id="tinyblue"></div>
+                        <div id="sidemetal">
+                            <div class="metaledge top"></div>
+                        </div>
+
+                        <!-- 하단 좌측 곡선 장식 -->
+                        <div class="shapeshader" id="bottomleft">
+                            <div class="wmpshape"></div>
+                        </div>
+                        <div class="wmpshapeholder" id="bottomleft">
+                            <div class="wmpshape"></div>
+                        </div>
+
+                        <div class="shapeshader" id="ctrlleft">
+                            <div class="wmpshape"></div>
+                        </div>
+                        <div class="wmpshapeholder" id="ctrlleft">
+                            <div class="wmpshape"></div>
+                        </div>
+                        <div class="shapeshader" id="ctrlmid">
+                            <div class="wmpshape"></div>
+                        </div>
+                        <div class="wmpshapeholder" id="ctrlmid">
+                            <div class="wmpshape"></div>
+                        </div>
+                        <div class="shapeshader" id="ctrlright">
+                            <div class="wmpshape"></div>
+                        </div>
+                        <div class="wmpshapeholder" id="ctrlright">
+                            <div class="wmpshape"></div>
+                        </div>
+
+                        <!-- 좌측 메뉴 패널 (Now Playing, Library 등) -->
+                        <div id="navcollapsed"></div>
+                        <div id="nav" class="hideable">
+                            <div id="nowplaying" class="navitem expands selected">Now Playing<div class="expander">
+                                </div>
+                            </div>
+                            <div id="guide" class="navitem">Media Guide</div>
+                            <div id="rip" class="navitem">Copy from CD</div>
+                            <div id="library" class="navitem">Media Library</div>
+                            <div id="radio" class="navitem">Radio Tuner</div>
+                            <div id="burn" class="navitem">Copy to CD or Device</div>
+                            <div id="skins" class="navitem">Skin Chooser</div>
+                            <div id="premium" class="navitem expands">Premium Services<div class="expander"></div>
+                            </div>
+                            <div id="brand"><img src="./xplogo_small.png"></div>
+                        </div>
+
+                        <!-- 내비게이션 접기/펴기 토글 버튼 -->
+                        <div id="navtoggle" title="Toggle Navigation Pane">
+                            <div id="arrow">&gt;</div>
+                        </div>
+
+                        <div id="lowermetal">
+                            <div class="metaledge left"></div>
+                            <fnbutton id="colorswitch" title="Cycle Color Scheme"></fnbutton>
+                            <fnbutton id="skinmode" title="Switch to Skin Mode (Mini Player)"></fnbutton>
+                        </div>
+
+                        <!-- 우측 하단 사이즈 조절 가이드 -->
+                        <div id="cornermetal">
+                            <div id="wmpresizer"></div>
+                        </div>
+
+                        <wmpcontent>
+                            <div id="playbackcontainer">
+                                <span id="artistname">Microsoft</span>
+                                <span id="songname">Big buck bunny.mp4</span>
+                                <div id="visualizer">
+                                    <canvas id="vis-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+                                </div>
+                                <video id="main-video"
+                                    style="width: 100%; height: 100%; object-fit: contain; display: none; background: #000;"></video>
+                                <iframe id="videoiframe" src="" style="display: none;"></iframe>
+                                <div id="viscontrols">
+                                    <fnbutton id="prevvis" title="Previous Visualization"></fnbutton>
+                                    <fnbutton id="nextvis" title="Next Visualization"></fnbutton>
+                                    <fnbutton id="visgroups" title="Visualization Groups"></fnbutton>
+                                    <span id="visname">Ambience: Water</span>
+                                    <fnbutton id="fullscreen" title="Full Screen"></fnbutton>
+                                </div>
+                            </div>
+
+                            <!-- 플레이리스트 및 곡 목록 루프 -->
+                            <div id="playlistcontainer">
+                                <ul>
+                                    <li data-index="0" data-src="./Big buck bunny.mp4" class="selected">Big buck bunny.mp4</li>
+                                    <li data-index="1" data-src="./campfire.mp4" class="">Camp fire.mp4</li>
+                                    <li data-index="2" data-src="./blueocean.mp4" class="">blueocean.mp4</li>
+                                    <li data-index="3" data-src="./Turkish March.mp3" class="">Turkish March.mp3</li>
+                                    <li data-index="4" data-src="./canon.mp3" class="">canon.mp3</li>
+                                </ul>
+                            </div>
+
+                            <!-- 하단 상태 바 (Playing...) -->
+                            <div id="statusbar"><span id="info">Ready</span></div>
+                        </wmpcontent>
+
+                        <!-- 재생/일시정지/볼륨 컨트롤 영역 -->
+                        <playbackcontrols>
+                            <div id="rewind" title="Rewind (Previous Track)"></div>
+                            <div id="seekbar">
+                                <div id="seekbg"></div>
+                                <div id="seekfill" style="width: 0%;"></div>
+                                <div id="seekpointer" style="left: 0%;"></div>
+                            </div>
+                            <div id="ffwd" title="Fast Forward (Next Track)"></div>
+                            <fnbutton id="playpause" title="Play/Pause">
+                                <buttonbody></buttonbody>
+                            </fnbutton>
+                            <fnbutton id="stop" title="Stop">
+                                <buttonbody></buttonbody>
+                            </fnbutton>
+                            <fnbutton id="prev" title="Previous Track">
+                                <buttonbody></buttonbody>
+                            </fnbutton>
+                            <fnbutton id="next" title="Next Track">
+                                <buttonbody></buttonbody>
+                            </fnbutton>
+                            <fnbutton id="mute" title="Mute/Unmute">
+                                <buttonbody></buttonbody>
+                            </fnbutton>
+                            <div id="volbar">
+                                <div id="volbg"></div>
+                                <div id="volfill" style="width: 70%;"></div>
+                                <div id="volpointer" style="left: 70%;"></div>
+                            </div>
+                        </playbackcontrols>
+
+                        <!-- 진행 시간 텍스트 -->
+                        <div id="progress">00:00</div>
+                    </wmpcolorifier>
+                </wmpmainframe>
+
+                <div id="wmp9brand"><img src="./xplogo_small.png"></div>
+            </appcontentholder>
+        </appcontents>
+    </app>
+
+    <!-- UI 동작 인터랙션 스크립트 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('main-video');
+            const wmpContent = document.querySelector('wmpcontent');
+            const info = document.getElementById('info');
+            const songNameEl = document.getElementById('songname');
+            const progressEl = document.getElementById('progress');
+            const playPauseBtn = document.getElementById('playpause');
+            const muteBtn = document.getElementById('mute');
+            // --- 시각화 엔진 변수 (모듈 사용) ---
+            let audioCtx = null;
+            let analyser = null;
+            let source = null;
+            const canvas = document.getElementById('vis-canvas');
+
+            const initAudioContext = () => {
+                if (audioCtx) return;
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioCtx.createAnalyser();
+                    analyser.fftSize = 256;
+                    source = audioCtx.createMediaElementSource(video);
+                    source.connect(analyser);
+                    analyser.connect(audioCtx.destination);
+                    console.log('WMP: AudioContext Initialized.');
+                } catch (e) {
+                    console.error('WMP: Failed to init AudioContext', e);
+                }
+            };
+
+            // 미디어 재생 통합 함수
+            const playMedia = (mediaSrc, autoPlay = true) => {
+                initAudioContext();
+                console.log('WMP: Playing media:', mediaSrc);
+
+                const finalUrl = mediaSrc;
+                const lowerSrc = finalUrl.toLowerCase();
+                
+                // 오디오 확장자 판단 기준 강화
+                const audioExtensions = ['.mp3', '.wav', '.wma', '.m4a', '.flac', '.aac', '.ogg'];
+                const isAudio = audioExtensions.some(ext => lowerSrc.endsWith(ext));
+
+                video.src = finalUrl;
+                video.load();
+
+                if (isAudio) {
+                    video.style.display = 'none';
+                    document.getElementById('visualizer').style.display = 'block';
+                    wmpContent.classList.remove('videomode');
+                    if (window.wmpVisualizer) window.wmpVisualizer.start(analyser);
+                } else {
+                    // 비디오 모드
+                    video.style.display = 'block';
+                    video.style.position = 'absolute';
+                    video.style.top = '46px';
+                    video.style.left = '3px';
+                    video.style.width = 'calc(100% - 6px)';
+                    video.style.height = 'calc(100% - 70px)';
+                    video.style.zIndex = '5';
+                    document.getElementById('visualizer').style.display = 'none';
+                    wmpContent.classList.add('videomode');
+                    if (window.wmpVisualizer) window.wmpVisualizer.stop();
+                }
+
+                const fileName = finalUrl.split('/').pop();
+                songNameEl.innerText = fileName;
+
+                if (autoPlay) {
+                    video.play().then(() => {
+                        console.log('WMP: Playback started.');
+                        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+                    }).catch(err => {
+                        console.warn('WMP: Playback failed.', err);
+                        info.innerText = 'Ready to play: ' + fileName;
+                    });
+                } else {
+                    info.innerText = 'Ready to play: ' + fileName;
+                }
+            };
+
+            // 시각화 모듈 초기화
+            if (window.wmpVisualizer) {
+                window.wmpVisualizer.init(canvas);
+            }
+
+            // 초기 파일 설정 (자동 재생 안 함)
+            playMedia('./Big buck bunny.mp4', false);
+
+            // 시간 포맷 변환 (초 -> 00:00)
+            const formatTime = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            // 1. 재생/일시정지 기능 연동
+            const updateUIState = () => {
+                if (video.paused) {
+                    playPauseBtn.classList.remove('playing');
+                    info.innerText = 'Paused';
+                } else {
+                    playPauseBtn.classList.add('playing');
+                    info.innerText = 'Playing: ' + songNameEl.innerText;
+
+                    // 재생 시 오디오 컨텍스트 재개 및 시각화 시작
+                    if (audioCtx && audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                    if (window.wmpVisualizer && !wmpContent.classList.contains('videomode')) {
+                        window.wmpVisualizer.start(analyser);
+                    }
+                }
+            };
+
+            if (playPauseBtn) {
+                playPauseBtn.addEventListener('click', () => {
+                    initAudioContext(); // 사용자 클릭 시 초기화
+                    if (video.paused) {
+                        video.play().catch(e => console.warn('Autoplay blocked or no source.'));
+                    } else {
+                        video.pause();
+                    }
+                    updateUIState();
+                });
+            }
+
+            video.addEventListener('play', updateUIState);
+            video.addEventListener('pause', updateUIState);
+
+            // 2. 정지 버튼
+            const stopBtn = document.getElementById('stop');
+            if (stopBtn) {
+                stopBtn.addEventListener('click', () => {
+                    video.pause();
+                    video.currentTime = 0;
+                    updateUIState();
+                    if (window.wmpVisualizer) {
+                        window.wmpVisualizer.stop();
+                    }
+                });
+            }
+
+            // 3. 뮤트 버튼
+            if (muteBtn) {
+                muteBtn.addEventListener('click', () => {
+                    video.muted = !video.muted;
+                    muteBtn.classList.toggle('muted', video.muted);
+                });
+            }
+
+            // 4. 시간 및 탐색바 동기화
+            const seekPointer = document.getElementById('seekpointer');
+            const seekFill = document.getElementById('seekfill');
+
+            video.addEventListener('timeupdate', () => {
+                const perc = (video.currentTime / video.duration) * 100;
+                if (!isNaN(perc)) {
+                    seekPointer.style.left = perc + '%';
+                    seekFill.style.width = perc + '%';
+                }
+                progressEl.innerText = formatTime(video.currentTime);
+            });
+
+            // 5. 탐색바 및 볼륨바 드래그 핸들링
+            const bindBar = (barId, pointerId, fillId, callback) => {
+                const bar = document.getElementById(barId);
+                if (!bar) return;
+                let isDragging = false;
+
+                const updateBar = (e) => {
+                    const rect = bar.getBoundingClientRect();
+                    let perc = ((e.clientX - rect.left) / rect.width) * 100;
+                    perc = Math.max(0, Math.min(100, perc));
+                    const pointer = document.getElementById(pointerId);
+                    const fill = document.getElementById(fillId);
+                    if (pointer) pointer.style.left = perc + '%';
+                    if (fill) fill.style.width = perc + '%';
+                    if (callback) callback(perc);
+                };
+
+                bar.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    updateBar(e);
+                });
+                window.addEventListener('mousemove', (e) => {
+                    if (isDragging) updateBar(e);
+                });
+                window.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+            };
+
+            bindBar('seekbar', 'seekpointer', 'seekfill', (perc) => {
+                if (!isNaN(video.duration)) {
+                    video.currentTime = (perc / 100) * video.duration;
+                }
+            });
+
+            bindBar('volbar', 'volpointer', 'volfill', (perc) => {
+                video.volume = perc / 100;
+            });
+
+
+            // 6. 외부 메시지 수신 (동영상/음악 로드)
+            window.addEventListener('message', (e) => {
+                const data = e.data;
+                const mediaSrc = data.videoUrl || data.source;
+                if (data.type === 'openVideo' && mediaSrc) {
+                    playMedia(mediaSrc);
+                }
+            });
+
+            // 플레이리스트 선택 및 재생
+            const playlistItems = document.querySelectorAll('#playlistcontainer ul li');
+            let currentIndex = 0;
+
+            const updatePlaylistUI = (index) => {
+                playlistItems.forEach((n, i) => {
+                    if (i === index) n.classList.add('selected');
+                    else n.classList.remove('selected');
+                });
+                currentIndex = index;
+            };
+
+            playlistItems.forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    const src = item.getAttribute('data-src');
+                    if (src) {
+                        updatePlaylistUI(index);
+                        playMedia(src);
+                    }
+                });
+            });
+
+            // 이전/다음 곡 버튼 핸들링
+            const playNext = () => {
+                let nextIdx = currentIndex + 1;
+                if (nextIdx >= playlistItems.length) nextIdx = 0;
+                const nextItem = playlistItems[nextIdx];
+                if (nextItem) {
+                    const src = nextItem.getAttribute('data-src');
+                    updatePlaylistUI(nextIdx);
+                    playMedia(src);
+                }
+            };
+
+            const playPrev = () => {
+                let prevIdx = currentIndex - 1;
+                if (prevIdx < 0) prevIdx = playlistItems.length - 1;
+                const prevItem = playlistItems[prevIdx];
+                if (prevItem) {
+                    const src = prevItem.getAttribute('data-src');
+                    updatePlaylistUI(prevIdx);
+                    playMedia(src);
+                }
+            };
+
+            const nextBtn = document.getElementById('next');
+            if (nextBtn) nextBtn.addEventListener('click', playNext);
+            const prevBtn = document.getElementById('prev');
+            if (prevBtn) prevBtn.addEventListener('click', playPrev);
+
+            // Rewind/FFWD 버튼도 동일하게 작동하도록 연결 (WMP 감성)
+            const ffwdBtn = document.getElementById('ffwd');
+            if (ffwdBtn) ffwdBtn.addEventListener('click', playNext);
+            const rewindBtn = document.getElementById('rewind');
+            if (rewindBtn) rewindBtn.addEventListener('click', playPrev);
+
+            // 원본 스프라이트 디자인 (.active) 연동
+            const controlBtns = ['playpause', 'stop', 'prev', 'next', 'mute'];
+            controlBtns.forEach(id => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                btn.addEventListener('mousedown', () => btn.classList.add('active'));
+                const resetVisual = () => btn.classList.remove('active');
+                btn.addEventListener('mouseup', resetVisual);
+                btn.addEventListener('mouseleave', resetVisual);
+            });
+
+            // 창 레이아웃 토글
+            const appWmp = document.querySelector('app.wmp');
+            const navToggle = document.getElementById('navtoggle');
+            if (navToggle && appWmp) {
+                navToggle.addEventListener('click', () => {
+                    appWmp.classList.toggle('collapsed');
+                    navToggle.classList.toggle('collapsed');
+                });
+            }
+
+            const playlistBtn = document.getElementById('playlist');
+            if (playlistBtn && appWmp && wmpContent) {
+                playlistBtn.addEventListener('click', () => {
+                    appWmp.classList.toggle('playlisthidden');
+                    wmpContent.classList.toggle('playlisthidden');
+                    playlistBtn.classList.toggle('active');
+                });
+            }
+
+            const skinModeBtn = document.getElementById('skinmode');
+            const fsBtn = document.getElementById('fullscreen');
+            const appEl = document.querySelector('app.wmp');
+
+            async function toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    try {
+                        if (appEl.requestFullscreen) {
+                            await appEl.requestFullscreen();
+                        } else if (appEl.webkitRequestFullscreen) {
+                            await appEl.webkitRequestFullscreen();
+                        } else if (appEl.msRequestFullscreen) {
+                            await appEl.msRequestFullscreen();
+                        }
+                        appEl.classList.add('fullscreen-video');
+                    } catch (err) {
+                        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+                        // Fallback to just toggling class if API fails
+                        appEl.classList.toggle('fullscreen-video');
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                    appEl.classList.remove('fullscreen-video');
+                }
+            }
+
+            if (fsBtn) {
+                fsBtn.addEventListener('click', toggleFullscreen);
+            }
+
+            // Double click to toggle fullscreen
+            video.addEventListener('dblclick', toggleFullscreen);
+
+            // Sync class state when fullscreen changes (e.g., via Esc key)
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement) {
+                    appEl.classList.remove('fullscreen-video');
+                } else {
+                    appEl.classList.add('fullscreen-video');
+                }
+            });
+
+            // Escape key listener is redundant with fullscreenchange but kept for safety
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && appEl.classList.contains('fullscreen-video')) {
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                    }
+                    appEl.classList.remove('fullscreen-video');
+                }
+            });
+
+            if (skinModeBtn && appWmp) {
+                skinModeBtn.addEventListener('click', () => {
+                    const isMini = appWmp.classList.toggle('miniplayer');
+                    window.parent.postMessage({
+                        type: 'wmplayerToggleSkinMode',
+                        isMiniplayer: isMini
+                    }, '*');
+                });
+            }
+
+            // 창 드래그 및 제어 처리
+            let isDragging = false;
+            appWmp.addEventListener('mousedown', (e) => {
+                if (e.target.closest('fnbutton, #nav, #seekbar, #volbar, #windowcontrols, #playlistcontainer, select, iframe, video')) return;
+                isDragging = true;
+                window.parent.postMessage({ type: 'wmplayerDragStart', x: e.screenX, y: e.screenY }, '*');
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                window.parent.postMessage({ type: 'wmplayerDrag', x: e.screenX, y: e.screenY }, '*');
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    window.parent.postMessage({ type: 'wmplayerDragEnd' }, '*');
+                }
+            });
+
+            // 최소화/닫기/리사이즈
+            const minBtn = document.getElementById('minimize');
+            if (minBtn) minBtn.addEventListener('click', () => window.parent.postMessage({ type: 'wmplayerMinimize' }, '*'));
+            const closeBtn = document.getElementById('close');
+            if (closeBtn) closeBtn.addEventListener('click', () => window.parent.postMessage({ type: 'wmplayerClose' }, '*'));
+            const miniMinBtn = document.getElementById('mini-minimize');
+            if (miniMinBtn) miniMinBtn.addEventListener('click', () => window.parent.postMessage({ type: 'wmplayerMinimize' }, '*'));
+            const miniCloseBtn = document.getElementById('mini-close');
+            if (miniCloseBtn) miniCloseBtn.addEventListener('click', () => window.parent.postMessage({ type: 'wmplayerClose' }, '*'));
+
+            const resizer = document.getElementById('wmpresizer');
+            if (resizer) {
+                let isResizing = false;
+                resizer.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    isResizing = true;
+                    window.parent.postMessage({ type: 'wmplayerResizeStart', x: e.screenX, y: e.screenY }, '*');
+                });
+                window.addEventListener('mousemove', (e) => {
+                    if (!isResizing) return;
+                    window.parent.postMessage({ type: 'wmplayerResize', x: e.screenX, y: e.screenY }, '*');
+                });
+                window.addEventListener('mouseup', () => {
+                    if (isResizing) {
+                        isResizing = false;
+                        window.parent.postMessage({ type: 'wmplayerResizeEnd' }, '*');
+                    }
+                });
+            }
+        });
+
+    </script>
+</body>
+
+</html>
